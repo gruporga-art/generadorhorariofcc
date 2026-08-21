@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Planeador de Horarios Facico | Universidad Veracruzana</title>
+<style>
+  :root {
+    --azul-uv: #18529D;
+    --azul-uv-dark: #0f3a73;
+    --azul-uv-light: #eaf1fb;
+    --verde-uv: #28AD56;
+    --verde-uv-dark: #1d8240;
+    --alerta: #dc2626;
+    --alerta-bg: #fef2f2;
+    --gris-claro: #f5f7fa;
+    --morado-eq: #7c3aed;
+    --morado-eq-bg: #f5f3ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, var(--azul-uv) 0%, var(--verde-uv) 100%);
+    min-height: 100vh;
+    padding: 16px;
+    color: #333;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    overflow: hidden;
+  }
+  header {
+    background: var(--azul-uv);
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 4px solid var(--verde-uv);
+  }
+  header h1 { font-size: 1.3em; margin-bottom: 4px; }
+  header p { opacity: 0.9; font-size: 0.9em; }
+  header .uv-badge {
+    display: inline-block;
+    background: var(--verde-uv);
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.75em;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  header .plan-actual {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    margin-top: 6px;
+  }
+
+  /* --- Pantalla de selección de plan --- */
+  .selector-plan {
+    padding: 32px 20px;
+    text-align: center;
+  }
+  .selector-plan h2 { color: var(--azul-uv); margin-bottom: 6px; font-size: 1.2em; }
+  .selector-plan p.ayuda { color: #64748b; font-size: 0.9em; margin-bottom: 24px; }
+  .tarjetas-plan {
+    display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 640px; margin: 0 auto;
+  }
+  @media (min-width: 640px) { .tarjetas-plan { grid-template-columns: 1fr 1fr; } }
+  .tarjeta-plan {
+    border: 2px solid #e2e8f0; border-radius: 14px; padding: 20px; cursor: pointer;
+    background: #fff; text-align: left; transition: all 0.15s;
+  }
+  .tarjeta-plan:hover { border-color: var(--azul-uv); box-shadow: 0 4px 12px rgba(24,82,157,0.15); }
+  .tarjeta-plan .año { font-size: 1.6em; font-weight: 800; color: var(--azul-uv); }
+  .tarjeta-plan .desc { color: #475569; font-size: 0.88em; margin-top: 8px; line-height: 1.4; }
+  .tarjeta-plan .btn-elegir {
+    margin-top: 14px; width: 100%; padding: 10px; border: none; border-radius: 8px;
+    background: var(--verde-uv); color: #fff; font-weight: 700; cursor: pointer; font-size: 0.9em;
+  }
+  .tarjeta-plan.eq-2025 .btn-elegir { background: var(--azul-uv); }
+
+  /* --- App principal (una sola columna, pensada para móvil primero) --- */
+  .app-principal { padding: 16px 20px 20px; }
+
+  .panel-topbar {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 14px;
+  }
+  .panel-topbar h2 { font-size: 1.1em; color: var(--azul-uv); display: flex; align-items: center; gap: 8px; }
+
+  .btn-cambiar-plan {
+    width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 8px;
+    background: #fff; color: #475569; font-size: 0.8em; cursor: pointer;
+  }
+
+  .btn-cambiar-plan-top {
+    padding: 7px 14px; border: 1px solid #cbd5e0; border-radius: 8px;
+    background: #fff; color: var(--azul-uv); font-size: 0.82em; font-weight: 600; cursor: pointer;
+  }
+
+  .stats-row {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px;
+  }
+  @media (min-width: 640px) { .stats-row { grid-template-columns: repeat(4, 1fr); } }
+  .stat-card {
+    background: #fff; border: 1px solid #e2e8f0; border-left: 4px solid var(--verde-uv); border-radius: 10px;
+    padding: 14px 10px; text-align: center;
+  }
+  .stat-card.con-choques { border-left-color: var(--alerta); background: var(--alerta-bg); }
+  .stat-num { font-size: 1.8em; font-weight: 800; color: var(--azul-uv); line-height: 1; }
+  .stat-card.con-choques .stat-num { color: var(--alerta); }
+  .stat-label { font-size: 0.75em; color: #64748b; margin-top: 4px; }
+
+  .btn-agregar-ee {
+    width: 100%; padding: 14px; margin-bottom: 16px; border: none; border-radius: 10px;
+    background: var(--verde-uv); color: #fff; font-weight: 700; font-size: 1em; cursor: pointer;
+    box-shadow: 0 2px 6px rgba(40,173,86,0.35);
+  }
+  .btn-agregar-ee:active { background: var(--verde-uv-dark); }
+
+  .botonera-inferior { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .botonera-inferior .btn-print, .botonera-inferior .btn-limpiar { margin-top: 0; }
+
+  .ayuda-quitar { font-size: 0.8em; color: #64748b; margin-bottom: 10px; text-align: center; }
+
+  /* --- Modal para agregar Experiencia Educativa --- */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(15,23,42,0.55); z-index: 100;
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  @media (min-width: 640px) { .modal-overlay { align-items: center; } }
+  .modal-contenido {
+    background: var(--gris-claro); width: 100%; max-width: 520px; max-height: 88vh;
+    border-radius: 16px 16px 0 0; padding: 16px 18px 20px; overflow-y: auto;
+    display: flex; flex-direction: column;
+  }
+  @media (min-width: 640px) { .modal-contenido { border-radius: 16px; max-height: 80vh; } }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .modal-header h3 { color: var(--azul-uv); font-size: 1.05em; }
+  .modal-cerrar {
+    border: none; background: #e2e8f0; color: #475569; width: 32px; height: 32px; border-radius: 50%;
+    font-size: 1em; cursor: pointer;
+  }
+  .modal-lista { max-height: none; }
+
+
+  .buscador {
+    width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 8px;
+    font-size: 0.9em; margin-bottom: 10px;
+  }
+
+  .lista-materias { margin-top: 10px; max-height: 400px; overflow-y: auto; }
+  .materia-item {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px;
+    margin-bottom: 10px; font-size: 0.85em; position: relative; border-left: 4px solid var(--verde-uv);
+    transition: transform 0.1s;
+  }
+  .materia-item:active { transform: scale(0.98); }
+  .materia-item.choque { border-left-color: var(--alerta); background: var(--alerta-bg); }
+  .materia-item strong { display: block; color: var(--azul-uv); margin-bottom: 4px; font-size: 1.05em; }
+  .materia-item .meta { color: #475569; display: block; margin-bottom: 2px; }
+  .materia-item .horario-texto { color: var(--verde-uv-dark); font-weight: 600; display: block; margin-top: 6px; font-size: 0.9em; }
+  .materia-item .equivalencia {
+    display: block; margin-top: 8px; padding: 6px 8px; background: var(--morado-eq-bg);
+    color: var(--morado-eq); border-radius: 6px; font-size: 0.82em; border-left: 3px solid var(--morado-eq);
+  }
+
+  .btn-agregar {
+    width: 100%; margin-top: 10px; padding: 8px; background: var(--azul-uv); color: #fff;
+    border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9em;
+  }
+  .btn-agregar:disabled { background: #cbd5e0; cursor: not-allowed; }
+  .btn-eliminar {
+    position: absolute; top: 8px; right: 8px; background: none; border: none;
+    color: var(--alerta); font-size: 1.3em; cursor: pointer; padding: 4px;
+  }
+
+  .alerta-choque {
+    background: var(--alerta-bg); color: var(--alerta); padding: 12px; border-radius: 8px;
+    margin-bottom: 16px; font-size: 0.9em; display: none; border: 1px solid var(--alerta);
+    font-weight: 600;
+  }
+  .alerta-choque.activo { display: block; }
+
+  .horario-container { padding: 20px; overflow-x: auto; }
+  .horario-grid {
+    display: grid;
+    grid-template-columns: 60px repeat(6, 1fr);
+    gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0; min-width: 780px;
+    position: relative;
+  }
+  .grid-header { background: var(--azul-uv); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85em; }
+  .grid-header.sabado { background: var(--azul-uv-dark); }
+  .grid-time { background: var(--gris-claro); display: flex; align-items: center; justify-content: center; font-size: 0.75em; color: #64748b; font-weight: 600; }
+  .grid-cell { background: #fff; position: relative; }
+  .grid-cell.col-sabado { background: #fafcff; }
+
+  .clase-bloque {
+    position: absolute; left: 2px; right: 2px;
+    background: var(--verde-uv); color: #fff; border-radius: 6px; padding: 4px 5px;
+    font-size: 0.62em; line-height: 1.25; display: flex; flex-direction: column; justify-content: center;
+    align-items: center; text-align: center; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10;
+    cursor: pointer; transition: filter 0.1s; word-break: break-word;
+  }
+  .clase-bloque:active { filter: brightness(0.9); }
+  .clase-bloque.choque { background: var(--alerta); animation: pulse 1.5s infinite; }
+  .clase-bloque strong { display: block; font-size: 1.05em; margin-bottom: 1px; width: 100%; white-space: normal; }
+  .clase-bloque .nrc-mini { opacity: 0.9; font-size: 0.92em; }
+  .clase-bloque .quitar-tip { font-size: 0.85em; opacity: 0.85; margin-top: 2px; }
+
+  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+  /* --- Tabla de bloques (modalidad Abierto) --- */
+  .horario-bloques {
+    display: grid;
+    grid-template-columns: 110px repeat(5, 1fr);
+    gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0; min-width: 760px;
+  }
+  .bloque-header { background: var(--morado-eq); color: #fff; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; font-weight: 700; font-size: 0.85em; padding: 8px 4px; text-align: center; }
+  .bloque-header small { font-weight: 400; opacity: 0.85; font-size: 0.85em; margin-top: 2px; }
+  .bloque-turno-label { background: var(--gris-claro); display: flex; align-items: center; justify-content: center;
+    font-size: 0.85em; color: #475569; font-weight: 700; text-align: center; padding: 8px 4px; }
+  .bloque-celda { background: #fff; padding: 6px; min-height: 110px; display: flex; flex-direction: column; gap: 6px; }
+  .bloque-celda.vacia::after { content: '—'; color: #cbd5e0; text-align: center; display: block; margin-top: 8px; }
+  .bloque-tarjeta {
+    background: var(--verde-uv); color: #fff; border-radius: 6px; padding: 6px 8px; font-size: 0.74em;
+    text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; transition: filter 0.1s;
+    line-height: 1.3;
+  }
+  .bloque-tarjeta:active { filter: brightness(0.9); }
+  .bloque-tarjeta.choque { background: var(--alerta); animation: pulse 1.5s infinite; }
+  .bloque-tarjeta strong { display: block; font-size: 1.05em; margin-bottom: 2px; }
+  .bloque-tarjeta .nrc-mini { opacity: 0.9; display: block; }
+  .bloque-tarjeta .quitar-tip { opacity: 0.85; display: block; margin-top: 3px; font-size: 0.9em; }
+  .bloques-sin-asignar {
+    margin-top: 14px; padding: 12px; background: var(--alerta-bg); border: 1px solid var(--alerta);
+    border-radius: 8px; font-size: 0.85em; color: var(--alerta);
+  }
+  .bloques-sin-asignar strong { display: block; margin-bottom: 6px; }
+
+  .btn-limpiar {
+    width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 1em; font-weight: 600;
+    cursor: pointer; margin-top: 16px; background: #ef4444; color: #fff;
+  }
+  .btn-print {
+    width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 1em; font-weight: 600;
+    cursor: pointer; margin-top: 8px; background: #64748b; color: #fff;
+  }
+
+  footer {
+    text-align: center; padding: 16px; background: var(--gris-claro);
+    font-size: 0.8em; color: #64748b; border-top: 3px solid var(--verde-uv);
+  }
+
+  .oculto { display: none !important; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    footer, .btn-limpiar, .btn-print, .btn-cambiar-plan-top, .btn-agregar-ee, .ayuda-quitar,
+    .modal-overlay, .stats-row, .botonera-inferior { display: none !important; }
+    .container { box-shadow: none; max-width: 100%; }
+    .horario-container { overflow: visible; }
+    .horario-grid, .horario-bloques { min-width: 100%; }
+    /* Al imprimir, priorizar legibilidad de los datos sobre el color: sin animación
+       y con más contraste, para que NRC, EE, docente, horario, aula y bloque se
+       alcancen a leer en papel/PDF. */
+    .clase-bloque, .bloque-tarjeta { animation: none !important; box-shadow: none; border: 1px solid rgba(0,0,0,0.25); }
+    .clase-bloque { font-size: 6.5pt; cursor: default; }
+    .bloque-tarjeta { font-size: 8pt; cursor: default; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="uv-badge">UNIVERSIDAD VERACRUZANA</div>
+    <h1>📅 Planeador de Horarios Facico</h1>
+    <p id="subtituloPeriodo">Periodo Agosto 2026 - Enero 2027</p>
+    <div class="plan-actual oculto" id="planActualBadge"></div>
+  </header>
+
+  <!-- Pantalla 1: elegir modalidad -->
+  <div class="selector-plan" id="pantallaSelectorModalidad">
+    <h2>¿En qué modalidad estudias la Licenciatura en Ciencias de la Comunicación?</h2>
+    <p class="ayuda">La Facultad ofrece la Licenciatura en Ciencias de la Comunicación en dos modalidades distintas Escolarizado y Abierto.</p>
+    <div class="tarjetas-plan">
+      <div class="tarjeta-plan eq-2004" onclick="elegirModalidad('escolarizado')">
+        <div class="año" style="font-size:1.2em;">Escolarizado</div>
+        <div class="desc">Clases <strong>de Lunes a Viernes</strong>, en horarios fijos durante todo el periodo.</div>
+        <button class="btn-elegir">Soy de Escolarizado</button>
+      </div>
+      <div class="tarjeta-plan eq-2025" onclick="elegirModalidad('abierto')">
+        <div class="año" style="font-size:1.2em;">Abierto</div>
+        <div class="desc">Clases <strong>los Sábados</strong>, organizadas en bloques matutinos y vespertinos, según el calendario oficial.</div>
+        <button class="btn-elegir">Soy del Abierto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pantalla 2: elegir plan -->
+  <div class="selector-plan oculto" id="pantallaSelectorPlan">
+    <h2>¿A qué plan de estudios perteneces?</h2>
+    <p class="ayuda">Esto determina qué Experiencias Educativas verás disponibles para armar tu horario.</p>
+    <div class="tarjetas-plan">
+      <div class="tarjeta-plan eq-2004" onclick="elegirPlan(2004)">
+        <div class="año">Plan 2004</div>
+        <div class="desc">Si te inscribiste a la Facultad de Ciencias y Técnicas de la Comunicación en <strong>2024 o antes</strong>. Podrás ver, además, la equivalencia de cada Experiencia Educativa en el nuevo Plan 2025.</div>
+        <button class="btn-elegir">Soy de Plan 2004</button>
+      </div>
+      <div class="tarjeta-plan eq-2025" onclick="elegirPlan(2025)">
+        <div class="año">Plan 2025</div>
+        <div class="desc">Si te inscribiste a la Facultad <strong>a partir del 2025</strong>. Verás únicamente las Experiencias Educativas vigentes en el Plan 2025.</div>
+        <button class="btn-elegir">Soy de Plan 2025</button>
+      </div>
+    </div>
+    <button class="btn-cambiar-plan" style="max-width:300px; margin:20px auto 0;" onclick="volverAModalidad()">← Cambiar modalidad</button>
+  </div>
+
+  <!-- Aviso especial para Abierto: bloques y calendario -->
+  <div class="alerta-choque oculto" id="avisoBloques" style="background:var(--morado-eq-bg); color:var(--morado-eq); border-color:var(--morado-eq); margin:0 20px 0;">
+    📌 En modalidad Abierto cada Experiencia Educativa se imparte en un <strong>bloque</strong> (Del 1 a 5, matutino o vespertino) durante <strong>tres sábados </strong>. Consulta las fechas exactas de cada bloque en el
+    <a href="https://www.uv.mx/escolar/calendarios/2026/comunicacion.html" target="_blank" rel="noopener" style="color:var(--morado-eq); font-weight:700;">calendario oficial de la facultad</a>.
+  </div>
+
+  <!-- Pantalla 3: app principal -->
+  <div class="app-principal oculto" id="appPrincipal">
+    <div class="panel-topbar">
+      <h2>📂 Oferta Académica <span id="etiquetaPlanPanel"></span></h2>
+      <button class="btn-cambiar-plan-top" onclick="cambiarPlan()">Cambiar plan</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num" id="statEE">0</div>
+        <div class="stat-label">Experiencias Educativas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statCreditos">0</div>
+        <div class="stat-label">Créditos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statHoras">0</div>
+        <div class="stat-label" id="statHorasLabel">Horas/Semana</div>
+      </div>
+      <div class="stat-card" id="statChoquesCard">
+        <div class="stat-num" id="statChoques">0</div>
+        <div class="stat-label">Choques</div>
+      </div>
+    </div>
+
+    <button class="btn-agregar-ee" onclick="abrirModalOferta()">➕ Agregar Experiencia Educativa</button>
+
+    <div class="horario-container">
+      <p class="ayuda-quitar">👆 Toca una Experiencia Educativa en la cuadrícula para quitarla de tu horario.</p>
+      <div class="horario-grid" id="horarioGrid"></div>
+      <div class="horario-bloques oculto" id="horarioBloques"></div>
+      <div class="bloques-sin-asignar oculto" id="avisoSinBloque"></div>
+    </div>
+
+    <div class="botonera-inferior">
+      <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+      <button class="btn-limpiar" onclick="limpiarTodo()">🗑️ Limpiar Mi Horario</button>
+    </div>
+  </div>
+
+  <!-- Modal: agregar Experiencia Educativa -->
+  <div class="modal-overlay oculto" id="modalOferta" onclick="if(event.target===this) cerrarModalOferta()">
+    <div class="modal-contenido">
+      <div class="modal-header">
+        <h3>➕ Agregar Experiencia Educativa</h3>
+        <button class="modal-cerrar" onclick="cerrarModalOferta()">✕</button>
+      </div>
+
+      <div class="alerta-choque" id="alertaChoque">
+        ⚠️ ¡Choque de horario detectado! Quita una de las Experiencias Educativas marcadas en rojo tocándola en la cuadrícula.
+      </div>
+
+      <input type="text" class="buscador" id="buscador" placeholder="🔎 Buscar por Experiencia Educativa, NRC o docente..." oninput="mostrarOfertaEnLista()">
+
+      <div id="listaOferta" class="lista-materias modal-lista"></div>
+    </div>
+  </div>
+
+  <footer>
+    Facultad de Ciencias y Técnicas de la Comunicación · Universidad Veracruzana · 2026<br>
+    <small>Herramienta de apoyo. Verifica siempre la oferta oficial en la plataforma de la UV.</small>
+  </footer>
+</div>
+
+<script>
+/* ==========================================================================
+   DATOS PRECARGADOS
+   Generados a partir de:
+   - SYRPRAC-CSCO-04-E-CR-202701.xlsx (oferta Plan 2004)
+   - SYRPRAC-CSCO-25-E-CR-202701.xlsx (oferta Plan 2025)
+   - EQUIVALENCIA_2004_-2025.xlsx, hoja "PLAN 2004" (equivalencias 2004 -> 2025)
+   Los estudiantes ya NO necesitan cargar ningún Excel manualmente.
+   ========================================================================== */
+const OFERTA = {"escolarizado":{"2004":[{"nrc":"51656","clave":"FBGT-80004","titulo":"INGLES II","docente":"GLORIA OFELIA  DE SOL REYES-MENDEZ","creditos":6,"horarios":[{"dia":1,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":2,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":3,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":5,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 5-A","edificio":"A-CCEB"}]},{"nrc":"51644","clave":"CSCH-28001","titulo":"GUIONISMO","docente":"ARMANDO  ZAVARIZ-VIDAÑA","creditos":3,"horarios":[{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"B23","edificio":"B-CCEB"},{"dia":2,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"B24","edificio":"B-CCEB"}]},{"nrc":"51583","clave":"CSCG-28001","titulo":"INT. A L0S METODOS DE LAS C.S","docente":"Por asignar","creditos":8,"horarios":[{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":2,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":3,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"34950","clave":"CSCA-28002","titulo":"ECONOMIA Y COMUNICACION","docente":"CLOTILDE INGRID  TADEO-CASTILLO","creditos":6,"horarios":[{"dia":5,"inicio":"11:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 2-A","edificio":"A-CCEB"}]},{"nrc":"64375","clave":"CSCK-28001","titulo":"INT. COMUNICACION PUBLICITARIA","docente":"TERESA DE JESUS  ARROYO-GOPAR MARIA","creditos":6,"horarios":[{"dia":1,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 1-A","edificio":"A-CCEB"}]},{"nrc":"51599","clave":"CSCH-28002","titulo":"TALL. RED: NOTA INF. Y ENTREV.","docente":"SERGIO  LARA-ALBA","creditos":4,"horarios":[{"dia":1,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":3,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 7-A","edificio":"A-CCEB"}]},{"nrc":"51624","clave":"CSCH-28002","titulo":"TALL. RED: NOTA INF. Y ENTREV.","docente":"Por asignar","creditos":4,"horarios":[{"dia":4,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":5,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 7-A","edificio":"A-CCEB"}]},{"nrc":"51611","clave":"CSCH-28002","titulo":"TALL. RED: NOTA INF. Y ENTREV.","docente":"MARIA DE JESUS  ROJAS-ESPINOSA","creditos":4,"horarios":[{"dia":2,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":3,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":1,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 6-A","edificio":"A-CCEB"}]},{"nrc":"51683","clave":"CSCC-28001","titulo":"TEO. ADMON. P/ LA COMUNICACION","docente":"Por asignar","creditos":6,"horarios":[{"dia":2,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":1,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"24633","clave":"FBGT-80005","titulo":"LECTURA Y REDACCION A TRAVES D","docente":"IRMA  GARCIA-LEON","creditos":6,"horarios":[{"dia":1,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"A-1","edificio":"A-CCEB"},{"dia":2,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"A-1","edificio":"A-CCEB"}]},{"nrc":"51613","clave":"CSCB-28001","titulo":"INT. A LA TEORIA DE LA COMUNIC","docente":"JORGE ALEJANDRO  LEON-SANCHEZ","creditos":8,"horarios":[{"dia":1,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":2,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":3,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"51627","clave":"CSCB-28001","titulo":"INT. A LA TEORIA DE LA COMUNIC","docente":"JORGE ALEJANDRO  LEON-SANCHEZ","creditos":8,"horarios":[{"dia":1,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":3,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 35-B","edificio":"B-CCEB"},{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 35-B","edificio":"B-CCEB"}]},{"nrc":"51632","clave":"CSCB-28002","titulo":"PSIC., COMUNICACION E INFORMAC","docente":"SARA  MARTINEZ-RODRIGUEZ","creditos":8,"horarios":[{"dia":1,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":2,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"51646","clave":"CSCB-28002","titulo":"PSIC., COMUNICACION E INFORMAC","docente":"SARA  MARTINEZ-RODRIGUEZ","creditos":8,"horarios":[{"dia":3,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":4,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"51590","clave":"CSCD-28001","titulo":"TALLER DE FOTOGRAFIA I","docente":"LETICIA  NUÑEZ-HERNANDEZ","creditos":6,"horarios":[{"dia":2,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 35-B","edificio":"B-CCEB"},{"dia":5,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 35-B","edificio":"B-CCEB"}]},{"nrc":"51609","clave":"CSCD-28001","titulo":"TALLER DE FOTOGRAFIA I","docente":"HERIBERTO  IGNACIO RAMIREZ-CRUZ","creditos":6,"horarios":[{"dia":1,"inicio":"19:00","fin":"21:00","finMostrar":"20:59","aula":"AULA 7-A","edificio":"A-CCEB"},{"dia":2,"inicio":"19:00","fin":"21:00","finMostrar":"20:59","aula":"AULA 7-A","edificio":"A-CCEB"}]},{"nrc":"42178","clave":"CSCH-28001","titulo":"GUIONISMO","docente":"ALFREDO  REYES-GUTIERREZ","creditos":3,"horarios":[{"dia":4,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":5,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"C1","edificio":"C-CCEB"}]},{"nrc":"51647","clave":"CSCA-28002","titulo":"ECONOMIA Y COMUNICACION","docente":"ALFREDO  REYES-GUTIERREZ","creditos":6,"horarios":[{"dia":3,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":4,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":2,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 6-A","edificio":"A-CCEB"}]},{"nrc":"36822","clave":"CSCA-28003","titulo":"INT. FILOSOFIA DE LA COMUNIC.","docente":"Por asignar","creditos":6,"horarios":[{"dia":1,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":2,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":3,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 5-A","edificio":"A-CCEB"}]},{"nrc":"35307","clave":"CSCG-28001","titulo":"INT. A L0S METODOS DE LAS C.S","docente":"Por asignar","creditos":8,"horarios":[{"dia":3,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":2,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":4,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":5,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 6-A","edificio":"A-CCEB"}]},{"nrc":"51604","clave":"FBGT-80001","titulo":"COMPUTACION BASICA","docente":"JORGE ALEJANDRO  LEON-SANCHEZ","creditos":6,"horarios":[{"dia":4,"inicio":"11:00","fin":"14:00","finMostrar":"13:59","aula":"B24","edificio":"B-CCEB"},{"dia":5,"inicio":"11:00","fin":"14:00","finMostrar":"13:59","aula":"B24","edificio":"B-CCEB"}]},{"nrc":"51615","clave":"FBGT-80001","titulo":"COMPUTACION BASICA","docente":"BEATRIZ EUGENIA  SALAS-PARADA","creditos":6,"horarios":[{"dia":1,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"B24","edificio":"B-CCEB"},{"dia":2,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"B24","edificio":"B-CCEB"},{"dia":3,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"B24","edificio":"B-CCEB"}]},{"nrc":"51606","clave":"CSCE-28001","titulo":"INT. A LA TEORIA DEL LENGUAJE","docente":"FERNANDO  HERIBERTO MENDOZA-NUÑEZ","creditos":8,"horarios":[{"dia":4,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":1,"inicio":"18:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":2,"inicio":"18:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":3,"inicio":"18:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"51689","clave":"CSCI-28001","titulo":"PERIODISMO DE INVESTIGACION","docente":"MIGUEL ANGEL  BARRAGAN-VILLARREAL","creditos":6,"horarios":[{"dia":3,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":4,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 23-B","edificio":"B-CCEB"}]},{"nrc":"51672","clave":"CSCH-28003","titulo":"TALLER DE REDACCION: CRONICA","docente":"ADRIANA  CANALES-ABARCA","creditos":4,"horarios":[{"dia":4,"inicio":"07:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":5,"inicio":"07:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"51631","clave":"CSCH-28004","titulo":"TALLER DE REDACCION: REPORTAJE","docente":"ADRIANA  CANALES-ABARCA","creditos":4,"horarios":[{"dia":2,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":3,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":4,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":5,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 5-A","edificio":"A-CCEB"}]},{"nrc":"33689","clave":"CSCD-28002","titulo":"TALLER DE FOTOGRAFIA II","docente":"JAVIER  CASCO-LOPEZ","creditos":6,"horarios":[{"dia":3,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"C1","edificio":"C-CCEB"},{"dia":4,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"C1","edificio":"C-CCEB"}]},{"nrc":"73094","clave":"CSCE-28003","titulo":"TEORIA DEL LENGUAJE","docente":"JAVIER  CASCO-LOPEZ","creditos":8,"horarios":[{"dia":1,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":2,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 5-A","edificio":"A-CCEB"}]},{"nrc":"51622","clave":"CSCB-28004","titulo":"SOCIOLOGIA DE LA COMUNICACION","docente":"ODILIA  DOMINGUEZ-RAMIREZ","creditos":8,"horarios":[{"dia":1,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":2,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":3,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 8-B","edificio":"B-CCEB"}]},{"nrc":"51691","clave":"CSCK-28004","titulo":"ESTRATEGIA PRODUC. PUBLICIDAD","docente":"FRANCISCO  GONZALEZ-DOMINGUEZ","creditos":5,"horarios":[{"dia":1,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 24-B","edificio":"B-CCEB"},{"dia":2,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 24-B","edificio":"B-CCEB"}]},{"nrc":"51700","clave":"CSCC-28005","titulo":"RELACI. PUBLICAS CORPORATIVAS","docente":"FRANCISCO  GONZALEZ-DOMINGUEZ","creditos":6,"horarios":[{"dia":3,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":2,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"51679","clave":"CSCD-28004","titulo":"TALLER DE HIPERMEDIA I","docente":"FERRER ARTURO  GONZALEZ-LIMA","creditos":5,"horarios":[{"dia":2,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":4,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":5,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 22-B","edificio":"B-CCEB"}]},{"nrc":"51696","clave":"CSCI-28002","titulo":"TALLER DE DISEÑO EDITORIAL","docente":"FERRER ARTURO  GONZALEZ-LIMA","creditos":4,"horarios":[{"dia":1,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":3,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 22-B","edificio":"B-CCEB"}]},{"nrc":"51623","clave":"CSCH-28003","titulo":"TALLER DE REDACCION: CRONICA","docente":"Por asignar","creditos":4,"horarios":[{"dia":3,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":4,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":1,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 9-A","edificio":"A-CCEB"},{"dia":2,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 9-A","edificio":"A-CCEB"}]},{"nrc":"51735","clave":"CSCA-28010","titulo":"SIST. POLITICO MEX Y COMUNICAC","docente":"Por asignar","creditos":8,"horarios":[{"dia":3,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":4,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":1,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":2,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"51726","clave":"CSCA-28010","titulo":"SIST. POLITICO MEX Y COMUNICAC","docente":"SERGIO  LARA-ALBA","creditos":8,"horarios":[{"dia":1,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":3,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"51663","clave":"CSCG-28003","titulo":"TEC. INV. CUANTIT Y CUALITATIV","docente":"Por asignar","creditos":6,"horarios":[{"dia":4,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":5,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 8-B","edificio":"B-CCEB"}]},{"nrc":"51708","clave":"CSCD-28004","titulo":"TALLER DE HIPERMEDIA I","docente":"SERGIO ARTURO  LEON-SANCHEZ","creditos":5,"horarios":[{"dia":5,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":3,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":4,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 22-B","edificio":"B-CCEB"}]},{"nrc":"92764","clave":"CSCI-28002","titulo":"TALLER DE DISEÑO EDITORIAL","docente":"SERGIO ARTURO  LEON-SANCHEZ","creditos":4,"horarios":[{"dia":4,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":5,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 22-B","edificio":"B-CCEB"}]},{"nrc":"51709","clave":"CSCA-28009","titulo":"REGIMEN JURIDICO MEDIOS COMUNI","docente":"CARLOS ENRIQUE  LEVET-RIVERA","creditos":8,"horarios":[{"dia":3,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 36-B","edificio":"B-CCEB"},{"dia":4,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 36-B","edificio":"B-CCEB"}]},{"nrc":"71692","clave":"CSCC-28002","titulo":"COMUNICAC. INTERNA ORGANIZACIO","docente":"RICARDO  PERI-ALARCON","creditos":6,"horarios":[{"dia":1,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"51693","clave":"CSCK-28003","titulo":"DISEÑO Y CREATIVIDAD GRAFICA P","docente":"Por asignar","creditos":6,"horarios":[{"dia":1,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 24-B","edificio":"B-CCEB"},{"dia":2,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 24-B","edificio":"B-CCEB"}]},{"nrc":"58083","clave":"CSCD-28003","titulo":"TALLER DE TELEVISION Y VIDEO I","docente":"JOSE LUIS  ROGEL-MONTALVO","creditos":5,"horarios":[{"dia":5,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":3,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 35-B","edificio":"B-CCEB"},{"dia":4,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 35-B","edificio":"B-CCEB"},{"dia":2,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"C16","edificio":"C-CCEB"}]},{"nrc":"51717","clave":"CSCD-28003","titulo":"TALLER DE TELEVISION Y VIDEO I","docente":"JOSE LUIS  ROGEL-MONTALVO","creditos":5,"horarios":[{"dia":2,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"C16","edificio":"C-CCEB"},{"dia":3,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"C16","edificio":"C-CCEB"},{"dia":4,"inicio":"08:00","fin":"09:00","finMostrar":"08:59","aula":"C16","edificio":"C-CCEB"}]},{"nrc":"51641","clave":"CSCH-28004","titulo":"TALLER DE REDACCION: REPORTAJE","docente":"MARIA DE JESUS  ROJAS-ESPINOSA","creditos":4,"horarios":[{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 24-B","edificio":"B-CCEB"},{"dia":1,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 35-B","edificio":"B-CCEB"},{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 35-B","edificio":"B-CCEB"},{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 35-B","edificio":"B-CCEB"}]},{"nrc":"51673","clave":"CSCE-28002","titulo":"SEMIOTICA GENERAL","docente":"JUAN  SOTO-DEL ANGEL","creditos":8,"horarios":[{"dia":4,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":5,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 36-B","edificio":"B-CCEB"}]},{"nrc":"51654","clave":"CSCE-28002","titulo":"SEMIOTICA GENERAL","docente":"JUAN  SOTO-DEL ANGEL","creditos":8,"horarios":[{"dia":1,"inicio":"17:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":2,"inicio":"17:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":3,"inicio":"17:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":4,"inicio":"17:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"91492","clave":"CSCB-28005","titulo":"TEORIA DE LA COMUNICACION I","docente":"Por asignar","creditos":8,"horarios":[{"dia":2,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":3,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 8-B","edificio":"B-CCEB"}]},{"nrc":"51674","clave":"CSCB-28005","titulo":"TEORIA DE LA COMUNICACION I","docente":"Por asignar","creditos":8,"horarios":[{"dia":4,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":2,"inicio":"17:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":3,"inicio":"17:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 8-B","edificio":"B-CCEB"}]},{"nrc":"51629","clave":"CSCB-28006","titulo":"TEORIA DE LA COMUNICACION II","docente":"JUAN JOSE  DOMINGUEZ-PANAMA","creditos":8,"horarios":[{"dia":4,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 7-A","edificio":"A-CCEB"},{"dia":5,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 7-A","edificio":"A-CCEB"}]},{"nrc":"51685","clave":"CSCJ-28002","titulo":"PLANEAC. Y COMUNICAC. ESTRATEG","docente":"Por asignar","creditos":8,"horarios":[{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":5,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 8-B","edificio":"B-CCEB"}]},{"nrc":"51727","clave":"CSCA-28005","titulo":"ETICA Y COMUNICACION","docente":"JUAN  SOTO-DEL ANGEL","creditos":6,"horarios":[{"dia":1,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":2,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":3,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 2-A","edificio":"A-CCEB"}]},{"nrc":"51712","clave":"CSCA-28005","titulo":"ETICA Y COMUNICACION","docente":"JUAN  SOTO-DEL ANGEL","creditos":6,"horarios":[{"dia":3,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":1,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":2,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"51740","clave":"CSCC-28004","titulo":"PROY. COMUNICAC. Y DESARROLLO","docente":"CLOTILDE INGRID  TADEO-CASTILLO","creditos":5,"horarios":[{"dia":2,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":1,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 8-A","edificio":"A-CCEB"},{"dia":4,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"51658","clave":"CSCB-28003","titulo":"COMUNICACION Y OPINION PUBLICA","docente":"Por asignar","creditos":8,"horarios":[{"dia":1,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":5,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 10-A","edificio":"A-CCEB"}]},{"nrc":"51639","clave":"CSCA-28004","titulo":"CULTURA E IDENTIDAD AMERICA II","docente":"CARLOS ENRIQUE  VILLARREAL-MORALES","creditos":6,"horarios":[{"dia":5,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":3,"inicio":"18:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 8-A","edificio":"A-CCEB"},{"dia":2,"inicio":"18:00","fin":"19:00","finMostrar":"18:59","aula":"C1","edificio":"C-CCEB"}]},{"nrc":"60632","clave":"CSCA-28007","titulo":"HIST. CONTEMPORANEA DE MEXICO","docente":"Por asignar","creditos":5,"horarios":[{"dia":3,"inicio":"09:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 6-A","edificio":"A-CCEB"}]},{"nrc":"84970","clave":"CSCA-28009","titulo":"REGIMEN JURIDICO MEDIOS COMUNI","docente":"HERIBERTO  IGNACIO RAMIREZ-CRUZ","creditos":8,"horarios":[{"dia":1,"inicio":"08:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":2,"inicio":"08:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":3,"inicio":"08:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 8-A","edificio":"A-CCEB"},{"dia":4,"inicio":"08:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"51711","clave":"CSCA-28010","titulo":"SIST. POLITICO MEX Y COMUNICAC","docente":"Por asignar","creditos":8,"horarios":[{"dia":2,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":1,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"51643","clave":"CSCB-28004","titulo":"SOCIOLOGIA DE LA COMUNICACION","docente":"Por asignar","creditos":8,"horarios":[{"dia":5,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":4,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 9-A","edificio":"A-CCEB"}]},{"nrc":"52208","clave":"CSCB-28004","titulo":"SOCIOLOGIA DE LA COMUNICACION","docente":"Por asignar","creditos":8,"horarios":[{"dia":5,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 8-A","edificio":"A-CCEB"},{"dia":4,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"C1","edificio":"C-CCEB"}]},{"nrc":"51650","clave":"CSCB-28006","titulo":"TEORIA DE LA COMUNICACION II","docente":"ALMA SARAI  ROSELLO-LUNA","creditos":8,"horarios":[{"dia":3,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA B8","edificio":"B-CCEB"},{"dia":5,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"51668","clave":"CSCC-28002","titulo":"COMUNICAC. INTERNA ORGANIZACIO","docente":"Por asignar","creditos":6,"horarios":[{"dia":1,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":3,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 5-A","edificio":"A-CCEB"}]},{"nrc":"24997","clave":"CSCC-28003","titulo":"ESTRATEG. COMUNICACION CORPORA","docente":"IBIS MARTHA DEL  PILAR CARBAJAL-OJEDA","creditos":4,"horarios":[{"dia":3,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":4,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 5-A","edificio":"A-CCEB"}]},{"nrc":"51642","clave":"CSCC-28003","titulo":"ESTRATEG. COMUNICACION CORPORA","docente":"IBIS MARTHA DEL  PILAR CARBAJAL-OJEDA","creditos":4,"horarios":[{"dia":1,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":3,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 1-A","edificio":"A-CCEB"}]},{"nrc":"51716","clave":"CSCC-28004","titulo":"PROY. COMUNICAC. Y DESARROLLO","docente":"ANTONIO RAMON  MARIN-CARDIN","creditos":5,"horarios":[{"dia":1,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 8-A","edificio":"A-CCEB"},{"dia":3,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"","edificio":"A-CCEB"}]},{"nrc":"67101","clave":"CSCC-28005","titulo":"RELACI. PUBLICAS CORPORATIVAS","docente":"ANTONIO RAMON  MARIN-CARDIN","creditos":6,"horarios":[{"dia":2,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 7-A","edificio":"A-CCEB"},{"dia":3,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"C3","edificio":"C-CCEB"}]},{"nrc":"51748","clave":"CSCD-28003","titulo":"TALLER DE TELEVISION Y VIDEO I","docente":"SERGIO ARTURO  LEON-SANCHEZ","creditos":5,"horarios":[{"dia":3,"inicio":"15:00","fin":"18:00","finMostrar":"17:59","aula":"B23","edificio":"B-CCEB"},{"dia":4,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"C3","edificio":"C-CCEB"}]},{"nrc":"42170","clave":"CSCE-28003","titulo":"TEORIA DEL LENGUAJE","docente":"ALFREDO  REYES-GUTIERREZ","creditos":8,"horarios":[{"dia":5,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":2,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":3,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":4,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 8-B","edificio":"B-CCEB"}]},{"nrc":"51634","clave":"CSCG-28002","titulo":"INV. CUANTITATIVA Y CUALITATIV","docente":"Por asignar","creditos":8,"horarios":[{"dia":2,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"B36","edificio":"B-CCEB"},{"dia":4,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"B36","edificio":"B-CCEB"}]},{"nrc":"51635","clave":"CSCG-28002","titulo":"INV. CUANTITATIVA Y CUALITATIV","docente":"GENARO  AGUIRRE-AGUILAR","creditos":8,"horarios":[{"dia":1,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 8-A","edificio":"A-CCEB"},{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"67107","clave":"CSCG-28003","titulo":"TEC. INV. CUANTIT Y CUALITATIV","docente":"GENARO  AGUIRRE-AGUILAR","creditos":6,"horarios":[{"dia":1,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":2,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":3,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":4,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"67086","clave":"CSCH-28004","titulo":"TALLER DE REDACCION: REPORTAJE","docente":"GUADALUPE  HORTENCIA MAR-VAZQUEZ","creditos":4,"horarios":[{"dia":2,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 7-A","edificio":"A-CCEB"},{"dia":3,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 7-A","edificio":"A-CCEB"},{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 9-A","edificio":"A-CCEB"},{"dia":1,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"B36","edificio":"B-CCEB"}]},{"nrc":"51701","clave":"CSCI-28001","titulo":"PERIODISMO DE INVESTIGACION","docente":"GUADALUPE  HORTENCIA MAR-VAZQUEZ","creditos":6,"horarios":[{"dia":4,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":5,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":3,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 6-A","edificio":"A-CCEB"}]},{"nrc":"51729","clave":"CSCJ-28001","titulo":"COMUNICAC. DESARROLLO ECONOMIC","docente":"CLOTILDE INGRID  TADEO-CASTILLO","creditos":5,"horarios":[{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 8-A","edificio":"A-CCEB"},{"dia":1,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"B23","edificio":"B-CCEB"},{"dia":2,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"B23","edificio":"B-CCEB"}]},{"nrc":"51669","clave":"CSCJ-28002","titulo":"PLANEAC. Y COMUNICAC. ESTRATEG","docente":"ALMA SARAI  ROSELLO-LUNA","creditos":8,"horarios":[{"dia":2,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":1,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"B36","edificio":"B-CCEB"}]},{"nrc":"51738","clave":"CSCK-28002","titulo":"CAMPAÑAS COMUNICAC. PUBLICITAR","docente":"ALICIA ELENA  URBINA-GONZALEZ","creditos":6,"horarios":[{"dia":4,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":5,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"51682","clave":"CSCK-28003","titulo":"DISEÑO Y CREATIVIDAD GRAFICA P","docente":"Por asignar","creditos":6,"horarios":[{"dia":3,"inicio":"13:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":4,"inicio":"13:00","fin":"15:00","finMostrar":"14:59","aula":"B23","edificio":"B-CCEB"}]},{"nrc":"81902","clave":"CSCK-28004","titulo":"ESTRATEGIA PRODUC. PUBLICIDAD","docente":"FRANCISCO  GONZALEZ-DOMINGUEZ","creditos":5,"horarios":[{"dia":3,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 8-A","edificio":"A-CCEB"},{"dia":4,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"51677","clave":"CSCL-28002","titulo":"REALIZAC. DE PROY. RADIOFONICO","docente":"ALICIA ELENA  URBINA-GONZALEZ","creditos":4,"horarios":[{"dia":3,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"C3","edificio":"C-CCEB"},{"dia":4,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"C3","edificio":"C-CCEB"}]},{"nrc":"51695","clave":"CSCL-28002","titulo":"REALIZAC. DE PROY. RADIOFONICO","docente":"Por asignar","creditos":4,"horarios":[{"dia":1,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":2,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":3,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"C3","edificio":"C-CCEB"},{"dia":4,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"C3","edificio":"C-CCEB"}]},{"nrc":"35174","clave":"CSCM-28001","titulo":"ANALISIS CINEMATOGRAFICO","docente":"ARMANDO  ZAVARIZ-VIDAÑA","creditos":6,"horarios":[{"dia":1,"inicio":"13:00","fin":"15:00","finMostrar":"14:59","aula":"AULA B8","edificio":"B-CCEB"},{"dia":2,"inicio":"13:00","fin":"15:00","finMostrar":"14:59","aula":"B-1","edificio":"B-CCEB"}]},{"nrc":"58027","clave":"CSCM-28001","titulo":"ANALISIS CINEMATOGRAFICO","docente":"DAVID EMILIO  BARQUERO-MARTINEZ","creditos":6,"horarios":[{"dia":4,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":3,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 2-A","edificio":"A-CCEB"}]},{"nrc":"91373","clave":"CSCM-28002","titulo":"ANIMACION DIGITAL","docente":"RENATO  CAPITAINE-GRAJALES","creditos":4,"horarios":[{"dia":1,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"B22","edificio":"B-CCEB"},{"dia":2,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"B22","edificio":"B-CCEB"}]},{"nrc":"89415","clave":"CSCM-28004","titulo":"TALLER DE HIPERMEDIA II","docente":"JUAN ANTONIO  RODRIGUEZ-VINAZA","creditos":5,"horarios":[{"dia":5,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"B22","edificio":"B-CCEB"},{"dia":3,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"B22","edificio":"B-CCEB"},{"dia":4,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"B23","edificio":"B-CCEB"}]},{"nrc":"51719","clave":"CSCM-28005","titulo":"TALLER DE LA COMUNICACION GRAF","docente":"Por asignar","creditos":4,"horarios":[{"dia":3,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"B24","edificio":"B-CCEB"},{"dia":4,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"B24","edificio":"B-CCEB"}]},{"nrc":"51745","clave":"CSCM-28006","titulo":"TALLER DE TELEVISION Y VIDEO I","docente":"LUCIA GUADALUPE  SALCEDO-PUIG","creditos":5,"horarios":[{"dia":4,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":3,"inicio":"17:00","fin":"20:00","finMostrar":"19:59","aula":"AULA 22-B","edificio":"B-CCEB"}]},{"nrc":"52149","clave":"CSCM-28006","titulo":"TALLER DE TELEVISION Y VIDEO I","docente":"CESSIAH  ZAVARIZ-ANDRADE","creditos":5,"horarios":[{"dia":5,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":4,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":3,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"C16","edificio":"C-CCEB"}]},{"nrc":"51723","clave":"CSCN-28001","titulo":"COMPORTAMIENTO ORGANIZACIONAL","docente":"CLAUDIA  VIVEROS-LORENZO","creditos":5,"horarios":[{"dia":4,"inicio":"13:00","fin":"15:00","finMostrar":"14:59","aula":"AULA B8","edificio":"B-CCEB"},{"dia":5,"inicio":"13:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"58072","clave":"CSCN-28001","titulo":"COMPORTAMIENTO ORGANIZACIONAL","docente":"FERNANDO  HERIBERTO MENDOZA-NUÑEZ","creditos":5,"horarios":[{"dia":1,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":2,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 6-A","edificio":"A-CCEB"}]},{"nrc":"68823","clave":"CSCN-28002","titulo":"ECONOMIA DE LA INFORMACION Y G","docente":"Por asignar","creditos":5,"horarios":[{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA B8","edificio":"B-CCEB"},{"dia":5,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"B23","edificio":"B-CCEB"}]},{"nrc":"77267","clave":"CSCN-28003","titulo":"ESTRATEGIAS COMUNICACIONALES P","docente":"MARIA DEL ROCIO  OJEDA-CALLADO","creditos":6,"horarios":[{"dia":2,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA B8","edificio":"B-CCEB"},{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":3,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"B23","edificio":"B-CCEB"}]},{"nrc":"29573","clave":"CSCN-28004","titulo":"MEDIOS DE COMUNICACION INTERNA","docente":"CARLOS EDUARDO  ANAYA-AVILA","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"21:00","aula":"","edificio":"PXA"}]},{"nrc":"89414","clave":"CSCN-28004","titulo":"MEDIOS DE COMUNICACION INTERNA","docente":"CARLOS EDUARDO  ANAYA-AVILA","creditos":6,"horarios":[{"dia":2,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 8-A","edificio":"A-CCEB"},{"dia":1,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"B23","edificio":"B-CCEB"}]},{"nrc":"42166","clave":"CSCN-28005","titulo":"TEORIA Y PRACTICA DE LA ADMINI","docente":"ALFREDO  REYES-GUTIERREZ","creditos":6,"horarios":[{"dia":5,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":2,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":3,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":4,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"51714","clave":"CSCO-80001","titulo":"SERVICIO SOCIAL","docente":"MARIA DE JESUS  ROJAS-ESPINOSA","creditos":12,"horarios":[{"dia":1,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"B35","edificio":"B-CCEB"},{"dia":2,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"B35","edificio":"B-CCEB"}]},{"nrc":"51728","clave":"CSCO-80001","titulo":"SERVICIO SOCIAL","docente":"MARIA DEL PILAR  ANAYA-AVILA","creditos":12,"horarios":[{"dia":2,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":1,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 24-B","edificio":"B-CCEB"}]},{"nrc":"73106","clave":"CSCO-80001","titulo":"SERVICIO SOCIAL","docente":"MARIA DE JESUS  ROJAS-ESPINOSA","creditos":12,"horarios":[{"dia":1,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"CUB-B6","edificio":"B-CCEB"},{"dia":3,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"CUB-B6","edificio":"B-CCEB"},{"dia":2,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"CUB-B6","edificio":"B-CCEB"}]},{"nrc":"51730","clave":"CSCO-80002","titulo":"EXPERIENCIA RECEPCIONAL","docente":"ROSSY LORENA  LAURENCIO-MEZA","creditos":12,"horarios":[{"dia":3,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"AULA B8","edificio":"B-CCEB"},{"dia":4,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"AULA B8","edificio":"B-CCEB"}]},{"nrc":"58062","clave":"CSCO-80002","titulo":"EXPERIENCIA RECEPCIONAL","docente":"ODILIA  DOMINGUEZ-RAMIREZ","creditos":12,"horarios":[{"dia":3,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":1,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":2,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":1,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 7-A","edificio":"A-CCEB"}]},{"nrc":"71679","clave":"CSCP-28001","titulo":"ANALISIS DEL DISCURSO PERIODIS","docente":"JUAN  SOTO-DEL ANGEL","creditos":4,"horarios":[{"dia":1,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":2,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":3,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 9-A","edificio":"A-CCEB"}]},{"nrc":"58043","clave":"CSCP-28002","titulo":"CORRECCION DEL ESTILO EN MEDIO","docente":"ANTONIO RAMON  MARIN-CARDIN","creditos":4,"horarios":[{"dia":4,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 36-B","edificio":"B-CCEB"},{"dia":2,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 36-B","edificio":"B-CCEB"},{"dia":3,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 36-B","edificio":"B-CCEB"}]},{"nrc":"84813","clave":"CSCP-28003","titulo":"DISEÑO EDITORIAL ASISTIDO POR","docente":"CARLOS ENRIQUE  VILLARREAL-MORALES","creditos":4,"horarios":[{"dia":2,"inicio":"19:00","fin":"21:00","finMostrar":"20:59","aula":"B22","edificio":"B-CCEB"},{"dia":3,"inicio":"19:00","fin":"21:00","finMostrar":"20:59","aula":"B22","edificio":"B-CCEB"}]},{"nrc":"51733","clave":"CSCP-28004","titulo":"PERIODISMO DIGITAL","docente":"MARIA DE JESUS  ROJAS-ESPINOSA","creditos":6,"horarios":[{"dia":1,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"B24","edificio":"B-CCEB"},{"dia":4,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"B35","edificio":"B-CCEB"}]},{"nrc":"71800","clave":"CSCP-28005","titulo":"PERIODISMO ESPECIALIZADO","docente":"TERESA DE JESUS  ARROYO-GOPAR MARIA","creditos":6,"horarios":[{"dia":3,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":4,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":1,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 7-A","edificio":"A-CCEB"},{"dia":2,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 7-A","edificio":"A-CCEB"}]}],"2025":[{"nrc":"37760","clave":"BGRT-80004","titulo":"LENGUA II","docente":"GLORIA OFELIA  DE SOL REYES-MENDEZ","creditos":4,"horarios":[{"dia":1,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":2,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":3,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":5,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 5-A","edificio":"A-CCEB"}]},{"nrc":"23856","clave":"CCCD-28002","titulo":"GUIONISMO","docente":"ARMANDO  ZAVARIZ-VIDAÑA","creditos":4,"horarios":[{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"B23","edificio":"B-CCEB"},{"dia":2,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"B24","edificio":"B-CCEB"}]},{"nrc":"19584","clave":"CCNV-28001","titulo":"INVESTIGACION EN EL CAMPO DE L","docente":"Por asignar","creditos":8,"horarios":[{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":2,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":3,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"20554","clave":"CCSC-28002","titulo":"SOCIOECONOMIA DE LA COMUNICACI","docente":"CLOTILDE INGRID  TADEO-CASTILLO","creditos":6,"horarios":[{"dia":5,"inicio":"11:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 2-A","edificio":"A-CCEB"}]},{"nrc":"20130","clave":"CCCR-28001","titulo":"INTRODUCCION A LA COMUNICACION","docente":"TERESA DE JESUS  ARROYO-GOPAR MARIA","creditos":6,"horarios":[{"dia":1,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 1-A","edificio":"A-CCEB"}]},{"nrc":"19482","clave":"CCPR-28001","titulo":"TEXTOS PERIODISTICOS INFORMATI","docente":"SERGIO  LARA-ALBA","creditos":5,"horarios":[{"dia":1,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":3,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 7-A","edificio":"A-CCEB"}]},{"nrc":"19598","clave":"CCPR-28001","titulo":"TEXTOS PERIODISTICOS INFORMATI","docente":"Por asignar","creditos":5,"horarios":[{"dia":4,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":5,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 7-A","edificio":"A-CCEB"}]},{"nrc":"19875","clave":"CCPR-28001","titulo":"TEXTOS PERIODISTICOS INFORMATI","docente":"MARIA DE JESUS  ROJAS-ESPINOSA","creditos":5,"horarios":[{"dia":2,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":3,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":1,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 6-A","edificio":"A-CCEB"}]},{"nrc":"15680","clave":"BGRT-80005","titulo":"LECTURA Y ESCRITURA DE TEXTOS","docente":"IRMA  GARCIA-LEON","creditos":4,"horarios":[{"dia":1,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"A-1","edificio":"A-CCEB"},{"dia":2,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"A-1","edificio":"A-CCEB"}]},{"nrc":"26324","clave":"CCCL-28002","titulo":"GENESIS Y EVOLUCION DE LA COMU","docente":"JORGE ALEJANDRO  LEON-SANCHEZ","creditos":8,"horarios":[{"dia":1,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":2,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":3,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"26335","clave":"CCCL-28002","titulo":"GENESIS Y EVOLUCION DE LA COMU","docente":"JORGE ALEJANDRO  LEON-SANCHEZ","creditos":8,"horarios":[{"dia":1,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 35-B","edificio":"B-CCEB"},{"dia":3,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 35-B","edificio":"B-CCEB"}]},{"nrc":"26552","clave":"CCSC-28004","titulo":"TEORIAS PSICOLOGICAS EN LA COM","docente":"SARA  MARTINEZ-RODRIGUEZ","creditos":8,"horarios":[{"dia":1,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":2,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"26554","clave":"CCSC-28004","titulo":"TEORIAS PSICOLOGICAS EN LA COM","docente":"SARA  MARTINEZ-RODRIGUEZ","creditos":8,"horarios":[{"dia":3,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":4,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"26610","clave":"CCCD-28001","titulo":"FOTOGRAFIA BASICA","docente":"LETICIA  NUÑEZ-HERNANDEZ","creditos":6,"horarios":[{"dia":2,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 35-B","edificio":"B-CCEB"},{"dia":5,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 35-B","edificio":"B-CCEB"}]},{"nrc":"27090","clave":"CCCD-28001","titulo":"FOTOGRAFIA BASICA","docente":"HERIBERTO  IGNACIO RAMIREZ-CRUZ","creditos":6,"horarios":[{"dia":1,"inicio":"19:00","fin":"21:00","finMostrar":"20:59","aula":"AULA 7-A","edificio":"A-CCEB"},{"dia":2,"inicio":"19:00","fin":"21:00","finMostrar":"20:59","aula":"AULA 7-A","edificio":"A-CCEB"}]},{"nrc":"28500","clave":"CCCD-28002","titulo":"GUIONISMO","docente":"ALFREDO  REYES-GUTIERREZ","creditos":4,"horarios":[{"dia":4,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":5,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"C1","edificio":"C-CCEB"}]},{"nrc":"28510","clave":"CCSC-28002","titulo":"SOCIOECONOMIA DE LA COMUNICACI","docente":"ALFREDO  REYES-GUTIERREZ","creditos":6,"horarios":[{"dia":3,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":4,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":2,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 6-A","edificio":"A-CCEB"}]},{"nrc":"28636","clave":"CCSC-28003","titulo":"FILOSOFIA DE LA COMUNICACION","docente":"Por asignar","creditos":6,"horarios":[{"dia":1,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":2,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":3,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 5-A","edificio":"A-CCEB"}]},{"nrc":"28678","clave":"CCNV-28001","titulo":"INVESTIGACION EN EL CAMPO DE L","docente":"Por asignar","creditos":8,"horarios":[{"dia":3,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":2,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":4,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":5,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 6-A","edificio":"A-CCEB"}]},{"nrc":"15251","clave":"BGRT-80001","titulo":"LITERACIDAD DIGITAL","docente":"JORGE ALEJANDRO  LEON-SANCHEZ","creditos":4,"horarios":[{"dia":4,"inicio":"11:00","fin":"14:00","finMostrar":"13:59","aula":"B24","edificio":"B-CCEB"},{"dia":5,"inicio":"11:00","fin":"14:00","finMostrar":"13:59","aula":"B24","edificio":"B-CCEB"}]},{"nrc":"15503","clave":"BGRT-80001","titulo":"LITERACIDAD DIGITAL","docente":"BEATRIZ EUGENIA  SALAS-PARADA","creditos":4,"horarios":[{"dia":1,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"B24","edificio":"B-CCEB"},{"dia":2,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"B24","edificio":"B-CCEB"},{"dia":3,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"B24","edificio":"B-CCEB"}]},{"nrc":"15569","clave":"BGRT-80002","titulo":"PENSAMIENTO CRITICO PARA LA","docente":"ALMA SARAI  ROSELLO-LUNA","creditos":4,"horarios":[{"dia":1,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":4,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 2-A","edificio":"A-CCEB"}]},{"nrc":"15571","clave":"BGRT-80002","titulo":"PENSAMIENTO CRITICO PARA LA","docente":"ALMA SARAI  ROSELLO-LUNA","creditos":4,"horarios":[{"dia":3,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":5,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"15558","clave":"BGRT-80003","titulo":"LENGUA I","docente":"ALICIA MARCELA  RENDON-CASTRO","creditos":4,"horarios":[{"dia":1,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":2,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":3,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"27003","clave":"BGRT-80005","titulo":"LECTURA Y ESCRITURA DE TEXTOS","docente":"RICARDO  PERI-ALARCON","creditos":4,"horarios":[{"dia":4,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"AULA 24-B","edificio":"B-CCEB"},{"dia":5,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 24-B","edificio":"B-CCEB"}]},{"nrc":"19532","clave":"CCCD-28001","titulo":"FOTOGRAFIA BASICA","docente":"HERIBERTO  IGNACIO RAMIREZ-CRUZ","creditos":6,"horarios":[{"dia":2,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 7-A","edificio":"A-CCEB"},{"dia":3,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 7-A","edificio":"A-CCEB"}]},{"nrc":"19632","clave":"CCCD-28001","titulo":"FOTOGRAFIA BASICA","docente":"Por asignar","creditos":6,"horarios":[{"dia":3,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":4,"inicio":"13:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 6-A","edificio":"A-CCEB"}]},{"nrc":"19644","clave":"CCCD-28001","titulo":"FOTOGRAFIA BASICA","docente":"Por asignar","creditos":6,"horarios":[{"dia":5,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 9-A","edificio":"A-CCEB"},{"dia":1,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 9-A","edificio":"A-CCEB"}]},{"nrc":"19858","clave":"CCCD-28001","titulo":"FOTOGRAFIA BASICA","docente":"JAVIER  CASCO-LOPEZ","creditos":6,"horarios":[{"dia":1,"inicio":"13:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 9-A","edificio":"A-CCEB"},{"dia":4,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 9-A","edificio":"A-CCEB"}]},{"nrc":"19969","clave":"CCCD-28001","titulo":"FOTOGRAFIA BASICA","docente":"LETICIA  NUÑEZ-HERNANDEZ","creditos":6,"horarios":[{"dia":5,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":4,"inicio":"13:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"20167","clave":"CCCD-28001","titulo":"FOTOGRAFIA BASICA","docente":"LETICIA  NUÑEZ-HERNANDEZ","creditos":6,"horarios":[{"dia":3,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":1,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 7-A","edificio":"A-CCEB"}]},{"nrc":"20536","clave":"CCCD-28001","titulo":"FOTOGRAFIA BASICA","docente":"HERIBERTO  IGNACIO RAMIREZ-CRUZ","creditos":6,"horarios":[{"dia":3,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"B35","edificio":"B-CCEB"},{"dia":1,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"B35","edificio":"B-CCEB"}]},{"nrc":"23849","clave":"CCCD-28002","titulo":"GUIONISMO","docente":"CESSIAH  ZAVARIZ-ANDRADE","creditos":4,"horarios":[{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 9-A","edificio":"A-CCEB"},{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"B23","edificio":"B-CCEB"},{"dia":5,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"B23","edificio":"B-CCEB"}]},{"nrc":"23859","clave":"CCCD-28002","titulo":"GUIONISMO","docente":"Por asignar","creditos":4,"horarios":[{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 36-B","edificio":"B-CCEB"},{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 36-B","edificio":"B-CCEB"},{"dia":5,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"B23","edificio":"B-CCEB"}]},{"nrc":"23677","clave":"CCCD-28003","titulo":"FUNDAMENTOS DE LA PRODUCCION S","docente":"ALICIA ELENA  URBINA-GONZALEZ","creditos":5,"horarios":[{"dia":3,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"C1","edificio":"C-CCEB"},{"dia":2,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"C3","edificio":"C-CCEB"}]},{"nrc":"23718","clave":"CCCD-28003","titulo":"FUNDAMENTOS DE LA PRODUCCION S","docente":"ALICIA ELENA  URBINA-GONZALEZ","creditos":5,"horarios":[{"dia":3,"inicio":"13:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 3-C","edificio":"C-CCEB"},{"dia":4,"inicio":"13:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 3-C","edificio":"C-CCEB"}]},{"nrc":"19451","clave":"CCCL-28001","titulo":"TEORIA DEL LENGUAJE","docente":"JAVIER  CASCO-LOPEZ","creditos":8,"horarios":[{"dia":1,"inicio":"07:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":2,"inicio":"07:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 1-A","edificio":"A-CCEB"}]},{"nrc":"19660","clave":"CCCL-28001","titulo":"TEORIA DEL LENGUAJE","docente":"CARLOS ENRIQUE  VILLARREAL-MORALES","creditos":8,"horarios":[{"dia":2,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":3,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 1-A","edificio":"A-CCEB"}]},{"nrc":"20002","clave":"CCCL-28001","titulo":"TEORIA DEL LENGUAJE","docente":"JAVIER  CASCO-LOPEZ","creditos":8,"horarios":[{"dia":3,"inicio":"07:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":4,"inicio":"07:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 1-A","edificio":"A-CCEB"}]},{"nrc":"19642","clave":"CCCL-28002","titulo":"GENESIS Y EVOLUCION DE LA COMU","docente":"ARMANDO  ZAVARIZ-VIDAÑA","creditos":8,"horarios":[{"dia":1,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":2,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":3,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":4,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 2-A","edificio":"A-CCEB"}]},{"nrc":"19891","clave":"CCCL-28002","titulo":"GENESIS Y EVOLUCION DE LA COMU","docente":"ODILIA  DOMINGUEZ-RAMIREZ","creditos":8,"horarios":[{"dia":5,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":1,"inicio":"08:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 8-A","edificio":"A-CCEB"},{"dia":2,"inicio":"08:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"20357","clave":"CCCR-28001","titulo":"INTRODUCCION A LA COMUNICACION","docente":"ANTONIO RAMON  MARIN-CARDIN","creditos":6,"horarios":[{"dia":1,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 8-A","edificio":"A-CCEB"},{"dia":2,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"","edificio":"A-CCEB"}]},{"nrc":"46673","clave":"CCCR-28001","titulo":"INTRODUCCION A LA COMUNICACION","docente":"TERESA DE JESUS  ARROYO-GOPAR MARIA","creditos":6,"horarios":[{"dia":4,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":1,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":2,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 8-A","edificio":"A-CCEB"},{"dia":3,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 9-A","edificio":"A-CCEB"}]},{"nrc":"18796","clave":"CCNV-28001","titulo":"INVESTIGACION EN EL CAMPO DE L","docente":"Por asignar","creditos":8,"horarios":[{"dia":5,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":4,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":1,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 5-A","edificio":"A-CCEB"}]},{"nrc":"18964","clave":"CCNV-28001","titulo":"INVESTIGACION EN EL CAMPO DE L","docente":"GENARO  AGUIRRE-AGUILAR","creditos":8,"horarios":[{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":1,"inicio":"08:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":2,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":3,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 36-B","edificio":"B-CCEB"}]},{"nrc":"19963","clave":"CCNV-28001","titulo":"INVESTIGACION EN EL CAMPO DE L","docente":"ARACELI  BAIZABAL-ANDRADE","creditos":8,"horarios":[{"dia":2,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":3,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"19670","clave":"CCPR-28001","titulo":"TEXTOS PERIODISTICOS INFORMATI","docente":"ADRIANA  CANALES-ABARCA","creditos":5,"horarios":[{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":5,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"19895","clave":"CCPR-28001","titulo":"TEXTOS PERIODISTICOS INFORMATI","docente":"TERESA DE JESUS  ARROYO-GOPAR MARIA","creditos":5,"horarios":[{"dia":1,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":2,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":3,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 1-A","edificio":"A-CCEB"}]},{"nrc":"20094","clave":"CCPR-28001","titulo":"TEXTOS PERIODISTICOS INFORMATI","docente":"MARIA DE JESUS  ROJAS-ESPINOSA","creditos":5,"horarios":[{"dia":1,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 7-A","edificio":"A-CCEB"},{"dia":2,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"B24","edificio":"B-CCEB"},{"dia":3,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"B24","edificio":"B-CCEB"},{"dia":4,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"B24","edificio":"B-CCEB"}]},{"nrc":"20307","clave":"CCPR-28001","titulo":"TEXTOS PERIODISTICOS INFORMATI","docente":"ADRIANA  CANALES-ABARCA","creditos":5,"horarios":[{"dia":2,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":3,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":5,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"20568","clave":"CCPR-28001","titulo":"TEXTOS PERIODISTICOS INFORMATI","docente":"FIDEL  PEREZ-SANCHEZ","creditos":5,"horarios":[{"dia":3,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"B35","edificio":"B-CCEB"},{"dia":4,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"B35","edificio":"B-CCEB"}]},{"nrc":"19515","clave":"CCSC-28001","titulo":"ESTUDIOS CULTURALES LATINOAMER","docente":"Por asignar","creditos":6,"horarios":[{"dia":1,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":2,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":3,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 2-A","edificio":"A-CCEB"}]},{"nrc":"19887","clave":"CCSC-28001","titulo":"ESTUDIOS CULTURALES LATINOAMER","docente":"CARLOS ENRIQUE  VILLARREAL-MORALES","creditos":6,"horarios":[{"dia":5,"inicio":"12:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"20261","clave":"CCSC-28001","titulo":"ESTUDIOS CULTURALES LATINOAMER","docente":"Por asignar","creditos":6,"horarios":[{"dia":1,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":4,"inicio":"17:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"39632","clave":"CCSC-28001","titulo":"ESTUDIOS CULTURALES LATINOAMER","docente":"Por asignar","creditos":6,"horarios":[{"dia":2,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":1,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":3,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"19939","clave":"CCSC-28002","titulo":"SOCIOECONOMIA DE LA COMUNICACI","docente":"CLOTILDE INGRID  TADEO-CASTILLO","creditos":6,"horarios":[{"dia":1,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 5-A","edificio":"A-CCEB"}]},{"nrc":"23672","clave":"CCSC-28002","titulo":"SOCIOECONOMIA DE LA COMUNICACI","docente":"ALFREDO  REYES-GUTIERREZ","creditos":6,"horarios":[{"dia":2,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":3,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":4,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 2-A","edificio":"A-CCEB"}]},{"nrc":"28742","clave":"CCSC-28002","titulo":"SOCIOECONOMIA DE LA COMUNICACI","docente":"Por asignar","creditos":6,"horarios":[{"dia":5,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":3,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":4,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 2-A","edificio":"A-CCEB"}]},{"nrc":"19572","clave":"CCSC-28003","titulo":"FILOSOFIA DE LA COMUNICACION","docente":"JUAN  SOTO-DEL ANGEL","creditos":6,"horarios":[{"dia":2,"inicio":"18:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":3,"inicio":"18:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":4,"inicio":"18:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 1-A","edificio":"A-CCEB"}]},{"nrc":"19665","clave":"CCSC-28003","titulo":"FILOSOFIA DE LA COMUNICACION","docente":"SERGIO  LARA-ALBA","creditos":6,"horarios":[{"dia":4,"inicio":"08:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":5,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"19926","clave":"CCSC-28003","titulo":"FILOSOFIA DE LA COMUNICACION","docente":"JUAN  SOTO-DEL ANGEL","creditos":6,"horarios":[{"dia":2,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":3,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":4,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 1-A","edificio":"A-CCEB"}]},{"nrc":"20175","clave":"CCSC-28003","titulo":"FILOSOFIA DE LA COMUNICACION","docente":"JUAN  SOTO-DEL ANGEL","creditos":6,"horarios":[{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":5,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 2-A","edificio":"A-CCEB"}]},{"nrc":"19579","clave":"CCSC-28004","titulo":"TEORIAS PSICOLOGICAS EN LA COM","docente":"ELSA MERCEDES  SOLIS-CARRANZA","creditos":8,"horarios":[{"dia":4,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":5,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 1-A","edificio":"A-CCEB"}]},{"nrc":"20148","clave":"CCSC-28004","titulo":"TEORIAS PSICOLOGICAS EN LA COM","docente":"ELSA MERCEDES  SOLIS-CARRANZA","creditos":8,"horarios":[{"dia":2,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"AULA B8","edificio":"B-CCEB"},{"dia":3,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"29011","clave":"CCCR-28002","titulo":"TEORIAS ADMINISTRATICAS PARA L","docente":"IBIS MARTHA DEL  PILAR CARBAJAL-OJEDA","creditos":6,"horarios":[{"dia":2,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":1,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"21866","clave":"CCPR-28004","titulo":"PERIODISMO DE INVESTIGACION","docente":"MIGUEL ANGEL  BARRAGAN-VILLARREAL","creditos":6,"horarios":[{"dia":3,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":4,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 23-B","edificio":"B-CCEB"}]},{"nrc":"24076","clave":"CCPR-28002","titulo":"PERIODISMO NARRATIVO MULTIMEDI","docente":"ADRIANA  CANALES-ABARCA","creditos":4,"horarios":[{"dia":4,"inicio":"07:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":5,"inicio":"07:00","fin":"09:00","finMostrar":"08:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"24129","clave":"CCPR-28003","titulo":"PERIODISMO INTERPRETATIVO MULT","docente":"ADRIANA  CANALES-ABARCA","creditos":4,"horarios":[{"dia":2,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":3,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":4,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":5,"inicio":"12:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 5-A","edificio":"A-CCEB"}]},{"nrc":"24155","clave":"CCCD-28004","titulo":"FOTOGRAFIA ESPECIALIZADA","docente":"JAVIER  CASCO-LOPEZ","creditos":4,"horarios":[{"dia":3,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"C1","edificio":"C-CCEB"},{"dia":4,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"C1","edificio":"C-CCEB"}]},{"nrc":"24208","clave":"CCCL-28006","titulo":"DISCURSO Y PODER","docente":"JAVIER  CASCO-LOPEZ","creditos":6,"horarios":[{"dia":1,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":2,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 5-A","edificio":"A-CCEB"}]},{"nrc":"24212","clave":"CCSC-28012","titulo":"TENDENCIAS SOCIOLOGICAS DE LA","docente":"ODILIA  DOMINGUEZ-RAMIREZ","creditos":8,"horarios":[{"dia":1,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":2,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":3,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":4,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 8-B","edificio":"B-CCEB"}]},{"nrc":"24703","clave":"CCCR-28008","titulo":"ESTRATEGIAS DE COMUNICACION PO","docente":"FRANCISCO  GONZALEZ-DOMINGUEZ","creditos":5,"horarios":[{"dia":1,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 24-B","edificio":"B-CCEB"},{"dia":2,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 24-B","edificio":"B-CCEB"}]},{"nrc":"25036","clave":"CCCR-28006","titulo":"RELACIONES PUBLICAS APLICADAS","docente":"FRANCISCO  GONZALEZ-DOMINGUEZ","creditos":6,"horarios":[{"dia":3,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":2,"inicio":"18:00","fin":"20:00","finMostrar":"19:59","aula":"AULA 8-A","edificio":"A-CCEB"}]},{"nrc":"25592","clave":"CCCD-28006","titulo":"HIPERMEDIA","docente":"FERRER ARTURO  GONZALEZ-LIMA","creditos":6,"horarios":[{"dia":5,"inicio":"09:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":2,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":4,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 22-B","edificio":"B-CCEB"}]},{"nrc":"25593","clave":"CCPR-28005","titulo":"DISEÑO Y PRODUCCION EDITORIAL","docente":"FERRER ARTURO  GONZALEZ-LIMA","creditos":5,"horarios":[{"dia":1,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":3,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 22-B","edificio":"B-CCEB"}]},{"nrc":"26185","clave":"CCPR-28002","titulo":"PERIODISMO NARRATIVO MULTIMEDI","docente":"Por asignar","creditos":4,"horarios":[{"dia":3,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":4,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 6-A","edificio":"A-CCEB"},{"dia":1,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 9-A","edificio":"A-CCEB"},{"dia":2,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 9-A","edificio":"A-CCEB"}]},{"nrc":"26235","clave":"CCSC-28010","titulo":"ESTADO Y SOCIEDAD","docente":"Por asignar","creditos":8,"horarios":[{"dia":3,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":4,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":1,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":2,"inicio":"14:00","fin":"15:00","finMostrar":"14:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"26242","clave":"CCSC-28010","titulo":"ESTADO Y SOCIEDAD","docente":"SERGIO  LARA-ALBA","creditos":8,"horarios":[{"dia":1,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":3,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"26303","clave":"CCNV-28003","titulo":"LABORATORIO DE INVESTIGACION E","docente":"Por asignar","creditos":6,"horarios":[{"dia":4,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":5,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 8-B","edificio":"B-CCEB"}]},{"nrc":"26362","clave":"CCCD-28006","titulo":"HIPERMEDIA","docente":"SERGIO ARTURO  LEON-SANCHEZ","creditos":6,"horarios":[{"dia":3,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":4,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":5,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 22-B","edificio":"B-CCEB"}]},{"nrc":"26521","clave":"CCPR-28005","titulo":"DISEÑO Y PRODUCCION EDITORIAL","docente":"SERGIO ARTURO  LEON-SANCHEZ","creditos":5,"horarios":[{"dia":4,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 22-B","edificio":"B-CCEB"},{"dia":5,"inicio":"14:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 22-B","edificio":"B-CCEB"}]},{"nrc":"26541","clave":"CCSC-28009","titulo":"MARCO LEGAL DE LA COMUNICACION","docente":"CARLOS ENRIQUE  LEVET-RIVERA","creditos":8,"horarios":[{"dia":3,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 36-B","edificio":"B-CCEB"},{"dia":4,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 36-B","edificio":"B-CCEB"}]},{"nrc":"27076","clave":"CCCR-28005","titulo":"ENDOMARKETING","docente":"RICARDO  PERI-ALARCON","creditos":6,"horarios":[{"dia":1,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"27080","clave":"CCCR-28009","titulo":"DISEÑO CREATIVO DE MENSAJES PU","docente":"Por asignar","creditos":5,"horarios":[{"dia":1,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 24-B","edificio":"B-CCEB"},{"dia":2,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 24-B","edificio":"B-CCEB"}]},{"nrc":"27337","clave":"CCCD-28005","titulo":"PRINCIPIOS DE LA PRODUCCION AU","docente":"JOSE LUIS  ROGEL-MONTALVO","creditos":6,"horarios":[{"dia":5,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":3,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 35-B","edificio":"B-CCEB"},{"dia":4,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 35-B","edificio":"B-CCEB"},{"dia":2,"inicio":"11:00","fin":"12:00","finMostrar":"11:59","aula":"C16","edificio":"C-CCEB"}]},{"nrc":"27339","clave":"CCCD-28005","titulo":"PRINCIPIOS DE LA PRODUCCION AU","docente":"JOSE LUIS  ROGEL-MONTALVO","creditos":6,"horarios":[{"dia":2,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"C16","edificio":"C-CCEB"},{"dia":3,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"C16","edificio":"C-CCEB"},{"dia":4,"inicio":"08:00","fin":"09:00","finMostrar":"08:59","aula":"C16","edificio":"C-CCEB"}]},{"nrc":"27636","clave":"CCPR-28003","titulo":"PERIODISMO INTERPRETATIVO MULT","docente":"MARIA DE JESUS  ROJAS-ESPINOSA","creditos":4,"horarios":[{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 24-B","edificio":"B-CCEB"},{"dia":1,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 35-B","edificio":"B-CCEB"},{"dia":2,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 35-B","edificio":"B-CCEB"},{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 35-B","edificio":"B-CCEB"}]},{"nrc":"27788","clave":"CCCL-28005","titulo":"SEMIOTICA SOCIAL","docente":"JUAN  SOTO-DEL ANGEL","creditos":6,"horarios":[{"dia":4,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":5,"inicio":"11:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 36-B","edificio":"B-CCEB"}]},{"nrc":"27800","clave":"CCCL-28005","titulo":"SEMIOTICA SOCIAL","docente":"JUAN  SOTO-DEL ANGEL","creditos":6,"horarios":[{"dia":1,"inicio":"17:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":2,"inicio":"17:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":3,"inicio":"17:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":4,"inicio":"17:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 3-A","edificio":"A-CCEB"}]},{"nrc":"27854","clave":"CCCL-28003","titulo":"TEORIAS CLASICAS DE LA COMUNIC","docente":"Por asignar","creditos":8,"horarios":[{"dia":2,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":3,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 8-B","edificio":"B-CCEB"}]},{"nrc":"27877","clave":"CCCL-28003","titulo":"TEORIAS CLASICAS DE LA COMUNIC","docente":"Por asignar","creditos":8,"horarios":[{"dia":2,"inicio":"17:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":3,"inicio":"17:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":4,"inicio":"16:00","fin":"18:00","finMostrar":"17:59","aula":"AULA 8-B","edificio":"B-CCEB"}]},{"nrc":"27924","clave":"CCCL-28008","titulo":"ESTUDIOS CONTEMPORANEOS DE LA","docente":"JUAN JOSE  DOMINGUEZ-PANAMA","creditos":8,"horarios":[{"dia":4,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 7-A","edificio":"A-CCEB"},{"dia":5,"inicio":"12:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 7-A","edificio":"A-CCEB"}]},{"nrc":"27947","clave":"CCCR-28007","titulo":"COMUNICACION PARA EL DESARROLL","docente":"Por asignar","creditos":5,"horarios":[{"dia":5,"inicio":"10:00","fin":"12:00","finMostrar":"11:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":3,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 8-B","edificio":"B-CCEB"},{"dia":4,"inicio":"10:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 8-B","edificio":"B-CCEB"}]},{"nrc":"28013","clave":"CCSC-28005","titulo":"ETICA Y COMUNICACION","docente":"JUAN  SOTO-DEL ANGEL","creditos":6,"horarios":[{"dia":1,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":2,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":3,"inicio":"16:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 2-A","edificio":"A-CCEB"}]},{"nrc":"28016","clave":"CCSC-28005","titulo":"ETICA Y COMUNICACION","docente":"JUAN  SOTO-DEL ANGEL","creditos":6,"horarios":[{"dia":3,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":1,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 4-A","edificio":"A-CCEB"},{"dia":2,"inicio":"15:00","fin":"16:00","finMostrar":"15:59","aula":"AULA 4-A","edificio":"A-CCEB"}]},{"nrc":"28693","clave":"CCSC-28011","titulo":"OPINION PUBLICA","docente":"Por asignar","creditos":8,"horarios":[{"dia":1,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":5,"inicio":"09:00","fin":"11:00","finMostrar":"10:59","aula":"AULA 10-A","edificio":"A-CCEB"}]},{"nrc":"19645","clave":"CCCR-28002","titulo":"TEORIAS ADMINISTRATIVAS PARA L","docente":"JOSE LUIS  ROGEL-MONTALVO","creditos":6,"horarios":[{"dia":3,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":4,"inicio":"15:00","fin":"17:00","finMostrar":"16:59","aula":"AULA 23-B","edificio":"B-CCEB"}]},{"nrc":"27068","clave":"CCCR-28004","titulo":"COMUNICACION CORPORATIVA","docente":"RICARDO  PERI-ALARCON","creditos":5,"horarios":[{"dia":1,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 10-A","edificio":"A-CCEB"},{"dia":2,"inicio":"17:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 10-A","edificio":"A-CCEB"}]},{"nrc":"23404","clave":"CCPR-28003","titulo":"PERIODISMO INTERPRETATIVO MULT","docente":"ADRIANA  CANALES-ABARCA","creditos":4,"horarios":[{"dia":2,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":3,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 3-A","edificio":"A-CCEB"},{"dia":4,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 5-A","edificio":"A-CCEB"},{"dia":5,"inicio":"13:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 5-A","edificio":"A-CCEB"}]},{"nrc":"21858","clave":"CCPR-28004","titulo":"PERIODISMO DE INVESTIGACION","docente":"MIGUEL ANGEL  BARRAGAN-VILLARREAL","creditos":6,"horarios":[{"dia":3,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 23-B","edificio":"B-CCEB"},{"dia":4,"inicio":"08:00","fin":"10:00","finMostrar":"09:59","aula":"AULA 23-B","edificio":"B-CCEB"}]},{"nrc":"21855","clave":"CCSC-28005","titulo":"ETICA Y COMUNICACION","docente":"MIGUEL ANGEL  BARRAGAN-VILLARREAL","creditos":6,"horarios":[{"dia":1,"inicio":"18:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 1-A","edificio":"A-CCEB"},{"dia":2,"inicio":"18:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 2-A","edificio":"A-CCEB"},{"dia":3,"inicio":"18:00","fin":"19:00","finMostrar":"18:59","aula":"AULA 6-A","edificio":"A-CCEB"}]}]},"abierto":{"2004":[{"nrc":"85099","clave":"CSCA-28001","titulo":"CULTURA E IDENTIDAD AMERICA I","docente":"JAVIER  RAMIREZ-CARRILLO","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"20:00","finMostrar":"19:59","aula":"","edificio":"PXA","bloque":4,"turno":"Vespertino"}]},{"nrc":"64851","clave":"CSCL-28001","titulo":"FUNDAMENTOS MEDIO RADIOFONICO","docente":"Por asignar","creditos":4,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":5,"turno":"Vespertino"}]},{"nrc":"33719","clave":"CSCH-28001","titulo":"GUIONISMO","docente":"ARMANDO  ZAVARIZ-VIDAÑA","creditos":3,"horarios":[{"dia":6,"inicio":"09:00","fin":"13:00","finMostrar":"12:59","aula":"","edificio":"PXA","bloque":5,"turno":"Matutino"}]},{"nrc":"85107","clave":"CSCA-28003","titulo":"INT. FILOSOFIA DE LA COMUNIC.","docente":"ELSA MERCEDES  SOLIS-CARRANZA","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"AULA 2-A","edificio":"A-CCEB","bloque":3,"turno":"Vespertino"}]},{"nrc":"85101","clave":"CSCG-28001","titulo":"INT. A L0S METODOS DE LAS C.S","docente":"Por asignar","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 6-A","edificio":"A-CCEB","bloque":2,"turno":"Matutino"}]},{"nrc":"64843","clave":"CSCK-28001","titulo":"INT. COMUNICACION PUBLICITARIA","docente":"SATURNINO  GASTEASORO-DOMINGUEZ","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":5,"turno":"Matutino"}]},{"nrc":"91615","clave":"CSCK-28001","titulo":"INT. COMUNICACION PUBLICITARIA","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":5,"turno":"Vespertino"}]},{"nrc":"85106","clave":"CSCB-28001","titulo":"INT. A LA TEORIA DE LA COMUNIC","docente":"JUAN JOSE  DOMINGUEZ-PANAMA","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"98818","clave":"FBGT-80001","titulo":"COMPUTACION BASICA","docente":"OMAR ESTEBAN  DE LA TORRE-ALOR","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"15:00","finMostrar":"14:59","aula":"B24","edificio":"B-CCEB","bloque":null,"turno":"Matutino"}]},{"nrc":"64896","clave":"CSCA-28002","titulo":"ECONOMIA Y COMUNICACION","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"17675","clave":"CSCC-28001","titulo":"TEO. ADMON. P/ LA COMUNICACION","docente":"CARLOS EDUARDO  ANAYA-AVILA","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":1,"turno":"Vespertino"}]},{"nrc":"34964","clave":"CSCB-28002","titulo":"PSIC., COMUNICACION E INFORMAC","docente":"SARA  MARTINEZ-RODRIGUEZ","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":2,"turno":"Matutino"}]},{"nrc":"89222","clave":"CSCD-28001","titulo":"TALLER DE FOTOGRAFIA I","docente":"LETICIA  NUÑEZ-HERNANDEZ","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"22:00","finMostrar":"21:59","aula":"","edificio":"PXA","bloque":2,"turno":"Vespertino"}]},{"nrc":"37615","clave":"FBGT-80002","titulo":"HABILIDADES DEL PENSAMIENTO","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":null,"turno":"Matutino"}]},{"nrc":"64824","clave":"FBGT-80003","titulo":"INGLES I","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"AULA 1-A","edificio":"A-CCEB","bloque":null,"turno":"Vespertino"}]},{"nrc":"91288","clave":"CSCJ-28001","titulo":"COMUNICAC. DESARROLLO ECONOMIC","docente":"EMILIO  ORTIZ-MEDINA","creditos":5,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"64877","clave":"CSCA-28009","titulo":"REGIMEN JURIDICO MEDIOS COMUNI","docente":"ARMANDO  ZAVARIZ-VIDAÑA","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":2,"turno":"Matutino"}]},{"nrc":"33705","clave":"CSCB-28006","titulo":"TEORIA DE LA COMUNICACION II","docente":"ARMANDO  ZAVARIZ-VIDAÑA","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"34081","clave":"CSCA-28004","titulo":"CULTURA E IDENTIDAD AMERICA II","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"13:00","finMostrar":"12:59","aula":"","edificio":"PXA","bloque":2,"turno":"Matutino"}]},{"nrc":"34082","clave":"CSCA-28006","titulo":"FILOSOFIA DE LA COMUNICACION","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"13:00","finMostrar":"12:59","aula":"","edificio":"PXA","bloque":5,"turno":"Matutino"}]},{"nrc":"34084","clave":"CSCA-28007","titulo":"HIST. CONTEMPORANEA DE MEXICO","docente":"Por asignar","creditos":5,"horarios":[{"dia":6,"inicio":"16:00","fin":"20:00","finMostrar":"19:59","aula":"","edificio":"PXA","bloque":2,"turno":"Vespertino"}]},{"nrc":"46170","clave":"CSCJ-28002","titulo":"PLANEAC. Y COMUNICAC. ESTRATEG","docente":"Por asignar","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"46176","clave":"CSCL-28002","titulo":"REALIZAC. DE PROY. RADIOFONICO","docente":"Por asignar","creditos":4,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":4,"turno":"Vespertino"}]},{"nrc":"46181","clave":"CSCA-28010","titulo":"SIST. POLITICO MEX Y COMUNICAC","docente":"Por asignar","creditos":8,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":5,"turno":"Vespertino"}]},{"nrc":"25029","clave":"CSCD-28002","titulo":"TALLER DE FOTOGRAFIA II","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":2,"turno":"Vespertino"}]},{"nrc":"64866","clave":"CSCD-28004","titulo":"TALLER DE HIPERMEDIA I","docente":"JUAN ANTONIO  RODRIGUEZ-VINAZA","creditos":5,"horarios":[{"dia":6,"inicio":"09:00","fin":"15:00","finMostrar":"14:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"64853","clave":"CSCD-28003","titulo":"TALLER DE TELEVISION Y VIDEO I","docente":"JUAN ANTONIO  RODRIGUEZ-VINAZA","creditos":5,"horarios":[{"dia":6,"inicio":"09:00","fin":"15:00","finMostrar":"14:59","aula":"","edificio":"PXA","bloque":5,"turno":"Matutino"}]},{"nrc":"64812","clave":"CSCB-28005","titulo":"TEORIA DE LA COMUNICACION I","docente":"PATRICIA DEL  CARMEN AGUIRRE-GAMBOA","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"73061","clave":"CSCC-28005","titulo":"RELACI. PUBLICAS CORPORATIVAS","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":3,"turno":"Vespertino"}]},{"nrc":"82062","clave":"CSCI-28001","titulo":"PERIODISMO DE INVESTIGACION","docente":"TERESA DE JESUS  ARROYO-GOPAR MARIA","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":1,"turno":"Vespertino"}]},{"nrc":"91580","clave":"CSCH-28004","titulo":"TALLER DE REDACCION: REPORTAJE","docente":"MIGUEL ANGEL  BARRAGAN-VILLARREAL","creditos":4,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 5-A","edificio":"A-CCEB","bloque":1,"turno":"Matutino"}]},{"nrc":"64867","clave":"CSCF-28001","titulo":"TRADUCC.TEXTOS EN COMUNICACION","docente":"Por asignar","creditos":4,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":3,"turno":"Vespertino"}]},{"nrc":"64863","clave":"CSCA-28005","titulo":"ETICA Y COMUNICACION","docente":"ROSA  HERNANDEZ-ESPEJO","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"13:00","finMostrar":"12:59","aula":"","edificio":"PXA","bloque":2,"turno":"Matutino"}]},{"nrc":"64865","clave":"CSCK-28003","titulo":"DISEÑO Y CREATIVIDAD GRAFICA P","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":2,"turno":"Vespertino"}]},{"nrc":"64903","clave":"CSCG-28002","titulo":"INV. CUANTITATIVA Y CUALITATIV","docente":"Por asignar","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"11973","clave":"CSCC-28004","titulo":"PROY. COMUNICAC. Y DESARROLLO","docente":"CARLOS EDUARDO  ANAYA-AVILA","creditos":5,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":3,"turno":"Vespertino"}]},{"nrc":"24991","clave":"CSCC-28002","titulo":"COMUNICAC. INTERNA ORGANIZACIO","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":4,"turno":"Vespertino"}]},{"nrc":"64836","clave":"CSCK-28004","titulo":"ESTRATEGIA PRODUC. PUBLICIDAD","docente":"Por asignar","creditos":5,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":1,"turno":"Vespertino"}]},{"nrc":"64901","clave":"CSCG-28003","titulo":"TEC. INV. CUANTIT Y CUALITATIV","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":5,"turno":"Matutino"}]},{"nrc":"64838","clave":"CSCI-28002","titulo":"TALLER DE DISEÑO EDITORIAL","docente":"GUADALUPE  HORTENCIA MAR-VAZQUEZ","creditos":4,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"33673","clave":"CSCH-28003","titulo":"TALLER DE REDACCION: CRONICA","docente":"ANTONIO RAMON  MARIN-CARDIN","creditos":4,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":1,"turno":"Matutino"}]},{"nrc":"64827","clave":"CSCA-28008","titulo":"PSICOLOG SOCIAL Y COMUNICACION","docente":"SARA  MARTINEZ-RODRIGUEZ","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"77669","clave":"CSCE-28002","titulo":"SEMIOTICA GENERAL","docente":"MARIA DEL ROCIO  OJEDA-CALLADO","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"73064","clave":"CSCC-28003","titulo":"ESTRATEG. COMUNICACION CORPORA","docente":"MARIA DEL ROCIO  OJEDA-CALLADO","creditos":4,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"64828","clave":"CSCE-28003","titulo":"TEORIA DEL LENGUAJE","docente":"PATRICIA  GARCIA-HERNANDEZ","creditos":8,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":4,"turno":"Vespertino"}]},{"nrc":"64864","clave":"CSCK-28002","titulo":"CAMPAÑAS COMUNICAC. PUBLICITAR","docente":"PATRICIA DEL  CARMEN AGUIRRE-GAMBOA","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":2,"turno":"Vespertino"}]},{"nrc":"91612","clave":"CSCK-28002","titulo":"CAMPAÑAS COMUNICAC. PUBLICITAR","docente":"MARIA DEL ROCIO  OJEDA-CALLADO","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":5,"turno":"Matutino"}]},{"nrc":"64879","clave":"CSCM-28001","titulo":"ANALISIS CINEMATOGRAFICO","docente":"SATURNINO  GASTEASORO-DOMINGUEZ","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"64883","clave":"CSCM-28002","titulo":"ANIMACION DIGITAL","docente":"RENATO  CAPITAINE-GRAJALES","creditos":4,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"B29","edificio":"B-CCEB","bloque":4,"turno":"Vespertino"}]},{"nrc":"64872","clave":"CSCM-28003","titulo":"PROYECTOS RADIOFONICOS EXPERIM","docente":"Por asignar","creditos":4,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":5,"turno":"Matutino"}]},{"nrc":"64885","clave":"CSCM-28004","titulo":"TALLER DE HIPERMEDIA II","docente":"JORGE ALEJANDRO  LEON-SANCHEZ","creditos":5,"horarios":[{"dia":6,"inicio":"09:00","fin":"15:00","finMostrar":"14:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"34907","clave":"CSCN-28001","titulo":"COMPORTAMIENTO ORGANIZACIONAL","docente":"CLOTILDE INGRID  TADEO-CASTILLO","creditos":5,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 3-A","edificio":"A-CCEB","bloque":1,"turno":"Matutino"}]},{"nrc":"46195","clave":"CSCN-28002","titulo":"ECONOMIA DE LA INFORMACION Y G","docente":"CLOTILDE INGRID  TADEO-CASTILLO","creditos":5,"horarios":[{"dia":6,"inicio":"09:00","fin":"13:00","finMostrar":"12:59","aula":"B28","edificio":"B-CCEB","bloque":4,"turno":"Matutino"}]},{"nrc":"46199","clave":"CSCN-28003","titulo":"ESTRATEGIAS COMUNICACIONALES P","docente":"MARIA DEL ROCIO  OJEDA-CALLADO","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":2,"turno":"Matutino"}]},{"nrc":"29573","clave":"CSCN-28004","titulo":"MEDIOS DE COMUNICACION INTERNA","docente":"CARLOS EDUARDO  ANAYA-AVILA","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"21:00","aula":"","edificio":"PXA","bloque":null,"turno":"Vespertino"}]},{"nrc":"64889","clave":"CSCN-28005","titulo":"TEORIA Y PRACTICA DE LA ADMINI","docente":"ALFREDO  REYES-GUTIERREZ","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":5,"turno":"Matutino"}]},{"nrc":"73065","clave":"CSCO-80001","titulo":"SERVICIO SOCIAL","docente":"MARIA DEL PILAR  ANAYA-AVILA","creditos":12,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":1,"turno":"Vespertino"}]},{"nrc":"64875","clave":"CSCO-80002","titulo":"EXPERIENCIA RECEPCIONAL","docente":"ROSSY LORENA  LAURENCIO-MEZA","creditos":12,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"AULA B8","edificio":"B-CCEB","bloque":1,"turno":"Matutino"}]},{"nrc":"89449","clave":"CSCO-80002","titulo":"EXPERIENCIA RECEPCIONAL","docente":"ODILIA  DOMINGUEZ-RAMIREZ","creditos":12,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":1,"turno":"Vespertino"}]},{"nrc":"46188","clave":"CSCP-28002","titulo":"CORRECCION DEL ESTILO EN MEDIO","docente":"Por asignar","creditos":4,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"B31","edificio":"B-CCEB","bloque":4,"turno":"Matutino"}]},{"nrc":"64869","clave":"CSCP-28003","titulo":"DISEÑO EDITORIAL ASISTIDO POR","docente":"GUADALUPE  HORTENCIA MAR-VAZQUEZ","creditos":4,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"76976","clave":"CSCP-28005","titulo":"PERIODISMO ESPECIALIZADO","docente":"MIGUEL ANGEL  BARRAGAN-VILLARREAL","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":1,"turno":"Vespertino"}]}],"2025":[{"nrc":"28882","clave":"CCSC-28001","titulo":"ESTUDIOS CULTURALES LATINOAMER","docente":"JAVIER  RAMIREZ-CARRILLO","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"20:00","finMostrar":"19:59","aula":"","edificio":"PXA","bloque":4,"turno":"Vespertino"}]},{"nrc":"20097","clave":"CCCD-28003","titulo":"FUNDAMENTOS DE LA PRODUCCION S","docente":"Por asignar","creditos":5,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":5,"turno":"Vespertino"}]},{"nrc":"28887","clave":"CCCD-28002","titulo":"GUIONISMO","docente":"ARMANDO  ZAVARIZ-VIDAÑA","creditos":4,"horarios":[{"dia":6,"inicio":"09:00","fin":"13:00","finMostrar":"12:59","aula":"","edificio":"PXA","bloque":5,"turno":"Matutino"}]},{"nrc":"23196","clave":"CCSC-28003","titulo":"FILOSOFIA DE LA COMUNICACION","docente":"ELSA MERCEDES  SOLIS-CARRANZA","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"AULA 2-A","edificio":"A-CCEB","bloque":3,"turno":"Vespertino"}]},{"nrc":"23108","clave":"CCNV-28001","titulo":"INVESTIGACION EN EL CAMPO DE L","docente":"IBIS MARTHA DEL  PILAR CARBAJAL-OJEDA","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 6-A","edificio":"A-CCEB","bloque":2,"turno":"Matutino"}]},{"nrc":"23395","clave":"CCCR-28001","titulo":"INTRODUCCION A LA COMUNICACION","docente":"SATURNINO  GASTEASORO-DOMINGUEZ","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":5,"turno":"Matutino"}]},{"nrc":"21244","clave":"CCCR-28001","titulo":"INTRODUCCION A LA COMUNICACION","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":5,"turno":"Vespertino"}]},{"nrc":"22899","clave":"CCCL-28002","titulo":"GENESIS Y EVOLUCION DE LA COMU","docente":"JUAN JOSE  DOMINGUEZ-PANAMA","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"22659","clave":"BGRT-80001","titulo":"LITERACIDAD DIGITAL","docente":"OMAR ESTEBAN  DE LA TORRE-ALOR","creditos":4,"horarios":[{"dia":6,"inicio":"09:00","fin":"15:00","finMostrar":"14:59","aula":"B24","edificio":"B-CCEB","bloque":null,"turno":"Matutino"}]},{"nrc":"28753","clave":"CCSC-28002","titulo":"SOCIOECONOMIA DE LA COMUNICACI","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"28859","clave":"CCSC-28004","titulo":"TEORIAS PSICOLOGICAS EN LA COM","docente":"SARA  MARTINEZ-RODRIGUEZ","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":2,"turno":"Matutino"}]},{"nrc":"28863","clave":"CCCD-28001","titulo":"FOTOGRAFIA BASICA","docente":"LETICIA  NUÑEZ-HERNANDEZ","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"22:00","finMostrar":"21:59","aula":"","edificio":"PXA","bloque":2,"turno":"Vespertino"}]},{"nrc":"22923","clave":"BGRT-80005","titulo":"LECTURA Y ESCRITURA DE TEXTOS","docente":"ANDRES DE JESUS  VALLEJO-MARTINEZ","creditos":4,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":null,"turno":"Vespertino"}]},{"nrc":"22693","clave":"BGRT-80002","titulo":"PENSAMIENTO CRITICO PARA LA","docente":"ADRIANA  COVARRUBIAS-GUTIERREZ","creditos":4,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":null,"turno":"Matutino"}]},{"nrc":"22892","clave":"BGRT-80003","titulo":"LENGUA I","docente":"JULIO FERNANDO  ORTIZ-CARDEL","creditos":4,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"AULA 1-A","edificio":"A-CCEB","bloque":null,"turno":"Vespertino"}]},{"nrc":"22573","clave":"BGRT-80001","titulo":"LITERACIDAD DIGITAL","docente":"Por asignar","creditos":4,"horarios":[{"dia":6,"inicio":"16:00","fin":"22:00","finMostrar":"21:59","aula":"B24","edificio":"B-CCEB","bloque":null,"turno":"Vespertino"}]},{"nrc":"22707","clave":"BGRT-80002","titulo":"PENSAMIENTO CRITICO PARA LA","docente":"SARA  MARTINEZ-RODRIGUEZ","creditos":4,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 1-A","edificio":"A-CCEB","bloque":null,"turno":"Matutino"}]},{"nrc":"22931","clave":"BGRT-80005","titulo":"LECTURA Y ESCRITURA DE TEXTOS","docente":"MARÍA FERNANDA  DE LA ENCARNACI ROMERO-SCHLESKE","creditos":4,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":null,"turno":"Vespertino"}]},{"nrc":"22968","clave":"CCCD-28001","titulo":"FOTOGRAFIA BASICA","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":2,"turno":"Matutino"}]},{"nrc":"22974","clave":"CCCD-28001","titulo":"FOTOGRAFIA BASICA","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":2,"turno":"Vespertino"}]},{"nrc":"28865","clave":"CCCD-28001","titulo":"FOTOGRAFIA BASICA","docente":"HERIBERTO  IGNACIO RAMIREZ-CRUZ","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":2,"turno":"Matutino"}]},{"nrc":"28886","clave":"CCCD-28003","titulo":"FUNDAMENTOS DE LA PRODUCCION S","docente":"ALICIA ELENA  URBINA-GONZALEZ","creditos":5,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"23205","clave":"CCCL-28001","titulo":"TEORIA DEL LENGUAJE","docente":"Por asignar","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"47559","clave":"CCCL-28002","titulo":"GENESIS Y EVOLUCION DE LA COMU","docente":"PATRICIA DEL  CARMEN AGUIRRE-GAMBOA","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":1,"turno":"Matutino"}]},{"nrc":"23298","clave":"CCNV-28001","titulo":"INVESTIGACION EN EL CAMPO DE L","docente":"Por asignar","creditos":8,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"AULA B8","edificio":"B-CCEB","bloque":4,"turno":"Vespertino"}]},{"nrc":"22895","clave":"CCPR-28001","titulo":"TEXTOS PERIODISTICOS INFORMATI","docente":"GUADALUPE  HORTENCIA MAR-VAZQUEZ","creditos":5,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":1,"turno":"Matutino"}]},{"nrc":"23143","clave":"CCPR-28001","titulo":"TEXTOS PERIODISTICOS INFORMATI","docente":"MARIA DEL PILAR  ANAYA-AVILA","creditos":5,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"AULA B8","edificio":"B-CCEB","bloque":2,"turno":"Vespertino"}]},{"nrc":"23145","clave":"CCSC-28001","titulo":"ESTUDIOS CULTURALES LATINOAMER","docente":"MIGUEL ANGEL  BARRAGAN-VILLARREAL","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"13:00","finMostrar":"12:59","aula":"AULA 4-A","edificio":"A-CCEB","bloque":3,"turno":"Matutino"}]},{"nrc":"23207","clave":"CCSC-28001","titulo":"ESTUDIOS CULTURALES LATINOAMER","docente":"JUAN JOSE  DOMINGUEZ-PANAMA","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":3,"turno":"Vespertino"}]},{"nrc":"28878","clave":"CCSC-28013","titulo":"ECONOMIA Y COMUNICACION PARA E","docente":"EMILIO  ORTIZ-MEDINA","creditos":5,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"28902","clave":"CCSC-28009","titulo":"MARCO LEGAL DE LA COMUNICACION","docente":"ARMANDO  ZAVARIZ-VIDAÑA","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":2,"turno":"Matutino"}]},{"nrc":"28890","clave":"CCCL-28008","titulo":"ESTUDIOS CONTEMPORANEOS DE LA","docente":"ARMANDO  ZAVARIZ-VIDAÑA","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"28932","clave":"CCCL-28004","titulo":"COMUNICACION INTERCULTURAL","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"13:00","finMostrar":"12:59","aula":"","edificio":"PXA","bloque":2,"turno":"Matutino"}]},{"nrc":"28936","clave":"CCSC-28006","titulo":"FILOSOFIA Y PENSAMIENTO CONTEM","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"13:00","finMostrar":"12:59","aula":"","edificio":"PXA","bloque":5,"turno":"Matutino"}]},{"nrc":"28944","clave":"CCSC-28007","titulo":"PERSPECTIVA HISTORICA DE LOS M","docente":"Por asignar","creditos":5,"horarios":[{"dia":6,"inicio":"16:00","fin":"20:00","finMostrar":"19:59","aula":"","edificio":"PXA","bloque":2,"turno":"Vespertino"}]},{"nrc":"28952","clave":"CCCR-28007","titulo":"COMUNICACION PARA EL DESARROLL","docente":"Por asignar","creditos":5,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"28957","clave":"CCCD-28007","titulo":"PRODUCCION DE PROYECTOS SONORO","docente":"Por asignar","creditos":4,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":4,"turno":"Vespertino"}]},{"nrc":"28962","clave":"CCSC-28010","titulo":"ESTADO Y SOCIEDAD","docente":"Por asignar","creditos":8,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":5,"turno":"Vespertino"}]},{"nrc":"28973","clave":"CCCD-28004","titulo":"FOTOGRAFIA ESPECIALIZADA","docente":"Por asignar","creditos":4,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":2,"turno":"Vespertino"}]},{"nrc":"28984","clave":"CCCD-28006","titulo":"HIPERMEDIA","docente":"JUAN ANTONIO  RODRIGUEZ-VINAZA","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"15:00","finMostrar":"14:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"28999","clave":"CCCD-28005","titulo":"PRINCIPIOS DE LA PRODUCCION AU","docente":"JUAN ANTONIO  RODRIGUEZ-VINAZA","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"15:00","finMostrar":"14:59","aula":"","edificio":"PXA","bloque":5,"turno":"Matutino"}]},{"nrc":"20617","clave":"CCCL-28003","titulo":"TEORIAS CLASICAS DE LA COMUNIC","docente":"PATRICIA DEL  CARMEN AGUIRRE-GAMBOA","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"21006","clave":"CCCR-28006","titulo":"RELACIONES PUBLICAS APLICADAS","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":3,"turno":"Vespertino"}]},{"nrc":"21272","clave":"CCPR-28004","titulo":"PERIODISMO DE INVESTIGACION","docente":"TERESA DE JESUS  ARROYO-GOPAR MARIA","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":1,"turno":"Vespertino"}]},{"nrc":"21872","clave":"CCPR-28003","titulo":"PERIODISMO INTERPRETATIVO MULT","docente":"MIGUEL ANGEL  BARRAGAN-VILLARREAL","creditos":4,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"AULA 5-A","edificio":"A-CCEB","bloque":1,"turno":"Matutino"}]},{"nrc":"23366","clave":"CCCL-28007","titulo":"CULTURA Y LINGUISTICA DE TEXTO","docente":"Por asignar","creditos":4,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":3,"turno":"Vespertino"}]},{"nrc":"25614","clave":"CCSC-28005","titulo":"ETICA Y COMUNICACION","docente":"ROSA  HERNANDEZ-ESPEJO","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"13:00","finMostrar":"12:59","aula":"","edificio":"PXA","bloque":2,"turno":"Matutino"}]},{"nrc":"27979","clave":"CCCR-28009","titulo":"DISEÑO CREATIVO DE MENSAJES PU","docente":"CARLOS EDUARDO  ANAYA-AVILA","creditos":5,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":2,"turno":"Vespertino"}]},{"nrc":"28765","clave":"CCNV-28002","titulo":"PLANEACION Y DISEÑO DE PROYECT","docente":"IBIS MARTHA DEL  PILAR CARBAJAL-OJEDA","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"28781","clave":"CCCR-28002","titulo":"TEORIAS ADMINISTRATICAS PARA L","docente":"CARLOS EDUARDO  ANAYA-AVILA","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":1,"turno":"Vespertino"}]},{"nrc":"28787","clave":"CCCR-28003","titulo":"EMPRENDIMIENTO EN COMUNICACION","docente":"CARLOS EDUARDO  ANAYA-AVILA","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":3,"turno":"Vespertino"}]},{"nrc":"28793","clave":"CCCR-28005","titulo":"ENDOMARKETING","docente":"CARLOS EDUARDO  ANAYA-AVILA","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":4,"turno":"Vespertino"}]},{"nrc":"28805","clave":"CCCR-28008","titulo":"ESTRATEGIAS DE COMUNICACION PO","docente":"Por asignar","creditos":5,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":1,"turno":"Vespertino"}]},{"nrc":"28835","clave":"CCNV-28003","titulo":"LABORATORIO DE INVESTIGACION E","docente":"Por asignar","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":5,"turno":"Matutino"}]},{"nrc":"28844","clave":"CCPR-28005","titulo":"DISEÑO Y PRODUCCION EDITORIAL","docente":"GUADALUPE  HORTENCIA MAR-VAZQUEZ","creditos":5,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"28855","clave":"CCPR-28002","titulo":"PERIODISMO NARRATIVO MULTIMEDI","docente":"ANTONIO RAMON  MARIN-CARDIN","creditos":4,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":1,"turno":"Matutino"}]},{"nrc":"28862","clave":"CCSC-28008","titulo":"COMUNICACION APLICADA EN PSICO","docente":"SARA  MARTINEZ-RODRIGUEZ","creditos":8,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"28868","clave":"CCCL-28005","titulo":"SEMIOTICA SOCIAL","docente":"MARIA DEL ROCIO  OJEDA-CALLADO","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":4,"turno":"Matutino"}]},{"nrc":"28872","clave":"CCCR-28004","titulo":"COMUNICACION CORPORATIVA","docente":"MARIA DEL ROCIO  OJEDA-CALLADO","creditos":5,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"28976","clave":"CCCD-28004","titulo":"FOTOGRAFIA ESPECIALIZADA","docente":"Por asignar","creditos":4,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":5,"turno":"Vespertino"}]},{"nrc":"25515","clave":"CCCR-28002","titulo":"TEORIAS ADMINISTRATICAS PARA L","docente":"FRANCISCO  GONZALEZ-DOMINGUEZ","creditos":6,"horarios":[{"dia":6,"inicio":"09:00","fin":"14:00","finMostrar":"13:59","aula":"","edificio":"PXA","bloque":3,"turno":"Matutino"}]},{"nrc":"24221","clave":"CCCR-28005","titulo":"ENDOMARKETING","docente":"ODILIA  DOMINGUEZ-RAMIREZ","creditos":6,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"","edificio":"PXA","bloque":2,"turno":"Vespertino"}]},{"nrc":"23096","clave":"CCSC-28012","titulo":"TENDENCIAS SOCIOLOGICAS DE LA","docente":"CARLOS ENRIQUE  VILLARREAL-MORALES","creditos":8,"horarios":[{"dia":6,"inicio":"16:00","fin":"21:00","finMostrar":"20:59","aula":"AULA 2-A","edificio":"A-CCEB","bloque":1,"turno":"Vespertino"}]}]}};
+const EQUIVALENCIAS_2004_A_2025 = {"CSCA-28001":{"clave2025":"CCSC-28001","nombre2025":"ESTUDIOS CULTURALES LATINOAMERICANOS"},"CSCA-28002":{"clave2025":"CCSC-28002","nombre2025":"SOCIOECONOMIA DE LA COMUNICACION"},"CSCA-28003":{"clave2025":"CCSC-28003","nombre2025":"FILOSOFIA DE LA COMUNICACION"},"CSCA-28004":{"clave2025":"CCCL-28004","nombre2025":"COMUNICACION INTERCULTURAL"},"CSCA-28005":{"clave2025":"CCSC-28005","nombre2025":"ETICA Y COMUNICACION"},"CSCA-28006":{"clave2025":"CCSC-28006","nombre2025":"FILOSOFIA Y PENSAMIENTO CONTEMPORANEO"},"CSCA-28007":{"clave2025":"CCSC-28007","nombre2025":"PERSPECTIVA HISTORICA DE LOS MEDIOS DE COMUNICACION EN MEXICO"},"CSCA-28008":{"clave2025":"CCSC-28008","nombre2025":"COMUNICACION APLICADA EN PSICOLOGIA SOCIAL"},"CSCA-28009":{"clave2025":"CCSC-28009","nombre2025":"MARCO LEGAL DE LA COMUNICACION"},"CSCA-28010":{"clave2025":"CCSC-28010","nombre2025":"ESTADO Y SOCIEDAD"},"CSCB-28001":{"clave2025":"CCCL-28002","nombre2025":"GENESIS Y EVOLUCION DE LA COMUNICACION"},"CSCB-28002":{"clave2025":"CCSC-28004","nombre2025":"TEORIAS PSICOLOGICAS EN LA COMUNICACION"},"CSCB-28003":{"clave2025":"CCSC-28011","nombre2025":"OPINION PUBLICA"},"CSCB-28004":{"clave2025":"CCSC-28012","nombre2025":"TENDENCIAS SOCIOLOGICAS DE LA COMUNICACION"},"CSCB-28005":{"clave2025":"CCCL-28003","nombre2025":"TEORIAS CLASICAS DE LA COMUNICACION"},"CSCB-28006":{"clave2025":"CCCL-28008","nombre2025":"ESTUDIOS CONTEMPORANEOS DE LA COMUNICACION"},"CSCC-28001":{"clave2025":"CCCR-28002","nombre2025":"TEORIAS ADMINISTRATICAS PARA LA COMUNICACION"},"CSCC-28002":{"clave2025":"CCCR-28005","nombre2025":"ENDOMARKETING"},"CSCC-28003":{"clave2025":"CCCR-28004","nombre2025":"COMUNICACION CORPORATIVA"},"CSCC-28004":{"clave2025":"CCCR-28003","nombre2025":"EMPRENDIMIENTO EN COMUNICACION"},"CSCC-28005":{"clave2025":"CCCR-28006","nombre2025":"RELACIONES PUBLICAS APLICADAS"},"CSCD-28001":{"clave2025":"CCCD-28001","nombre2025":"FOTOGRAFIA BASICA"},"CSCD-28002":{"clave2025":"CCCD-28004","nombre2025":"FOTOGRAFIA ESPECIALIZADA"},"CSCD-28003":{"clave2025":"CCCD-28005","nombre2025":"PRINCIPIOS DE LA PRODUCCION AUDIOVISUAL"},"CSCD-28004":{"clave2025":"CCCD-28006","nombre2025":"HIPERMEDIA"},"CSCE-28001":{"clave2025":"CCCL-28001","nombre2025":"TEORIA DEL LENGUAJE"},"CSCE-28002":{"clave2025":"CCCL-28005","nombre2025":"SEMIOTICA SOCIAL"},"CSCE-28003":{"clave2025":"CCCL-28006","nombre2025":"DISCURSO Y PODER"},"CSCF-28001":{"clave2025":"CCCL-28007","nombre2025":"CULTURA Y LINGUISTICA DE TEXTOS EN COMUNICACION"},"CSCG-28001":{"clave2025":"CCNV-28001","nombre2025":"INVESTIGACION EN EL CAMPO DE LA COMUNICACION"},"CSCG-28002":{"clave2025":"CCNV-28002","nombre2025":"PLANEACION Y DISEÑO DE PROYECTOS DE INVESTIGACION"},"CSCG-28003":{"clave2025":"CCNV-28003","nombre2025":"LABORATORIO DE INVESTIGACION EN COMUNICACION"},"CSCH-28001":{"clave2025":"CCCD-28002","nombre2025":"GUIONISMO"},"CSCH-28002":{"clave2025":"CCPR-28001","nombre2025":"TEXTOS PERIODISTICOS INFORMATIVOS MULTIMEDIOS"},"CSCH-28003":{"clave2025":"CCPR-28002","nombre2025":"PERIODISMO NARRATIVO MULTIMEDIA"},"CSCH-28004":{"clave2025":"CCPR-28003","nombre2025":"PERIODISMO INTERPRETATIVO MULTIMEDIA"},"CSCI-28001":{"clave2025":"CCPR-28004","nombre2025":"PERIODISMO DE INVESTIGACION"},"CSCI-28002":{"clave2025":"CCPR-28005","nombre2025":"DISEÑO Y PRODUCCION EDITORIAL"},"CSCJ-28001":{"clave2025":"CCSC-28013","nombre2025":"ECONOMIA Y COMUNICACION PARA EL DESARROLLO SUSTENTABLE"},"CSCJ-28002":{"clave2025":"CCCR-28007","nombre2025":"COMUNICACION PARA EL DESARROLLO DEL TALENTO HUMANO"},"CSCK-28001":{"clave2025":"CCCR-28001","nombre2025":"INTRODUCCION A LA COMUNICACION PUBLICITARIA Y POLITICA"},"CSCK-28002":{"clave2025":"CCCR-28014","nombre2025":"CAMPAÑAS PUBLICITARIAS Y POLITICAS"},"CSCK-28003":{"clave2025":"CCCR-28009","nombre2025":"DISEÑO CREATIVO DE MENSAJES PUBLICITARIOS Y POLITICOS"},"CSCK-28004":{"clave2025":"CCCR-28008","nombre2025":"ESTRATEGIAS DE COMUNICACION POLITICA"},"CSCL-28001":{"clave2025":"CCCD-28003","nombre2025":"FUNDAMENTOS DE LA PRODUCCION SONORA"},"CSCL-28002":{"clave2025":"CCCD-28007","nombre2025":"PRODUCCION DE PROYECTOS SONOROS"},"CSCM-28001":{"clave2025":"CCCD-28008","nombre2025":"CINE, ESTETICA Y REALIZACION"},"CSCM-28002":{"clave2025":"CCCD-28009","nombre2025":"ANIMACION MULTIPLATAFORMA"},"CSCM-28003":{"clave2025":"CCCD-28010","nombre2025":"PRODUCCION SONORA AVANZADA"},"CSCM-28004":{"clave2025":"CCCD-28011","nombre2025":"PRODUCCION DE INTERFACES GRAFICAS INTERACTIVAS"},"CSCM-28005":{"clave2025":"CCCD-28012","nombre2025":"COMUNICACION VISUAL EN MEDIOS DIGITALES"},"CSCM-28006":{"clave2025":"CCCD-28013","nombre2025":"CREACION DE CONTENIDOS PARA TELEVISION Y MULTIPLATAFORMA"},"CSCN-28001":{"clave2025":"CCCR-28010","nombre2025":"PROCESOS DE CAMBIO EN LAS ORGANIZACIONES"},"CSCN-28002":{"clave2025":"CCSC-28014","nombre2025":"ECONOMIA DE LA INFORMACION Y GLOBALIZACION"},"CSCN-28003":{"clave2025":"CCCR-28011","nombre2025":"COMUNICACION PARA LA FORMACION DE CAPITAL HUMANO"},"CSCN-28004":{"clave2025":"CCCR-28012","nombre2025":"SOCIAL MEDIA CORPORATIVA"},"CSCN-28005":{"clave2025":"CCCR-28013","nombre2025":"EMPRESAS DE COMUNICACION Y MODELO DE NEGOCIOS"},"CSCO-80001":{"clave2025":"CCNV-28006","nombre2025":"SERVICIO SOCIAL"},"CSCO-80002":{"clave2025":"CCNV-28007","nombre2025":"EXPERIENCIA RECEPCIONAL"},"CSCP-28001":{"clave2025":"CCPR-28007","nombre2025":"DISCURSO Y PERIODISMO"},"CSCP-28002":{"clave2025":"CCPR-28011","nombre2025":"CURADURIA DE DATOS PERIODISTICOS"},"CSCP-28003":{"clave2025":"CCPR-28008","nombre2025":"ESPECIALIZACION EN DISEÑO Y PRODUCCION EDITORIAL"},"CSCP-28004":{"clave2025":"CCPR-28009","nombre2025":"CIBERPERIODISMO"},"CSCP-28005":{"clave2025":"CCPR-28006","nombre2025":"ESPECIALIZACION PERIODISTICA"},"CSCP-28006":{"clave2025":"CCPR-28010","nombre2025":"PERIODISMO DE OPINION"},"FBGR-80001":{"clave2025":"BGRE-80001","nombre2025":"LITERACIDAD DIGITAL"},"FBGR-80002":{"clave2025":"BGRE-80002","nombre2025":"PENSAMIENTO CRITICO PARA LA SOLUCION DE PROBLEMAS"},"FBGR-80003":{"clave2025":"BGRE-80003","nombre2025":"LENGUA I"},"FBGR-80004":{"clave2025":"BGRE-80004","nombre2025":"LENGUA II"},"FBGR-80005":{"clave2025":"BGRE-80005","nombre2025":"LECTURA Y ESCRITURA DE TEXTOS ACADEMICOS"}};
+
+// Algunas Experiencias Educativas de Formación General (idiomas, cómputo, etc.)
+// tienen dos grupos con distinto sufijo de clave (ej. FBGR-80001 y FBGT-80001)
+// pero son la MISMA experiencia educativa; la tabla de equivalencias solo
+// registra una de las dos claves. Este alias cubre esos casos al buscar la
+// equivalencia de Plan 2025.
+const ALIAS_CLAVE_EQUIVALENCIA = { 'FBGT': 'FBGR' };
+
+// Para modalidad Abierto: construye el texto "· Bloque N (Turno)" a partir del
+// horario. Si el NRC no tiene bloque asignado en el SYRSEIL, se avisa en vez
+// de omitirlo silenciosamente.
+function textoBloque(h) {
+  if (modalidadActual !== 'abierto') return '';
+  if (h.bloque) return ` · Bloque ${h.bloque} (${h.turno})`;
+  return ' · ⚠️ Bloque sin asignar aún';
+}
+
+function buscarEquivalencia2025(clave2004) {
+  clave2004 = (clave2004 || '').toUpperCase();
+  if (EQUIVALENCIAS_2004_A_2025[clave2004]) return EQUIVALENCIAS_2004_A_2025[clave2004];
+  const prefijo = clave2004.split('-')[0];
+  const alias = ALIAS_CLAVE_EQUIVALENCIA[prefijo];
+  if (alias) {
+    const claveAlterna = clave2004.replace(prefijo, alias);
+    if (EQUIVALENCIAS_2004_A_2025[claveAlterna]) return EQUIVALENCIAS_2004_A_2025[claveAlterna];
+  }
+  return null;
+}
+
+// Configuración de la cuadrícula.
+const HORA_INICIO = 7;   // 7:00 am
+const HORA_FIN = 22;     // 10:00 pm (límite exclusivo, última franja es 21:00-22:00)
+const ALTURA_FILA_PX = 64; // más alto que antes (50px) para que quepan NRC, EE, docente, horario y aula sin recortarse
+const horas = [];
+for (let h = HORA_INICIO; h < HORA_FIN; h++) horas.push(`${h.toString().padStart(2, '0')}:00`);
+
+const diasSemana = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+let modalidadActual = null;     // 'escolarizado' o 'abierto'
+let planActual = null;          // 2004 o 2025
+let diasVisibles = [1, 2, 3, 4, 5, 6]; // columnas que se muestran en la cuadrícula
+let ofertaProcesada = [];       // materias del plan/modalidad elegidos
+let materiasEnHorario = [];
+
+// --- Selección de modalidad (paso 1) ---
+function elegirModalidad(modalidad) {
+  modalidadActual = modalidad;
+  localStorage.setItem('lccModalidadActual', modalidad);
+  diasVisibles = (modalidad === 'abierto') ? [6] : [1, 2, 3, 4, 5, 6];
+  document.getElementById('subtituloPeriodo').textContent = modalidad === 'abierto'
+    ? 'Periodo Agosto 2026 - Enero 2027 · Sistema Abierto · Sábados por bloques'
+    : 'Periodo Agosto 2026 - Enero 2027 · Sistema Escolarizado · Lunes a Viernes';
+  document.getElementById('avisoBloques').classList.toggle('activo', modalidad === 'abierto');
+  document.getElementById('pantallaSelectorModalidad').classList.add('oculto');
+  document.getElementById('pantallaSelectorPlan').classList.remove('oculto');
+}
+
+function volverAModalidad() {
+  document.getElementById('pantallaSelectorPlan').classList.add('oculto');
+  document.getElementById('pantallaSelectorModalidad').classList.remove('oculto');
+  document.getElementById('avisoBloques').classList.remove('activo');
+  localStorage.removeItem('lccModalidadActual');
+}
+
+// --- Selección de plan (paso 2) ---
+function elegirPlan(plan) {
+  planActual = plan;
+  localStorage.setItem('lccPlanActual', String(plan));
+  cargarOfertaDelPlan();
+  document.getElementById('pantallaSelectorPlan').classList.add('oculto');
+  document.getElementById('appPrincipal').classList.remove('oculto');
+  const nombreModalidad = modalidadActual === 'abierto' ? 'Abierto' : 'Escolarizado';
+  const badge = document.getElementById('planActualBadge');
+  badge.textContent = `${nombreModalidad} · Plan ${plan}`;
+  badge.classList.remove('oculto');
+  document.getElementById('etiquetaPlanPanel').textContent = `· ${nombreModalidad} · Plan ${plan}`;
+}
+
+function cambiarPlan() {
+  if (!confirm('¿Cambiar de plan o modalidad? Tu horario actual seguirá guardado para cuando regreses.')) return;
+  document.getElementById('pantallaSelectorModalidad').classList.remove('oculto');
+  document.getElementById('pantallaSelectorPlan').classList.add('oculto');
+  document.getElementById('appPrincipal').classList.add('oculto');
+  document.getElementById('planActualBadge').classList.add('oculto');
+  document.getElementById('avisoBloques').classList.remove('activo');
+  localStorage.removeItem('lccPlanActual');
+  localStorage.removeItem('lccModalidadActual');
+}
+
+function cargarOfertaDelPlan() {
+  ofertaProcesada = OFERTA[modalidadActual][String(planActual)];
+  materiasEnHorario = JSON.parse(localStorage.getItem(`horarioLCC_${modalidadActual}_${planActual}`) || '[]');
+  mostrarOfertaEnLista();
+  renderizar();
+}
+
+function escaparTexto(texto) {
+  const div = document.createElement('div');
+  div.textContent = texto == null ? '' : texto;
+  return div.innerHTML;
+}
+
+function mostrarOfertaEnLista() {
+  const contenedor = document.getElementById('listaOferta');
+  contenedor.innerHTML = '';
+
+  const filtro = (document.getElementById('buscador').value || '').trim().toLowerCase();
+  const oferta = filtro
+    ? ofertaProcesada.filter(m =>
+        m.titulo.toLowerCase().includes(filtro) ||
+        m.nrc.toLowerCase().includes(filtro) ||
+        m.docente.toLowerCase().includes(filtro))
+    : ofertaProcesada;
+
+  if (oferta.length === 0) {
+    contenedor.innerHTML = '<p style="text-align:center; color:#dc2626; padding:20px;">Sin resultados para tu búsqueda.</p>';
+    return;
+  }
+
+  oferta.forEach((m) => {
+    const idx = ofertaProcesada.indexOf(m);
+    const horarios = [...m.horarios].sort((a, b) => a.dia - b.dia);
+    const textoHorario = horarios
+      .map(h => `${diasSemana[h.dia].substring(0,3)} ${h.inicio}-${h.finMostrar} · ${h.aula || 'aula por confirmar'}${textoBloque(h)}`)
+      .join(' | ') || 'Sin horario registrado';
+
+    let htmlEquivalencia = '';
+    if (planActual === 2004) {
+      const eq = buscarEquivalencia2025(m.clave);
+      htmlEquivalencia = eq
+        ? `<span class="equivalencia">🔄 Equivale en Plan 2025 a: <strong>${escaparTexto(eq.nombre2025)}</strong></span>`
+        : `<span class="equivalencia">🔄 Sin equivalencia directa registrada en Plan 2025</span>`;
+    }
+
+    const div = document.createElement('div');
+    div.className = 'materia-item';
+    div.innerHTML = `
+      <strong>${escaparTexto(m.titulo)}</strong>
+      <span class="meta">🔑 NRC: ${escaparTexto(m.nrc)} | 👤 ${escaparTexto(m.docente)}</span>
+      <span class="horario-texto">🕒 ${escaparTexto(textoHorario)}</span>
+      ${htmlEquivalencia}
+      <button class="btn-agregar" onclick="agregarDesdeOferta(${idx})">+ Agregar al Horario</button>
+    `;
+    contenedor.appendChild(div);
+  });
+}
+
+function agregarDesdeOferta(idx) {
+  const m = ofertaProcesada[idx];
+
+  if (materiasEnHorario.some(mat => mat.nrc === m.nrc)) {
+    alert('⚠️ Esta Experiencia Educativa ya está en tu horario.');
+    return;
+  }
+
+  materiasEnHorario.push({ ...m, choque: false });
+  renderizar();
+}
+
+function abrirModalOferta() {
+  document.getElementById('modalOferta').classList.remove('oculto');
+  document.getElementById('buscador').focus();
+}
+
+function cerrarModalOferta() {
+  document.getElementById('modalOferta').classList.add('oculto');
+}
+
+function eliminarMateria(idx) {
+  materiasEnHorario.splice(idx, 1);
+  renderizar();
+}
+
+function limpiarTodo() {
+  if (confirm('¿Estás seguro de borrar todo tu horario de este plan?')) {
+    materiasEnHorario = [];
+    renderizar();
+  }
+}
+
+// --- Lógica de la Cuadrícula y Choques ---
+function generarGrid() {
+  const grid = document.getElementById('horarioGrid');
+  grid.innerHTML = '';
+  grid.style.gridTemplateRows = `40px repeat(${horas.length}, ${ALTURA_FILA_PX}px) 18px`;
+  grid.style.gridTemplateColumns = `60px repeat(${diasVisibles.length}, 1fr)`;
+  grid.style.minWidth = (diasVisibles.length <= 1) ? '260px' : '780px';
+
+  grid.appendChild(crearCelda('grid-header', 'Hora'));
+  diasVisibles.forEach(i => {
+    grid.appendChild(crearCelda('grid-header' + (i === 6 ? ' sabado' : ''), diasSemana[i]));
+  });
+
+  horas.forEach((h, index) => {
+    grid.appendChild(crearCelda('grid-time', h));
+    diasVisibles.forEach(i => {
+      grid.appendChild(crearCelda('grid-cell' + (i === 6 ? ' col-sabado' : ''), '', `cell-${i}-${index}`));
+    });
+  });
+
+  grid.appendChild(crearCelda('grid-time', `${HORA_FIN.toString().padStart(2,'0')}:00`));
+  diasVisibles.forEach(i => {
+    grid.appendChild(crearCelda('grid-cell' + (i === 6 ? ' col-sabado' : '')));
+  });
+}
+
+function crearCelda(clase, texto, id = '') {
+  const div = document.createElement('div');
+  div.className = clase;
+  div.textContent = texto;
+  if (id) div.id = id;
+  return div;
+}
+
+function horaAIndex(hora) {
+  const partes = hora.split(':');
+  const horaNum = parseInt(partes[0]) + (parseInt(partes[1]) / 60);
+  return horaNum - HORA_INICIO;
+}
+
+function detectarChoques() {
+  let hayChoque = false;
+  materiasEnHorario.forEach(m => m.choque = false);
+
+  for (let i = 0; i < materiasEnHorario.length; i++) {
+    for (let j = i + 1; j < materiasEnHorario.length; j++) {
+      const m1 = materiasEnHorario[i];
+      const m2 = materiasEnHorario[j];
+
+      m1.horarios.forEach(h1 => {
+        m2.horarios.forEach(h2 => {
+          if (h1.dia !== h2.dia) return;
+
+          // En modalidad Abierto, cada bloque ocupa 3 sábados distintos y
+          // consecutivos (ver calendario oficial) que NUNCA se traslapan entre
+          // bloques. Por lo tanto, dos EE de bloques diferentes jamás coinciden
+          // el mismo sábado, aunque su horario de reloj sea idéntico, y no
+          // deben marcarse como choque. Solo se comparan horas cuando ambas
+          // EE pertenecen al MISMO bloque (o cuando el bloque de alguna no
+          // está identificado en el SEIL, caso en el que se revisa por
+          // precaución).
+          if (modalidadActual === 'abierto' && h1.bloque && h2.bloque && h1.bloque !== h2.bloque) {
+            return;
+          }
+
+          const inicio1 = horaAIndex(h1.inicio);
+          const fin1 = horaAIndex(h1.fin);
+          const inicio2 = horaAIndex(h2.inicio);
+          const fin2 = horaAIndex(h2.fin);
+
+          if (inicio1 < fin2 && inicio2 < fin1) {
+            m1.choque = true;
+            m2.choque = true;
+            hayChoque = true;
+          }
+        });
+      });
+    }
+  }
+  document.getElementById('alertaChoque').classList.toggle('activo', hayChoque);
+}
+
+// Fechas oficiales de cada bloque, Sistema Abierto, periodo Agosto 2026 - Enero 2027
+// (Calendario escolar 2026, Ciencias y Técnicas de la Comunicación, Sistema de Enseñanza Abierta).
+// Cada bloque son 3 sábados consecutivos; un bloque termina y comienza el siguiente.
+const FECHAS_BLOQUE = {
+  1: '22 y 29 ago, 5 sep',
+  2: '12, 19 y 26 sep',
+  3: '3, 10 y 17 oct',
+  4: '24 y 31 oct, 7 nov',
+  5: '14, 21 y 28 nov'
+};
+
+// Construye la tabla de bloques (5 columnas x 2 turnos) para modalidad Abierto.
+function generarGridBloques() {
+  const grid = document.getElementById('horarioBloques');
+  grid.innerHTML = '';
+
+  const esquina = document.createElement('div');
+  esquina.className = 'bloque-turno-label';
+  esquina.textContent = 'Turno';
+  grid.appendChild(esquina);
+
+  for (let b = 1; b <= 5; b++) {
+    const header = document.createElement('div');
+    header.className = 'bloque-header';
+    header.innerHTML = `Bloque ${b}<small>${FECHAS_BLOQUE[b]}</small>`;
+    grid.appendChild(header);
+  }
+
+  ['Matutino', 'Vespertino'].forEach(turno => {
+    const label = document.createElement('div');
+    label.className = 'bloque-turno-label';
+    label.textContent = turno;
+    grid.appendChild(label);
+
+    const cod = turno === 'Matutino' ? 'M' : 'V';
+    for (let b = 1; b <= 5; b++) {
+      const celda = document.createElement('div');
+      celda.className = 'bloque-celda vacia';
+      celda.id = `bloque-${cod}-${b}`;
+      grid.appendChild(celda);
+    }
+  });
+}
+
+// Coloca una tarjeta de materia en su celda Bloque x Turno correspondiente.
+function colocarEnBloque(m, h) {
+  const cod = h.turno === 'Matutino' ? 'M' : 'V';
+  const celda = document.getElementById(`bloque-${cod}-${h.bloque}`);
+  if (!celda) return;
+  celda.classList.remove('vacia');
+  const tarjeta = document.createElement('div');
+  tarjeta.className = `bloque-tarjeta ${m.choque ? 'choque' : ''}`;
+  tarjeta.title = 'Toca para quitar esta Experiencia Educativa de tu horario';
+  tarjeta.onclick = () => pedirQuitarNRC(m.nrc);
+  tarjeta.innerHTML = `
+    <strong>${escaparTexto(m.titulo)}</strong>
+    <span class="nrc-mini">NRC ${escaparTexto(m.nrc)} · Bloque ${h.bloque} (${h.turno})</span>
+    <span>${escaparTexto(m.docente)}</span>
+    <span>${h.inicio}-${h.finMostrar} · ${escaparTexto(h.aula || 'S/A')}</span>
+    ${m.choque ? '<span class="quitar-tip">⚠️ CHOQUE</span>' : '<span class="quitar-tip">✕ quitar</span>'}
+  `;
+  celda.appendChild(tarjeta);
+}
+
+// Quita del horario la EE con este NRC, pidiendo confirmación primero.
+// Se usa al tocar/hacer clic sobre la tarjeta de la EE en la cuadrícula o en la
+// tabla de bloques (ya no existe una lista aparte de "Tu Horario Actual").
+function pedirQuitarNRC(nrc) {
+  const idx = materiasEnHorario.findIndex(m => m.nrc === nrc);
+  if (idx === -1) return;
+  const m = materiasEnHorario[idx];
+  if (confirm(`¿Quitar "${m.titulo}" (NRC ${m.nrc}) de tu horario?`)) {
+    materiasEnHorario.splice(idx, 1);
+    renderizar();
+  }
+}
+
+function renderizar() {
+  detectarChoques();
+
+  const usaBloques = modalidadActual === 'abierto';
+  document.getElementById('horarioGrid').classList.toggle('oculto', usaBloques);
+  document.getElementById('horarioBloques').classList.toggle('oculto', !usaBloques);
+  document.getElementById('avisoSinBloque').classList.add('oculto');
+
+  if (usaBloques) {
+    generarGridBloques();
+  } else {
+    generarGrid();
+  }
+
+  let minutosTotales = 0;
+  let creditosTotales = 0;
+  const sinBloqueAsignado = [];
+
+  materiasEnHorario.forEach((m) => {
+    creditosTotales += (typeof m.creditos === 'number') ? m.creditos : 0;
+
+    m.horarios.forEach(h => {
+      const inicioIdx = horaAIndex(h.inicio);
+      const finIdx = horaAIndex(h.fin);
+      const duracion = Math.max(0.5, finIdx - inicioIdx);
+      minutosTotales += duracion * 60;
+
+      if (usaBloques) {
+        if (h.bloque) {
+          colocarEnBloque(m, h);
+        } else {
+          sinBloqueAsignado.push({ materia: m, horario: h });
+        }
+        return;
+      }
+
+      const filaBase = Math.floor(inicioIdx);
+      const offsetDentroFila = (inicioIdx - filaBase) * ALTURA_FILA_PX;
+
+      const cellId = `cell-${h.dia}-${filaBase}`;
+      const cell = document.getElementById(cellId);
+      if (cell) {
+        const bloqueDiv = document.createElement('div');
+        bloqueDiv.className = `clase-bloque ${m.choque ? 'choque' : ''}`;
+        bloqueDiv.style.top = `${offsetDentroFila + 2}px`;
+        bloqueDiv.style.height = `calc(${duracion * ALTURA_FILA_PX}px - 4px)`;
+        bloqueDiv.title = 'Toca para quitar esta Experiencia Educativa de tu horario';
+        bloqueDiv.onclick = () => pedirQuitarNRC(m.nrc);
+        bloqueDiv.innerHTML = `
+          <strong>${escaparTexto(m.titulo)}</strong>
+          <span class="nrc-mini">NRC ${escaparTexto(m.nrc)}</span>
+          <span>${escaparTexto(m.docente)}</span>
+          <span>${h.inicio}-${h.finMostrar} · ${escaparTexto(h.aula || 'S/A')}</span>
+          ${m.choque ? '<span class="quitar-tip">⚠️ CHOQUE</span>' : '<span class="quitar-tip">✕ quitar</span>'}
+        `;
+        cell.appendChild(bloqueDiv);
+      } else {
+        console.warn(`La EE "${m.titulo}" tiene un horario fuera del rango visible (${h.inicio}-${h.fin}, día ${diasSemana[h.dia]}).`);
+      }
+    });
+  });
+
+  if (usaBloques && sinBloqueAsignado.length) {
+    const avisoDiv = document.getElementById('avisoSinBloque');
+    avisoDiv.classList.remove('oculto');
+    avisoDiv.innerHTML = `<strong>⚠️ ${sinBloqueAsignado.length} Experiencia(s) Educativa(s) de tu horario no tienen bloque registrado en el SEIL (probablemente Formación General):</strong>` +
+      sinBloqueAsignado.map(x => escaparTexto(`${x.materia.titulo} (${x.horario.inicio}-${x.horario.finMostrar})`)).join(' · ');
+  }
+
+  const numChoques = materiasEnHorario.filter(m => m.choque).length;
+  document.getElementById('statEE').textContent = materiasEnHorario.length;
+  document.getElementById('statCreditos').textContent = creditosTotales;
+  document.getElementById('statHoras').textContent = (minutosTotales / 60).toFixed(1);
+  document.getElementById('statHorasLabel').textContent = usaBloques ? 'Horas/Sábado' : 'Horas/Semana';
+  document.getElementById('statChoques').textContent = numChoques;
+  document.getElementById('statChoquesCard').classList.toggle('con-choques', numChoques > 0);
+
+  try {
+    localStorage.setItem(`horarioLCC_${modalidadActual}_${planActual}`, JSON.stringify(materiasEnHorario));
+  } catch (e) {
+    console.error('No se pudo guardar el horario localmente:', e);
+  }
+}
+
+// Inicializar: si ya había modalidad y plan elegidos antes (misma sesión de navegador), se retoma directo.
+try {
+  const modalidadGuardada = localStorage.getItem('lccModalidadActual');
+  const planGuardado = localStorage.getItem('lccPlanActual');
+  if ((modalidadGuardada === 'escolarizado' || modalidadGuardada === 'abierto') &&
+      (planGuardado === '2004' || planGuardado === '2025')) {
+    elegirModalidad(modalidadGuardada);
+    elegirPlan(parseInt(planGuardado, 10));
+  }
+} catch (e) {
+  console.warn('No se pudo leer la modalidad/plan guardados.', e);
+}
+</script>
+</body>
+</html>
