@@ -877,10 +877,7 @@ try {
    widgets simplemente no muestran nada, en vez de romper el resto de la
    página.
    ========================================================================== */
-const CONTADOR_NAMESPACE = 'armador-horario-lcc-uv-fcc';
-const CLAVE_VISITAS = 'visitas';
-const CLAVE_RATING_SUMA = 'rating-suma';
-const CLAVE_RATING_VOTOS = 'rating-votos';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwR7jhrNi0eSRoVnYJIPVDWyb293j4ymYS0fH9fvuln7dG5DE3OU2kOTqYtuUN_p20P/exec';
 
 function pintarEstrellas(valor) {
   document.querySelectorAll('#estrellasValorar .estrella').forEach(el => {
@@ -900,11 +897,9 @@ function mostrarPromedio(suma, votos) {
 
 async function cargarPromedioValoracion() {
   try {
-    const [rs, rv] = await Promise.all([
-      fetch(`https://api.countapi.xyz/get/${CONTADOR_NAMESPACE}/${CLAVE_RATING_SUMA}`).then(r => r.json()),
-      fetch(`https://api.countapi.xyz/get/${CONTADOR_NAMESPACE}/${CLAVE_RATING_VOTOS}`).then(r => r.json())
-    ]);
-    mostrarPromedio(rs.value || 0, rv.value || 0);
+    const r = await fetch(`${APPS_SCRIPT_URL}?accion=estado`);
+    const data = await r.json();
+    mostrarPromedio(data.suma || 0, data.votos || 0);
   } catch (e) {
     console.warn('No se pudo cargar el promedio de valoraciones.', e);
   }
@@ -917,10 +912,9 @@ async function calificar(valor) {
   pintarEstrellas(valor);
   localStorage.setItem('lccMiCalificacion', String(valor));
   try {
-    await fetch(`https://api.countapi.xyz/update/${CONTADOR_NAMESPACE}/${CLAVE_RATING_SUMA}?amount=${valor}`);
-    const rv = await fetch(`https://api.countapi.xyz/hit/${CONTADOR_NAMESPACE}/${CLAVE_RATING_VOTOS}`).then(r => r.json());
-    const rs = await fetch(`https://api.countapi.xyz/get/${CONTADOR_NAMESPACE}/${CLAVE_RATING_SUMA}`).then(r => r.json());
-    mostrarPromedio(rs.value || 0, rv.value || 0);
+    const r = await fetch(`${APPS_SCRIPT_URL}?accion=calificar&valor=${valor}`);
+    const data = await r.json();
+    mostrarPromedio(data.suma || 0, data.votos || 0);
   } catch (e) {
     console.warn('No se pudo enviar tu calificación.', e);
   }
@@ -928,10 +922,10 @@ async function calificar(valor) {
 
 async function registrarVisita() {
   try {
-    const r = await fetch(`https://api.countapi.xyz/hit/${CONTADOR_NAMESPACE}/${CLAVE_VISITAS}`);
+    const r = await fetch(`${APPS_SCRIPT_URL}?accion=visita`);
     const data = await r.json();
     const el = document.getElementById('contadorVisitas');
-    if (el) el.textContent = `👁️ ${data.value.toLocaleString('es-MX')} visitas`;
+    if (el) el.textContent = `👁️ ${data.visitas.toLocaleString('es-MX')} visitas`;
   } catch (e) {
     console.warn('No se pudo cargar el contador de visitas.', e);
   }
