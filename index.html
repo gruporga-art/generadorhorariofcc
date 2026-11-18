@@ -12,7 +12,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .header { background: #1a3a6b; color: white; padding: 20px; text-align: center; border-bottom: 4px solid #28a745; position: relative; }
 .header .uv-badge { background: #28a745; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.85em; font-weight: bold; display: inline-block; margin-bottom: 10px; }
 .header h1 { font-size: 1.8em; margin-bottom: 5px; }
-.header h1::before { content: '📅 '; }
+.header h1::before { content: ' '; }
 .header .subtitle { font-size: 1em; opacity: 0.9; margin-bottom: 10px; }
 .header .plan-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.9em; display: inline-block; }
 .back-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.5); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9em; transition: all 0.3s; }
@@ -63,14 +63,22 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .bloques-grid th:first-child { background: #1a3a6b; width: 100px; }
 .bloques-grid th .bloque-num { font-size: 1.1em; display: block; margin-bottom: 3px; }
 .bloques-grid th .bloque-fecha { font-size: 0.8em; font-weight: normal; opacity: 0.95; display: block; }
-.bloques-grid td { border: 1px solid #e0e0e0; padding: 12px 8px; text-align: center; vertical-align: middle; }
-.bloques-grid td:first-child { background: #f8f9fa; font-weight: bold; color: #1a3a6b; font-size: 1.05em; }
-.bloque-cell { cursor: pointer; transition: all 0.3s; min-height: 80px; overflow: hidden; }
-.bloque-cell:hover { background: #f0f4ff; }
-.bloque-cell.empty { color: #ccc; font-size: 1.5em; }
-.bloque-cell.occupied { background: #e8f5e9; border: 2px solid #28a745; }
-.bloque-cell .ee-nombre { font-weight: bold; color: #1a3a6b; font-size: 0.9em; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bloque-cell .ee-info { font-size: 0.78em; color: #666; line-height: 1.3; }
+.bloques-grid td { border: 1px solid #e0e0e0; padding: 6px; vertical-align: top; height: 110px; }
+.bloques-grid td:first-child { background: #f8f9fa; font-weight: bold; color: #1a3a6b; font-size: 1.05em; vertical-align: middle; text-align: center; }
+.bloque-cell { min-height: 100%; }
+.bloque-cell.empty::after { content: '—'; color: #ccc; font-size: 1.5em; display: block; text-align: center; margin-top: 25px; }
+.ee-card-bloque { color: white; padding: 6px 8px; border-radius: 5px; cursor: pointer; transition: all 0.3s; margin-bottom: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.15); overflow: hidden; }
+.ee-card-bloque:hover { transform: scale(1.02); box-shadow: 0 4px 8px rgba(0,0,0,0.25); }
+.ee-card-bloque .ee-nombre { font-weight: bold; font-size: 0.82em; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ee-card-bloque .ee-info { font-size: 0.72em; opacity: 0.95; line-height: 1.25; overflow: hidden; }
+.ee-card-bloque.conflicto { animation: pulseConflicto 1.5s infinite; }
+@keyframes pulseConflicto { 0%, 100% { box-shadow: 0 0 0 3px #ff0000, 0 4px 8px rgba(255,0,0,0.4); } 50% { box-shadow: 0 0 0 5px #ff0000, 0 4px 12px rgba(255,0,0,0.6); } }
+.sin-bloque-box { background: #fff8e6; border: 2px solid #ffc107; border-radius: 10px; padding: 15px; margin-bottom: 20px; display: none; }
+.sin-bloque-box.show { display: block; }
+.sin-bloque-box h4 { color: #856404; margin-bottom: 8px; }
+.sin-bloque-box p { font-size: 0.85em; color: #856404; margin-bottom: 8px; }
+.sin-bloque-box .ee-tag { display: inline-block; background: #ffe9a8; border: 1px solid #ffc107; color: #6b5200; padding: 4px 10px; border-radius: 15px; font-size: 0.8em; margin: 3px 4px 3px 0; cursor: pointer; }
+.sin-bloque-box .ee-tag:hover { background: #ffd75e; }
 .horario-table-wrapper { width: 100%; overflow-x: auto; margin-bottom: 20px; }
 .horario-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .horario-table th { background: #1a3a6b; color: white; padding: 12px 4px; text-align: center; font-weight: bold; font-size: 0.95em; border: 1px solid #0f2444; }
@@ -82,18 +90,13 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .horario-table .ee-card:hover { transform: scale(1.02); box-shadow: 0 4px 8px rgba(0,0,0,0.25); z-index: 10; position: relative; }
 .horario-table .ee-card .ee-nombre { font-weight: bold; font-size: 0.85em; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .horario-table .ee-card .ee-nrc, .horario-table .ee-card .ee-docente, .horario-table .ee-card .ee-horario, .horario-table .ee-card .ee-salon { font-size: 0.75em; opacity: 0.9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.horario-table .ee-card.conflicto { animation: pulseConflicto 1.5s infinite; box-shadow: 0 0 0 3px #ff0000, 0 4px 8px rgba(255,0,0,0.4); }
-@keyframes pulseConflicto { 0%, 100% { box-shadow: 0 0 0 3px #ff0000, 0 4px 8px rgba(255,0,0,0.4); } 50% { box-shadow: 0 0 0 5px #ff0000, 0 4px 12px rgba(255,0,0,0.6); } }
-.botones-inferiores { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-.btn-inferior { padding: 12px; border: none; border-radius: 10px; font-size: 1em; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+.horario-table .ee-card.conflicto { animation: pulseConflicto 1.5s infinite; }
+.botones-inferiores { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+.btn-inferior { padding: 15px; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: all 0.3s; }
 .btn-imprimir { background: #6c757d; color: white; }
 .btn-imprimir:hover { background: #5a6268; }
 .btn-limpiar { background: #dc3545; color: white; }
 .btn-limpiar:hover { background: #c82333; }
-.btn-deshacer { background: #17a2b8; color: white; }
-.btn-deshacer:hover { background: #138496; }
-.btn-exportar { background: #fd7e14; color: white; }
-.btn-exportar:hover { background: #e8590c; }
 .footer { background: #f8f9fa; border-top: 4px solid #28a745; padding: 20px; text-align: center; color: #666; font-size: 0.85em; line-height: 1.6; }
 .footer a { color: #1a3a6b; text-decoration: none; }
 .loading { text-align: center; padding: 40px; color: #1a3a6b; }
@@ -116,14 +119,42 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .ee-item p { font-size: 0.9em; color: #666; margin: 3px 0; }
 .ee-item.added { opacity: 0.5; cursor: not-allowed; background: #f0f0f0; }
 .area-badge { display: inline-block; background: #e0e0e0; color: #333; padding: 3px 8px; border-radius: 5px; font-size: 0.8em; margin-right: 5px; }
+.bloque-badge { display: inline-block; background: #7c3aed; color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.8em; margin-right: 5px; }
+.sin-bloque-badge { display: inline-block; background: #ffc107; color: #6b5200; padding: 3px 8px; border-radius: 5px; font-size: 0.8em; margin-right: 5px; }
 .btn-cerrar-modal { background: #6c757d; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-size: 1em; cursor: pointer; margin-top: 15px; }
 .conflict-warning { background: #fff3cd; border: 2px solid #ffc107; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; }
 .conflict-warning.show { display: block; }
-.creditos-indicator { background: #f8f9fa; border-radius: 8px; padding: 10px 15px; margin-bottom: 15px; font-size: 0.9em; }
-.creditos-bar { width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; margin-top: 5px; overflow: hidden; }
-.creditos-fill { height: 100%; transition: width 0.3s; border-radius: 4px; }
-@media (max-width: 768px) { .stats { grid-template-columns: repeat(2, 1fr); } .botones-inferiores { grid-template-columns: repeat(2, 1fr); } .bloques-grid { font-size: 0.75em; } .horario-table th, .horario-table td { font-size: 0.7em; padding: 2px; } .horario-table th:first-child { width: 50px; } .header h1 { font-size: 1.4em; } .step-label { display: none; } .selector-grid { grid-template-columns: 1fr; } }
-@media print { @page { size: landscape; margin: 8mm; } body { background: white !important; padding: 0 !important; margin: 0 !important; } * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .container { box-shadow: none !important; max-width: 100% !important; margin: 0 !important; } .header, .steps-indicator, .screen:not(#screen-3), .oferta-header, .stats, .btn-agregar, .instruccion, .botones-inferiores, .footer, .back-btn, .conflict-warning, #loading-section, #error-section, #success-section, #vista-abierto, .modal, .creditos-indicator { display: none !important; } #screen-3, #app-main, #vista-escolarizado { display: block !important; } body.imprimiendo-abierto #vista-escolarizado { display: none !important; } body.imprimiendo-abierto #vista-abierto { display: block !important; } body.imprimiendo-abierto .oferta-header, body.imprimiendo-abierto .stats { display: block !important; } .horario-table-wrapper { overflow: visible !important; } .horario-table { width: 100% !important; table-layout: fixed !important; font-size: 8pt !important; } .horario-table th { background: #1a3a6b !important; color: white !important; padding: 4px 2px !important; font-size: 9pt !important; } .horario-table th:first-child { width: 50px !important; } .horario-table td { padding: 2px !important; border: 1px solid #999 !important; height: auto !important; overflow: hidden !important; } .horario-table td:first-child { background: #f0f0f0 !important; font-size: 8pt !important; } .horario-table .ee-card { padding: 3px 4px !important; font-size: 7pt !important; box-shadow: none !important; } .bloques-grid { width: 100% !important; font-size: 9pt !important; margin-bottom: 10px !important; } .bloques-grid th { background: #7c3aed !important; color: white !important; padding: 6px 4px !important; font-size: 9pt !important; border: 1px solid #6d28d9 !important; } .bloques-grid th:first-child { background: #1a3a6b !important; width: 80px !important; } .bloques-grid td { padding: 6px 4px !important; border: 1px solid #999 !important; } .bloques-grid td:first-child { background: #f8f9fa !important; font-size: 9pt !important; } .bloque-cell { min-height: 60px !important; } .bloque-cell.occupied { background: #e8f5e9 !important; border: 2px solid #28a745 !important; } .bloque-cell .ee-nombre { font-size: 8pt !important; color: #1a3a6b !important; } .bloque-cell .ee-info { font-size: 7pt !important; color: #666 !important; } }
+.print-header { display: none; }
+@media (max-width: 768px) { .stats { grid-template-columns: repeat(2, 1fr); } .botones-inferiores { grid-template-columns: 1fr; } .bloques-grid { font-size: 0.75em; } .horario-table th, .horario-table td { font-size: 0.7em; padding: 2px; } .horario-table th:first-child { width: 50px; } .header h1 { font-size: 1.4em; } .step-label { display: none; } .selector-grid { grid-template-columns: 1fr; } }
+@media print {
+@page { size: landscape; margin: 8mm; }
+body { background: white !important; padding: 0 !important; margin: 0 !important; }
+* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+.container { box-shadow: none !important; max-width: 100% !important; margin: 0 !important; }
+.header, .steps-indicator, .screen:not(#screen-3), .oferta-header, .stats, .btn-agregar, .instruccion, .botones-inferiores, .footer, .back-btn, .conflict-warning, #loading-section, #error-section, #success-section, #vista-abierto, .modal { display: none !important; }
+#screen-3, #app-main, #vista-escolarizado { display: block !important; }
+body.imprimiendo-abierto #vista-escolarizado { display: none !important; }
+body.imprimiendo-abierto #vista-abierto { display: block !important; }
+.print-header { display: block !important; text-align: center; margin-bottom: 10px; }
+.print-header h2 { font-size: 14pt; color: #1a3a6b; margin-bottom: 3px; }
+.print-header p { font-size: 9pt; color: #333; }
+.sin-bloque-box.show { display: block !important; }
+.horario-table-wrapper { overflow: visible !important; }
+.horario-table { width: 100% !important; table-layout: fixed !important; font-size: 8pt !important; }
+.horario-table th { background: #1a3a6b !important; color: white !important; padding: 4px 2px !important; font-size: 9pt !important; }
+.horario-table th:first-child { width: 50px !important; }
+.horario-table td { padding: 2px !important; border: 1px solid #999 !important; height: auto !important; overflow: hidden !important; }
+.horario-table td:first-child { background: #f0f0f0 !important; font-size: 8pt !important; }
+.horario-table .ee-card { padding: 3px 4px !important; font-size: 7pt !important; box-shadow: none !important; }
+.bloques-grid { width: 100% !important; font-size: 9pt !important; margin-bottom: 10px !important; }
+.bloques-grid th { background: #7c3aed !important; color: white !important; padding: 6px 4px !important; font-size: 9pt !important; border: 1px solid #6d28d9 !important; }
+.bloques-grid th:first-child { background: #1a3a6b !important; width: 80px !important; }
+.bloques-grid td { padding: 4px !important; border: 1px solid #999 !important; height: auto !important; }
+.bloques-grid td:first-child { background: #f8f9fa !important; font-size: 9pt !important; }
+.ee-card-bloque { padding: 3px 4px !important; font-size: 7pt !important; box-shadow: none !important; }
+.ee-card-bloque .ee-nombre { font-size: 7.5pt !important; }
+.ee-card-bloque .ee-info { font-size: 6.5pt !important; }
+}
 </style>
 </head>
 <body>
@@ -166,11 +197,11 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 <div id="error-section" class="error" style="display: none;"></div>
 <div id="success-section" class="success" style="display: none;"></div>
 <div id="app-main" style="display: none;">
-<div class="oferta-header"><div class="oferta-title" id="oferta-title">Oferta Académica</div><button class="btn-cambiar" onclick="cambiarPlan()">Cambiar plan</button></div>
-<div class="creditos-indicator" id="creditos-indicator" style="display:none;">
-<strong>Créditos acumulados:</strong> <span id="creditos-texto">0 / 30</span>
-<div class="creditos-bar"><div class="creditos-fill" id="creditos-fill" style="width:0%; background:#28a745;"></div></div>
+<div class="print-header">
+<h2>📅 Planeador de Horarios Facico — Mi Horario</h2>
+<p id="print-info">Universidad Veracruzana · FCC</p>
 </div>
+<div class="oferta-header"><div class="oferta-title" id="oferta-title">Oferta Académica</div><button class="btn-cambiar" onclick="cambiarPlan()">Cambiar plan</button></div>
 <div class="stats">
 <div class="stat-card"><div class="stat-value" id="stat-ee">0</div><div class="stat-label">Experiencias Educativas</div></div>
 <div class="stat-card"><div class="stat-value" id="stat-creditos">0</div><div class="stat-label">Créditos</div></div>
@@ -178,24 +209,24 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 <div class="stat-card"><div class="stat-value" id="stat-choques">0</div><div class="stat-label">Choques</div></div>
 </div>
 <button class="btn-agregar" onclick="openModal()">Agregar Experiencia Educativa</button>
-<div class="conflict-warning" id="conflict-warning">⚠️ ¡Choque de horario detectado! Las experiencias en conflicto están marcadas con un borde rojo pulsante.</div>
+<div class="conflict-warning" id="conflict-warning">⚠️ ¡Choque de horario detectado! Las experiencias en conflicto están marcadas con un borde rojo pulsante. Toca una para quitarla.</div>
 <div class="instruccion">Toca una Experiencia Educativa en la cuadrícula para quitarla de tu horario.</div>
 <div id="vista-abierto" style="display:none;">
 <table class="bloques-grid" id="bloques-grid">
 <thead><tr><th>Turno</th><th><span class="bloque-num">Bloque 1</span><span class="bloque-fecha" id="fecha-bloque-1">Cargando...</span></th><th><span class="bloque-num">Bloque 2</span><span class="bloque-fecha" id="fecha-bloque-2">Cargando...</span></th><th><span class="bloque-num">Bloque 3</span><span class="bloque-fecha" id="fecha-bloque-3">Cargando...</span></th><th><span class="bloque-num">Bloque 4</span><span class="bloque-fecha" id="fecha-bloque-4">Cargando...</span></th><th><span class="bloque-num">Bloque 5</span><span class="bloque-fecha" id="fecha-bloque-5">Cargando...</span></th></tr></thead>
 <tbody>
-<tr><td>Matutino</td><td class="bloque-cell empty" data-turno="M" data-bloque="1" onclick="cellClickBloque('M', 1)">—</td><td class="bloque-cell empty" data-turno="M" data-bloque="2" onclick="cellClickBloque('M', 2)">—</td><td class="bloque-cell empty" data-turno="M" data-bloque="3" onclick="cellClickBloque('M', 3)">—</td><td class="bloque-cell empty" data-turno="M" data-bloque="4" onclick="cellClickBloque('M', 4)">—</td><td class="bloque-cell empty" data-turno="M" data-bloque="5" onclick="cellClickBloque('M', 5)">—</td></tr>
-<tr><td>Vespertino</td><td class="bloque-cell empty" data-turno="V" data-bloque="1" onclick="cellClickBloque('V', 1)">—</td><td class="bloque-cell empty" data-turno="V" data-bloque="2" onclick="cellClickBloque('V', 2)">—</td><td class="bloque-cell empty" data-turno="V" data-bloque="3" onclick="cellClickBloque('V', 3)">—</td><td class="bloque-cell empty" data-turno="V" data-bloque="4" onclick="cellClickBloque('V', 4)">—</td><td class="bloque-cell empty" data-turno="V" data-bloque="5" onclick="cellClickBloque('V', 5)">—</td></tr>
+<tr><td>Matutino</td><td class="bloque-cell empty" data-turno="M" data-bloque="1"></td><td class="bloque-cell empty" data-turno="M" data-bloque="2"></td><td class="bloque-cell empty" data-turno="M" data-bloque="3"></td><td class="bloque-cell empty" data-turno="M" data-bloque="4"></td><td class="bloque-cell empty" data-turno="M" data-bloque="5"></td></tr>
+<tr><td>Vespertino</td><td class="bloque-cell empty" data-turno="V" data-bloque="1"></td><td class="bloque-cell empty" data-turno="V" data-bloque="2"></td><td class="bloque-cell empty" data-turno="V" data-bloque="3"></td><td class="bloque-cell empty" data-turno="V" data-bloque="4"></td><td class="bloque-cell empty" data-turno="V" data-bloque="5"></td></tr>
 </tbody>
 </table>
+<div class="sin-bloque-box" id="sin-bloque-box">
+<h4>⚠️ Experiencias sin bloque asignado</h4>
+<p>Estas EEs están en tu horario pero aún no tienen bloque en SYRSEIL ni en NRC-SIN-BLOQUE. Pide a dirección que las registre:</p>
+<div id="sin-bloque-list"></div>
+</div>
 </div>
 <div id="vista-escolarizado" style="display:none;"><div class="horario-table-wrapper"><table class="horario-table" id="horario-table"></table></div></div>
-<div class="botones-inferiores">
-<button class="btn-inferior btn-imprimir" onclick="printHorario()">🖨️ Imprimir / PDF</button>
-<button class="btn-inferior btn-deshacer" onclick="deshacer()">↩️ Deshacer</button>
-<button class="btn-inferior btn-exportar" onclick="exportarCSV()">📥 Exportar CSV</button>
-<button class="btn-inferior btn-limpiar" onclick="clearHorario()">🗑️ Limpiar</button>
-</div>
+<div class="botones-inferiores"><button class="btn-inferior btn-imprimir" onclick="printHorario()">🖨️ Imprimir / Guardar PDF</button><button class="btn-inferior btn-limpiar" onclick="clearHorario()">🗑️ Limpiar Mi Horario</button></div>
 </div>
 </div>
 </div>
@@ -208,7 +239,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 <div class="filter-bar">
 <select id="filter-area" onchange="filterEEList()"><option value="">📁 Todas las áreas</option></select>
 <select id="filter-turno" onchange="filterEEList()"><option value="">🕐 Todos los turnos</option><option value="M">Matutino</option><option value="V">Vespertino</option></select>
-<select id="filter-bloque" onchange="filterEEList()" style="display:none;"><option value="">📅 Todos los bloques</option><option value="1">Bloque 1</option><option value="2">Bloque 2</option><option value="3">Bloque 3</option><option value="4">Bloque 4</option><option value="5">Bloque 5</option></select>
+<select id="filter-bloque" onchange="filterEEList()" style="display:none;"><option value="">📅 Todos los bloques</option><option value="1">Bloque 1</option><option value="2">Bloque 2</option><option value="3">Bloque 3</option><option value="4">Bloque 4</option><option value="5">Bloque 5</option><option value="0">Sin bloque asignado</option></select>
 </div>
 <div class="ee-list" id="ee-list"></div>
 <button class="btn-cerrar-modal" onclick="closeModal()">Cerrar</button>
@@ -217,7 +248,6 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 <script>
 const API_KEY = 'AIzaSyBI4tHjYhVazAn6y8CW1k2kC0zcxLX07xI';
 const FOLDER_ID = '1j6zXhkThBBJs5Ur_gnaS8Fql4iRfDNkY';
-const MAX_CREDITOS = 30;
 const FILE_PATTERNS = {
 '04-E': /SYRPRAC.*04.*E.*\.xlsx$/i, '04-A': /SYRPRAC.*04.*A.*\.xlsx$/i,
 '25-E': /SYRPRAC.*25.*E.*\.xlsx$/i, '25-A': /SYRPRAC.*25.*A.*\.xlsx$/i,
@@ -230,7 +260,7 @@ const PALETA_COLORES = [
 { bg: '#28a745', text: '#ffffff' }, { bg: '#007bff', text: '#ffffff' }, { bg: '#fd7e14', text: '#ffffff' },
 { bg: '#6f42c1', text: '#ffffff' }, { bg: '#20c997', text: '#ffffff' }, { bg: '#e83e8c', text: '#ffffff' },
 { bg: '#17a2b8', text: '#ffffff' }, { bg: '#ffc107', text: '#212529' }, { bg: '#dc3545', text: '#ffffff' },
-{ bg: '#6610f2', text: '#ffffff' }, { bg: '#343a40', text: '#ffffff' }, { bg: '#28a745', text: '#ffffff' }
+{ bg: '#6610f2', text: '#ffffff' }, { bg: '#343a40', text: '#ffffff' }, { bg: '#0d6efd', text: '#ffffff' }
 ];
 let appState = {
 currentScreen: 1, modalidad: null, plan: null,
@@ -238,26 +268,7 @@ datosCargados: { '04-E': null, '04-A': null, '25-E': null, '25-A': null },
 bloquesFechas: {}, nrcBloque: {},
 experienciasEducativas: [], horarioSeleccionado: [], datosCargadosOK: false
 };
-let historial = [];
-document.addEventListener('DOMContentLoaded', () => {
-const saved = localStorage.getItem('horarioFacico');
-if (saved) {
-try {
-const data = JSON.parse(saved);
-if (data.modalidad && data.plan) {
-appState.modalidad = data.modalidad;
-appState.plan = data.plan;
-}
-} catch(e) {}
-}
-});
-function guardarEstado() {
-localStorage.setItem('horarioFacico', JSON.stringify({
-modalidad: appState.modalidad,
-plan: appState.plan,
-horarioSeleccionado: appState.horarioSeleccionado.map(e => e.crn)
-}));
-}
+document.addEventListener('DOMContentLoaded', () => {});
 function goToScreen(num) {
 if (num === 2 && !appState.modalidad) return;
 if (num === 3 && (!appState.modalidad || !appState.plan)) return;
@@ -293,6 +304,7 @@ document.getElementById('loading-section').style.display = 'block';
 document.getElementById('app-main').style.display = 'none';
 document.getElementById('error-section').style.display = 'none';
 document.getElementById('success-section').style.display = 'none';
+updateLoadingMessage('🔍 Buscando archivos en Google Drive...');
 const files = await listFilesInFolder();
 console.log('Archivos encontrados:', files);
 if (!files || files.length === 0) throw new Error('No se encontraron archivos en la carpeta de Google Drive.');
@@ -301,43 +313,35 @@ for (const [key, pattern] of Object.entries(FILE_PATTERNS)) {
 const file = files.find(f => pattern.test(f.name));
 if (file) { archivosEncontrados[key] = file; console.log(`✓ ${key}: ${file.name}`); }
 }
-const seilKeys = Object.keys(archivosEncontrados).filter(k => k.startsWith('SEIL-'));
-for (const key of seilKeys) {
-const file = archivosEncontrados[key];
-try {
-updateLoadingMessage(`Cargando ${file.name}...`);
-const nrcMap = await downloadAndProcessSEIL(file.id);
+// DESCARGA PARALELA de todos los archivos encontrados (mejora de velocidad)
+updateLoadingMessage(`⬇️ Descargando ${Object.keys(archivosEncontrados).length} archivos en paralelo...`);
+const workbooks = {};
+await Promise.all(Object.entries(archivosEncontrados).map(async ([key, file]) => {
+try { workbooks[key] = await fetchWorkbook(file.id); }
+catch (err) { console.error(`Error descargando ${file.name}:`, err); }
+}));
+// PASO 1: SYRSEIL → mapa nrcBloque
+for (const key of Object.keys(workbooks).filter(k => k.startsWith('SEIL-'))) {
+const nrcMap = processSEILData(workbooks[key]);
 Object.assign(appState.nrcBloque, nrcMap);
 console.log(`✓ ${key}: ${Object.keys(nrcMap).length} NRCs con bloque`);
-} catch (err) { console.error(`Error procesando ${file.name}:`, err); }
 }
-if (archivosEncontrados['NRC-SIN-BLOQUE']) {
-try {
-updateLoadingMessage(`Cargando NRC-SIN-BLOQUE.xlsx...`);
-const nrcSinBloqueMap = await downloadAndProcessNRCSinBloque(archivosEncontrados['NRC-SIN-BLOQUE'].id);
-let nuevosNRC = 0;
-for (const [crn, bloque] of Object.entries(nrcSinBloqueMap)) {
-if (!appState.nrcBloque[crn]) {
-appState.nrcBloque[crn] = bloque;
-nuevosNRC++;
+// PASO 2: NRC-SIN-BLOQUE → completa los que faltan
+if (workbooks['NRC-SIN-BLOQUE']) {
+const sinMap = processNRCSinBloque(workbooks['NRC-SIN-BLOQUE']);
+let nuevos = 0;
+for (const [crn, bloque] of Object.entries(sinMap)) {
+if (!appState.nrcBloque[crn]) { appState.nrcBloque[crn] = bloque; nuevos++; }
 }
+console.log(`✓ NRC-SIN-BLOQUE: ${nuevos} NRCs agregados`);
 }
-console.log(`✓ NRC-SIN-BLOQUE: ${nuevosNRC} NRCs agregados (total: ${Object.keys(appState.nrcBloque).length})`);
-} catch (err) { console.error('Error procesando NRC-SIN-BLOQUE:', err); }
-}
-if (archivosEncontrados['BLOQUES-A']) {
-updateLoadingMessage(`Cargando Bloques-Abierto.xlsx...`);
-appState.bloquesFechas = await downloadAndProcessBloques(archivosEncontrados['BLOQUES-A'].id);
-}
-const pracKeys = Object.keys(archivosEncontrados).filter(k => !k.startsWith('SEIL-') && k !== 'BLOQUES-A' && k !== 'NRC-SIN-BLOQUE');
-for (const key of pracKeys) {
-const file = archivosEncontrados[key];
-try {
-updateLoadingMessage(`Cargando ${file.name}...`);
-const data = await downloadAndProcessFile(file.id);
+// PASO 3: Bloques-Abierto → fechas
+if (workbooks['BLOQUES-A']) appState.bloquesFechas = processBloquesData(workbooks['BLOQUES-A']);
+// PASO 4: SYRPRAC → EEs (nrcBloque ya está completo)
+for (const key of Object.keys(workbooks).filter(k => !k.startsWith('SEIL-') && k !== 'BLOQUES-A' && k !== 'NRC-SIN-BLOQUE')) {
+const data = processData(workbooks[key]);
 appState.datosCargados[key] = data;
 console.log(`✓ ${key}: ${data.length} EEs`);
-} catch (err) { console.error(`Error procesando ${file.name}:`, err); }
 }
 const totalEE = Object.values(appState.datosCargados).reduce((sum, d) => sum + (d ? d.length : 0), 0);
 if (totalEE === 0) throw new Error('No se pudo procesar ningún archivo SYRPRAC.');
@@ -357,98 +361,20 @@ const data = await response.json();
 if (data.error) throw new Error(data.error.message);
 return data.files || [];
 }
-async function downloadAndProcessFile(fileId) {
+async function fetchWorkbook(fileId) {
 const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
 const response = await fetch(url);
 if (!response.ok) throw new Error(`Error al descargar: ${response.status}`);
 const blob = await response.blob();
 const arrayBuffer = await blob.arrayBuffer();
-const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-const sheetName = workbook.SheetNames[0];
-const worksheet = workbook.Sheets[sheetName];
-const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-return processData(jsonData);
+return XLSX.read(arrayBuffer, { type: 'array' });
 }
-async function downloadAndProcessBloques(fileId) {
-const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
-const response = await fetch(url);
-if (!response.ok) throw new Error(`Error al descargar: ${response.status}`);
-const blob = await response.blob();
-const arrayBuffer = await blob.arrayBuffer();
-const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-const sheetName = workbook.SheetNames[0];
-const worksheet = workbook.Sheets[sheetName];
-const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-return processBloquesData(jsonData);
+function sheetToData(workbook, sheetName) {
+const ws = workbook.Sheets[sheetName];
+return XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 }
-async function downloadAndProcessSEIL(fileId) {
-const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
-const response = await fetch(url);
-if (!response.ok) throw new Error(`Error al descargar: ${response.status}`);
-const blob = await response.blob();
-const arrayBuffer = await blob.arrayBuffer();
-const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-const sheetName = workbook.SheetNames[0];
-const worksheet = workbook.Sheets[sheetName];
-const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-return processSEILData(jsonData);
-}
-async function downloadAndProcessNRCSinBloque(fileId) {
-const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
-const response = await fetch(url);
-if (!response.ok) throw new Error(`Error al descargar: ${response.status}`);
-const blob = await response.blob();
-const arrayBuffer = await blob.arrayBuffer();
-const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-const nrcMap = {};
-if (workbook.SheetNames.includes('2004')) {
-const worksheet2004 = workbook.Sheets['2004'];
-const jsonData2004 = XLSX.utils.sheet_to_json(worksheet2004, { header: 1, defval: '' });
-const nrcs2004 = processNRCSinBloqueSheet(jsonData2004, '04');
-Object.assign(nrcMap, nrcs2004);
-}
-if (workbook.SheetNames.includes('2025')) {
-const worksheet2025 = workbook.Sheets['2025'];
-const jsonData2025 = XLSX.utils.sheet_to_json(worksheet2025, { header: 1, defval: '' });
-const nrcs2025 = processNRCSinBloqueSheet(jsonData2025, '25');
-Object.assign(nrcMap, nrcs2025);
-}
-return nrcMap;
-}
-function processNRCSinBloqueSheet(data, plan) {
-const nrcMap = {};
-if (!data || data.length < 2) return nrcMap;
-let headerRowIndex = 0, headers = [];
-for (let i = 0; i < Math.min(5, data.length); i++) {
-const row = data[i];
-if (row && (String(row[0] || '').toLowerCase().includes('nrc') || String(row[0] || '').toLowerCase().includes('crn'))) {
-headerRowIndex = i;
-headers = row.map(h => String(h || '').trim().toUpperCase());
-break;
-}
-}
-if (headers.length === 0) headers = data[0].map(h => String(h || '').trim().toUpperCase());
-const idxNRC = headers.findIndex(h => h.includes('NRC') || h.includes('CRN'));
-const idxBloque = headers.findIndex(h => h.includes('BLOQUE'));
-if (idxNRC < 0 || idxBloque < 0) {
-console.warn(`NRC-SIN-BLOQUE hoja ${plan}: columnas no encontradas`);
-return nrcMap;
-}
-for (let i = headerRowIndex + 1; i < data.length; i++) {
-const row = data[i];
-if (!row || row.length === 0) continue;
-const nrc = row[idxNRC];
-const bloque = row[idxBloque];
-if (!nrc || !bloque) continue;
-const nrcStr = String(nrc).trim();
-const bloqueNum = parseInt(bloque);
-if (!isNaN(bloqueNum) && bloqueNum >= 1 && bloqueNum <= 5) {
-nrcMap[nrcStr] = bloqueNum;
-}
-}
-return nrcMap;
-}
-function processBloquesData(data) {
+function processBloquesData(workbook) {
+const data = sheetToData(workbook, workbook.SheetNames[0]);
 const bloques = {};
 let headerRow = null, fechasRow = null;
 for (let i = 0; i < data.length; i++) {
@@ -469,7 +395,8 @@ if (bloqueNombre && fechas) bloques[i] = fechas;
 }
 return bloques;
 }
-function processSEILData(data) {
+function processSEILData(workbook) {
+const data = sheetToData(workbook, workbook.SheetNames[0]);
 const nrcMap = {};
 if (!data || data.length < 2) return nrcMap;
 let headerRowIndex = 0, headers = [];
@@ -484,20 +411,45 @@ break;
 if (headers.length === 0) headers = data[0].map(h => String(h).trim());
 const idxCRN = headers.indexOf('SWBSEIL_CRN');
 const idxPTRM = headers.indexOf('SWBSEIL_PTRM_CODE');
-if (idxCRN < 0 || idxPTRM < 0) {
-console.warn('Columnas no encontradas. Encabezados:', headers);
-return nrcMap;
-}
+if (idxCRN < 0 || idxPTRM < 0) { console.warn('Columnas SYRSEIL no encontradas:', headers); return nrcMap; }
 for (let i = headerRowIndex + 1; i < data.length; i++) {
 const row = data[i];
 if (!row || row.length === 0) continue;
-const crn = row[idxCRN];
-const ptrm = row[idxPTRM];
+const crn = row[idxCRN], ptrm = row[idxPTRM];
 if (!crn || !ptrm) continue;
-const crnStr = String(crn).trim();
 const ptrmStr = String(ptrm).trim();
-if (PTRM_TO_BLOQUE[ptrmStr]) {
-nrcMap[crnStr] = PTRM_TO_BLOQUE[ptrmStr];
+if (PTRM_TO_BLOQUE[ptrmStr]) nrcMap[String(crn).trim()] = PTRM_TO_BLOQUE[ptrmStr];
+}
+return nrcMap;
+}
+function processNRCSinBloque(workbook) {
+const nrcMap = {};
+const sheets = workbook.SheetNames;
+// Hojas "2004"/"2025" (o "04"/"25")
+for (const sheetName of sheets) {
+if (!/2004|2025|^04$|^25$/i.test(sheetName)) continue;
+const data = sheetToData(workbook, sheetName);
+if (!data || data.length < 2) continue;
+let headerRowIndex = 0, headers = [];
+for (let i = 0; i < Math.min(5, data.length); i++) {
+const row = data[i];
+if (row && row.some(c => String(c || '').toUpperCase().includes('NRC'))) {
+headerRowIndex = i;
+headers = row.map(h => String(h || '').trim().toUpperCase());
+break;
+}
+}
+if (headers.length === 0) headers = data[0].map(h => String(h || '').trim().toUpperCase());
+const idxNRC = headers.findIndex(h => h.includes('NRC') || h.includes('CRN'));
+const idxBloque = headers.findIndex(h => h.includes('BLOQUE'));
+if (idxNRC < 0 || idxBloque < 0) { console.warn(`NRC-SIN-BLOQUE hoja ${sheetName}: columnas no encontradas`, headers); continue; }
+for (let i = headerRowIndex + 1; i < data.length; i++) {
+const row = data[i];
+if (!row || row.length === 0) continue;
+const nrc = row[idxNRC], bloque = row[idxBloque];
+if (!nrc || !bloque) continue;
+const bloqueNum = parseInt(bloque);
+if (!isNaN(bloqueNum) && bloqueNum >= 1 && bloqueNum <= 5) nrcMap[String(nrc).trim()] = bloqueNum;
 }
 }
 return nrcMap;
@@ -509,7 +461,8 @@ const el = document.getElementById(`fecha-bloque-${i}`);
 if (el) el.textContent = fechas;
 }
 }
-function processData(data) {
+function processData(workbook) {
+const data = sheetToData(workbook, workbook.SheetNames[0]);
 if (!data || data.length < 2) return [];
 let headerRowIndex = 0, headers = [];
 for (let i = 0; i < Math.min(5, data.length); i++) {
@@ -563,7 +516,7 @@ const ini = parseInt(row[d.ini]), fin = parseInt(row[d.fin]);
 if (!isNaN(ini) && !isNaN(fin) && ini > 0 && fin > 0 && fin > ini) {
 const existe = crnMap[crn].horarios.some(eh => eh.dia === d.dia && eh.inicio === ini && eh.fin === fin);
 if (!existe) crnMap[crn].horarios.push({ dia: d.dia, inicio: ini, fin: fin });
-if (salonCompleto) crnMap[crn].salonesPorDia[d.dia] = salonCompleto;
+if (salonCompleto && !crnMap[crn].salonesPorDia[d.dia]) crnMap[crn].salonesPorDia[d.dia] = salonCompleto;
 }
 });
 }
@@ -573,11 +526,12 @@ ee.bloqueAsignado = appState.nrcBloque[ee.crn] || null;
 return ee;
 });
 }
+// Detección de turno por HORA DE INICIO del sábado (más robusto que el promedio)
 function clasificarBloque(horarios) {
 const sabado = horarios.filter(h => h.dia === 5);
 if (sabado.length === 0) return { tipo: 'escolarizado', turno: null };
-const promedio = sabado.reduce((sum, h) => sum + h.inicio, 0) / sabado.length;
-const turno = promedio < 1400 ? 'M' : 'V';
+const inicioMin = Math.min(...sabado.map(h => timeToMinutes(h.inicio)));
+const turno = inicioMin < 14 * 60 ? 'M' : 'V';
 return { tipo: 'abierto', turno: turno };
 }
 function extraerAula(salonCompleto) {
@@ -593,8 +547,8 @@ showError('⚠️ No hay datos disponibles para esta combinación de plan y moda
 return;
 }
 appState.experienciasEducativas = datos;
-appState.horarioSeleccionado = [];
-historial = [];
+// RESTAURAR horario previo desde localStorage
+appState.horarioSeleccionado = loadHorario(key);
 document.getElementById('loading-section').style.display = 'none';
 document.getElementById('app-main').style.display = 'block';
 const modalidadTxt = appState.modalidad === 'E' ? 'Escolarizado' : 'Abierto';
@@ -603,15 +557,11 @@ document.getElementById('header-subtitle').textContent = `Periodo Agosto 2026 - 
 document.getElementById('header-plan-badge').textContent = `${modalidadTxt} · ${planTxt}`;
 document.getElementById('oferta-title').textContent = `Oferta Académica · ${modalidadTxt} · ${planTxt}`;
 document.getElementById('stat-horas-label').textContent = appState.modalidad === 'A' ? 'Horas/Sábado' : 'Horas/Semana';
+updatePrintHeader();
 const filterTurno = document.getElementById('filter-turno');
 const filterBloque = document.getElementById('filter-bloque');
-if (appState.modalidad === 'E') {
-filterTurno.style.display = 'none';
-filterBloque.style.display = 'none';
-} else {
-filterTurno.style.display = 'block';
-filterBloque.style.display = 'block';
-}
+if (appState.modalidad === 'E') { filterTurno.style.display = 'none'; filterBloque.style.display = 'none'; }
+else { filterTurno.style.display = 'block'; filterBloque.style.display = 'block'; }
 if (appState.modalidad === 'A') {
 document.getElementById('vista-abierto').style.display = 'block';
 document.getElementById('vista-escolarizado').style.display = 'none';
@@ -624,10 +574,15 @@ populateAreaFilter();
 updateStats();
 renderVista();
 }
+function updatePrintHeader() {
+const modalidadTxt = appState.modalidad === 'E' ? 'Escolarizado' : 'Abierto';
+const planTxt = appState.plan === '04' ? 'Plan 2004' : 'Plan 2025';
+const fecha = new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+document.getElementById('print-info').textContent = `Periodo Agosto 2026 - Enero 2027 · ${modalidadTxt} · ${planTxt} · Generado: ${fecha}`;
+}
 function cambiarPlan() {
 appState.plan = appState.plan === '04' ? '25' : '04';
 appState.horarioSeleccionado = [];
-historial = [];
 initializeApp();
 }
 function timeToMinutes(time) { const hours = Math.floor(time / 100); const minutes = time % 100; return hours * 60 + minutes; }
@@ -644,56 +599,68 @@ document.getElementById('stat-creditos').textContent = totalCreditos;
 document.getElementById('stat-horas').textContent = totalHoras;
 document.getElementById('stat-choques').textContent = choques;
 document.getElementById('conflict-warning').classList.toggle('show', choques > 0);
-const indicator = document.getElementById('creditos-indicator');
-if (appState.modalidad === 'E') {
-indicator.style.display = 'block';
-document.getElementById('creditos-texto').textContent = `${totalCreditos} / ${MAX_CREDITOS}`;
-const porcentaje = Math.min((totalCreditos / MAX_CREDITOS) * 100, 100);
-const fill = document.getElementById('creditos-fill');
-fill.style.width = `${porcentaje}%`;
-fill.style.background = porcentaje > 90 ? '#dc3545' : porcentaje > 75 ? '#ffc107' : '#28a745';
-} else {
-indicator.style.display = 'none';
-}
-guardarEstado();
 }
 function renderVista() { if (appState.modalidad === 'A') renderBloquesGrid(); else renderHorarioTable(); }
 function renderBloquesGrid() {
-document.querySelectorAll('.bloque-cell').forEach(cell => { cell.className = 'bloque-cell empty'; cell.innerHTML = '—'; });
+document.querySelectorAll('.bloque-cell').forEach(cell => { cell.className = 'bloque-cell empty'; cell.innerHTML = ''; });
+// Agrupar EEs por celda (turno-bloque)
+const celdas = {};
+const sinBloque = [];
 appState.horarioSeleccionado.forEach(ee => {
 const turno = ee.bloqueInfo.turno;
 const bloque = ee.bloqueAsignado;
-if (!turno || !bloque) return;
+if (!turno) return;
+if (!bloque) { sinBloque.push(ee); return; }
+const k = `${turno}-${bloque}`;
+if (!celdas[k]) celdas[k] = [];
+celdas[k].push(ee);
+});
+// Renderizar tarjetas en cada celda
+for (const [k, ees] of Object.entries(celdas)) {
+const [turno, bloque] = k.split('-');
 const cell = document.querySelector(`.bloque-cell[data-turno="${turno}"][data-bloque="${bloque}"]`);
-if (cell && cell.classList.contains('empty')) {
-cell.className = 'bloque-cell occupied';
-const nombreCorto = ee.nombre.length > 30 ? ee.nombre.substring(0, 30) + '...' : ee.nombre;
-cell.innerHTML = `<div class="ee-nombre">${nombreCorto}</div><div class="ee-info">NRC ${ee.crn}<br>${ee.docente.substring(0, 25)}<br>📍 ${Object.values(ee.salonesPorDia)[0] || 'Por asignar'}<br>🕐 ${ee.horarios.map(h => formatTime(h.inicio) + '-' + formatTime(h.fin)).join(', ')}</div>`;
-} else if (cell) {
-for (let b = bloque + 1; b <= 5; b++) {
-const nextCell = document.querySelector(`.bloque-cell[data-turno="${turno}"][data-bloque="${b}"]`);
-if (nextCell && nextCell.classList.contains('empty')) {
-nextCell.className = 'bloque-cell occupied';
-const nombreCorto = ee.nombre.length > 30 ? ee.nombre.substring(0, 30) + '...' : ee.nombre;
-nextCell.innerHTML = `<div class="ee-nombre">${nombreCorto}</div><div class="ee-info">NRC ${ee.crn}<br>${ee.docente.substring(0, 25)}<br>📍 ${Object.values(ee.salonesPorDia)[0] || 'Por asignar'}<br>🕐 ${ee.horarios.map(h => formatTime(h.inicio) + '-' + formatTime(h.fin)).join(', ')}</div>`;
-break;
-}
-}
-}
+if (!cell) continue;
+cell.classList.remove('empty');
+const esConflicto = ees.length > 1; // Dos EEs en el mismo bloque+turno = choque real
+ees.forEach(ee => {
+const idx = appState.horarioSeleccionado.findIndex(e => e.crn === ee.crn);
+const color = PALETA_COLORES[idx % PALETA_COLORES.length];
+const nombreCorto = ee.nombre.length > 28 ? ee.nombre.substring(0, 28) + '...' : ee.nombre;
+const aula = extraerAula(Object.values(ee.salonesPorDia)[0] || '');
+const card = document.createElement('div');
+card.className = 'ee-card-bloque' + (esConflicto ? ' conflicto' : '');
+card.dataset.crn = ee.crn;
+card.style.background = color.bg;
+card.style.color = color.text;
+card.innerHTML = `<div class="ee-nombre">${nombreCorto}</div><div class="ee-info">NRC ${ee.crn} · ${ee.docente}<br>🕐 ${ee.horarios.map(h => formatTime(h.inicio) + '-' + formatTime(h.fin)).join(', ')} · 📍 ${aula}</div>`;
+cell.appendChild(card);
 });
 }
-function cellClickBloque(turno, bloque) {
-const cell = document.querySelector(`.bloque-cell[data-turno="${turno}"][data-bloque="${bloque}"]`);
-if (cell.classList.contains('occupied')) {
-const eeNombre = cell.querySelector('.ee-nombre').textContent;
-if (confirm(`¿Quitar "${eeNombre}" de tu horario?`)) {
-const ee = appState.horarioSeleccionado.find(e => e.bloqueInfo.turno === turno && e.nombre.startsWith(eeNombre.replace('...', '')));
-if (ee) {
-historial.push([...appState.horarioSeleccionado]);
-appState.horarioSeleccionado = appState.horarioSeleccionado.filter(e => e.crn !== ee.crn);
-updateStats(); renderBloquesGrid();
+// Sección de EEs sin bloque asignado
+const box = document.getElementById('sin-bloque-box');
+const list = document.getElementById('sin-bloque-list');
+if (sinBloque.length > 0) {
+box.classList.add('show');
+list.innerHTML = sinBloque.map(ee => `<span class="ee-tag" data-crn="${ee.crn}" title="Clic para quitar">NRC ${ee.crn} · ${ee.nombre}</span>`).join('');
+list.querySelectorAll('.ee-tag').forEach(tag => {
+tag.onclick = () => removeEE(tag.dataset.crn);
+});
+} else {
+box.classList.remove('show');
+list.innerHTML = '';
 }
+// Clic en tarjetas para quitar
+document.querySelectorAll('.ee-card-bloque').forEach(card => {
+card.addEventListener('click', function() { removeEE(this.dataset.crn); });
+});
 }
+function removeEE(crn) {
+const ee = appState.horarioSeleccionado.find(e => e.crn === crn);
+if (ee && confirm(`¿Quitar "${ee.nombre}" de tu horario?`)) {
+appState.horarioSeleccionado = appState.horarioSeleccionado.filter(e => e.crn !== crn);
+saveHorario();
+updateStats();
+renderVista();
 }
 }
 function renderHorarioTable() {
@@ -745,31 +712,14 @@ row.appendChild(cell);
 table.appendChild(row);
 }
 document.querySelectorAll('.ee-card').forEach(card => {
-card.addEventListener('click', function() {
-const crn = this.dataset.crn;
-const ee = appState.horarioSeleccionado.find(e => e.crn === crn);
-if (ee && confirm(`¿Quitar "${ee.nombre}" de tu horario?`)) {
-historial.push([...appState.horarioSeleccionado]);
-appState.horarioSeleccionado = appState.horarioSeleccionado.filter(e => e.crn !== crn);
-updateStats(); renderHorarioTable();
-}
-});
+card.addEventListener('click', function() { removeEE(this.dataset.crn); });
 });
 }
 function detectConflicts() {
 let conflicts = 0;
-const conflictPairs = detectConflictEEs();
-const counted = new Set();
 for (let i = 0; i < appState.horarioSeleccionado.length; i++) {
 for (let j = i + 1; j < appState.horarioSeleccionado.length; j++) {
-const ee1 = appState.horarioSeleccionado[i];
-const ee2 = appState.horarioSeleccionado[j];
-if (conflictPairs.has(ee1.crn) && conflictPairs.has(ee2.crn)) {
-if (tieneChoqueReal(ee1, ee2)) {
-const key = `${ee1.crn}-${ee2.crn}`;
-if (!counted.has(key)) { counted.add(key); conflicts++; }
-}
-}
+if (tieneChoqueReal(appState.horarioSeleccionado[i], appState.horarioSeleccionado[j])) conflicts++;
 }
 }
 return conflicts;
@@ -778,12 +728,8 @@ function detectConflictEEs() {
 const conflictEEs = new Set();
 for (let i = 0; i < appState.horarioSeleccionado.length; i++) {
 for (let j = i + 1; j < appState.horarioSeleccionado.length; j++) {
-const ee1 = appState.horarioSeleccionado[i];
-const ee2 = appState.horarioSeleccionado[j];
-if (tieneChoqueReal(ee1, ee2)) {
-conflictEEs.add(ee1.crn);
-conflictEEs.add(ee2.crn);
-}
+const ee1 = appState.horarioSeleccionado[i], ee2 = appState.horarioSeleccionado[j];
+if (tieneChoqueReal(ee1, ee2)) { conflictEEs.add(ee1.crn); conflictEEs.add(ee2.crn); }
 }
 }
 return conflictEEs;
@@ -835,7 +781,7 @@ item.className = 'ee-item';
 item.dataset.search = `${ee.nombre} ${ee.docente} ${ee.crn} ${ee.area}`.toLowerCase();
 item.dataset.area = ee.area || '';
 item.dataset.turno = ee.bloqueInfo.turno || '';
-item.dataset.bloque = ee.bloqueAsignado || '';
+item.dataset.bloque = ee.bloqueAsignado || '0';
 const horariosDetallados = ee.horarios.map(h => {
 const salonDelDia = ee.salonesPorDia[h.dia] || Object.values(ee.salonesPorDia)[0] || '';
 const aula = extraerAula(salonDelDia);
@@ -843,8 +789,11 @@ return `${diasNombre[h.dia]} ${formatTime(h.inicio)}-${formatTime(h.fin)} (${aul
 }).join(' · ');
 const yaAgregada = appState.horarioSeleccionado.some(e => e.crn === ee.crn);
 if (yaAgregada) item.classList.add('added');
-const bloqueInfo = ee.bloqueAsignado ? ` · <strong>Bloque ${ee.bloqueAsignado}</strong>` : '';
-item.innerHTML = `<h4>${ee.nombre} ${yaAgregada ? '✓ (Ya agregada)' : ''}</h4><p><span class="area-badge">${ee.areaCode || 'N/A'}</span> <strong>NRC:</strong> ${ee.crn} · <strong>Créditos:</strong> ${ee.creditos}${bloqueInfo}</p><p><strong>Docente:</strong> ${ee.docente}</p><p><strong>Horario:</strong> ${horariosDetallados}</p><p><strong>Turno:</strong> ${ee.bloqueInfo.turno === 'M' ? 'Matutino' : ee.bloqueInfo.turno === 'V' ? 'Vespertino' : 'Escolarizado'}</p>`;
+let bloqueBadge = '';
+if (appState.modalidad === 'A') {
+bloqueBadge = ee.bloqueAsignado ? `<span class="bloque-badge">Bloque ${ee.bloqueAsignado}</span>` : `<span class="sin-bloque-badge">Sin bloque asignado</span>`;
+}
+item.innerHTML = `<h4>${ee.nombre} ${yaAgregada ? '✓ (Ya agregada)' : ''}</h4><p>${bloqueBadge}<span class="area-badge">${ee.areaCode || 'N/A'}</span> <strong>NRC:</strong> ${ee.crn} · <strong>Créditos:</strong> ${ee.creditos} · <strong>Cupo:</strong> ${ee.maxEnrl}</p><p><strong>Docente:</strong> ${ee.docente}</p><p><strong>Horario:</strong> ${horariosDetallados}</p><p><strong>Turno:</strong> ${ee.bloqueInfo.turno === 'M' ? 'Matutino' : ee.bloqueInfo.turno === 'V' ? 'Vespertino' : 'Escolarizado'}</p>`;
 if (!yaAgregada) item.onclick = () => addEEToHorario(ee);
 eeList.appendChild(item);
 });
@@ -868,67 +817,30 @@ item.style.display = (matchSearch && matchArea && matchTurno && matchBloque) ? '
 function closeModal() { document.getElementById('ee-modal').classList.remove('active'); }
 function addEEToHorario(ee) {
 if (appState.horarioSeleccionado.find(e => e.crn === ee.crn)) { alert('Esta EE ya está en tu horario'); return; }
-const tieneChoque = appState.horarioSeleccionado.some(e => tieneChoqueReal(e, ee));
-if (tieneChoque) {
-if (!confirm('⚠️ Esta EE tiene choque de horario con otra. ¿Deseas agregarla de todos modos?')) {
-return;
-}
-}
-historial.push([...appState.horarioSeleccionado]);
 appState.horarioSeleccionado.push(ee);
+saveHorario();
 updateStats(); renderVista(); closeModal();
 }
-function clearHorario() {
-if (appState.horarioSeleccionado.length === 0) {
-alert('El horario ya está vacío');
-return;
+function clearHorario() { if (confirm('¿Limpiar todo el horario?')) { appState.horarioSeleccionado = []; saveHorario(); updateStats(); renderVista(); } }
+// PERSISTENCIA con localStorage
+function horarioKey() { return `facico-horario-${appState.plan}-${appState.modalidad}`; }
+function saveHorario() {
+try { localStorage.setItem(horarioKey(), JSON.stringify(appState.horarioSeleccionado.map(e => e.crn))); } catch (e) {}
 }
-if (confirm(`¿Estás seguro de limpiar todo el horario?\n\nTienes ${appState.horarioSeleccionado.length} experiencia(s) educativa(s) agregada(s).`)) {
-historial.push([...appState.horarioSeleccionado]);
-appState.horarioSeleccionado = [];
-updateStats(); renderVista();
-}
-}
-function deshacer() {
-if (historial.length === 0) {
-alert('No hay acciones para deshacer');
-return;
-}
-appState.horarioSeleccionado = historial.pop();
-updateStats(); renderVista();
-}
-function exportarCSV() {
-if (appState.horarioSeleccionado.length === 0) {
-alert('No hay experiencias educativas en tu horario');
-return;
-}
-let csv = 'Día,Hora Inicio,Hora Fin,Experiencia Educativa,NRC,Docente,Salón,Créditos\n';
-const diasNombre = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-appState.horarioSeleccionado.forEach(ee => {
-ee.horarios.forEach(h => {
-const salonDelDia = ee.salonesPorDia[h.dia] || Object.values(ee.salonesPorDia)[0] || 'Por asignar';
-csv += `${diasNombre[h.dia]},${formatTime(h.inicio)},${formatTime(h.fin)},"${ee.nombre}",${ee.crn},"${ee.docente}","${salonDelDia}",${ee.creditos}\n`;
-});
-});
-const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url;
-a.download = `horario-${appState.modalidad === 'E' ? 'escolarizado' : 'abierto'}-${appState.plan === '04' ? '2004' : '2025'}.csv`;
-a.click();
-URL.revokeObjectURL(url);
+function loadHorario(key) {
+try {
+const raw = localStorage.getItem(key);
+if (!raw) return [];
+const crns = JSON.parse(raw);
+return appState.experienciasEducativas.filter(ee => crns.includes(ee.crn));
+} catch (e) { return []; }
 }
 function printHorario() {
-if (appState.modalidad === 'A') {
-document.body.classList.add('imprimiendo-abierto');
-} else {
-document.body.classList.remove('imprimiendo-abierto');
-}
+if (appState.modalidad === 'A') document.body.classList.add('imprimiendo-abierto');
+else document.body.classList.remove('imprimiendo-abierto');
 setTimeout(() => {
 window.print();
-setTimeout(() => {
-document.body.classList.remove('imprimiendo-abierto');
-}, 1000);
+setTimeout(() => { document.body.classList.remove('imprimiendo-abierto'); }, 1000);
 }, 100);
 }
 function updateLoadingMessage(msg) { document.getElementById('loading-message').textContent = msg; }
