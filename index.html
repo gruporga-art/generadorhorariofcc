@@ -119,8 +119,60 @@
         .btn-cerrar-modal { background: #6c757d; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-size: 1em; cursor: pointer; margin-top: 15px; }
         .conflict-warning { background: #fff3cd; border: 2px solid #ffc107; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; }
         .conflict-warning.show { display: block; }
-        @media (max-width: 768px) { .stats { grid-template-columns: repeat(2, 1fr); } .botones-inferiores { grid-template-columns: repeat(2, 1fr); } .bloques-grid { font-size: 0.75em; } .horario-table th, .horario-table td { font-size: 0.7em; padding: 2px; } .horario-table th:first-child { width: 50px; } .header h1 { font-size: 1.4em; } .step-label { display: none; } .selector-grid { grid-template-columns: 1fr; } }
-        @media print { @page { size: landscape; margin: 8mm; } body { background: white !important; padding: 0 !important; margin: 0 !important; } * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .container { box-shadow: none !important; max-width: 100% !important; margin: 0 !important; } .header, .steps-indicator, .screen:not(#screen-3), .oferta-header, .stats, .btn-agregar, .instruccion, .botones-inferiores, .footer, .back-btn, .conflict-warning, #loading-section, #error-section, #success-section, #vista-abierto, .modal { display: none !important; } #screen-3, #app-main, #vista-escolarizado { display: block !important; } body.imprimiendo-abierto #vista-escolarizado { display: none !important; } body.imprimiendo-abierto #vista-abierto { display: block !important; } body.imprimiendo-abierto .oferta-header, body.imprimiendo-abierto .stats { display: block !important; } .horario-table-wrapper { overflow: visible !important; } .horario-table { width: 100% !important; table-layout: fixed !important; font-size: 8pt !important; } .horario-table th { background: #1a3a6b !important; color: white !important; padding: 4px 2px !important; font-size: 9pt !important; } .horario-table th:first-child { width: 50px !important; } .horario-table td { padding: 2px !important; border: 1px solid #999 !important; height: auto !important; overflow: hidden !important; } .horario-table td:first-child { background: #f0f0f0 !important; font-size: 8pt !important; } .horario-table .ee-card { padding: 3px 4px !important; font-size: 7pt !important; box-shadow: none !important; } .bloques-grid { width: 100% !important; font-size: 9pt !important; margin-bottom: 10px !important; } .bloques-grid th { background: #7c3aed !important; color: white !important; padding: 6px 4px !important; font-size: 9pt !important; border: 1px solid #6d28d9 !important; } .bloques-grid th:first-child { background: #1a3a6b !important; width: 80px !important; } .bloques-grid td { padding: 6px 4px !important; border: 1px solid #999 !important; } .bloques-grid td:first-child { background: #f8f9fa !important; font-size: 9pt !important; } .bloque-cell { min-height: 60px !important; } .bloque-cell.occupied { background: #e8f5e9 !important; border: 2px solid #28a745 !important; } .bloque-cell .ee-nombre { font-size: 8pt !important; color: #1a3a6b !important; } .bloque-cell .ee-info { font-size: 7pt !important; color: #666 !important; } }
+        
+        /* ESTILOS DEL MODAL DE EVALUACIÓN */
+        .eval-role-btn { flex: 1; padding: 20px; font-size: 1.1em; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .eval-question { margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #1a3a6b; }
+        .eval-question p { font-weight: bold; color: #1a3a6b; margin-bottom: 10px; font-size: 0.95em; }
+        .eval-options { display: flex; gap: 10px; flex-wrap: wrap; }
+        .eval-options label { flex: 1; min-width: 80px; padding: 8px; background: white; border: 2px solid #e0e0e0; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.2s; font-size: 0.85em; }
+        .eval-options input[type="radio"] { display: none; }
+        .eval-options input[type="radio"]:checked + span { font-weight: bold; }
+        .eval-options label:has(input:checked) { border-color: #28a745; background: #e8f5e9; color: #155724; }
+        .eval-comentarios { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; margin-top: 15px; resize: vertical; min-height: 80px; font-family: inherit; font-size: 0.95em; }
+        .eval-comentarios:focus { outline: none; border-color: #1a3a6b; }
+        .btn-evaluar { background: #7c3aed; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 1em; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-top: 10px; }
+        .btn-evaluar:hover { background: #6d28d9; transform: translateY(-2px); }
+        
+        @media (max-width: 768px) { 
+            .stats { grid-template-columns: repeat(2, 1fr); } 
+            .botones-inferiores { grid-template-columns: repeat(2, 1fr); } 
+            .bloques-grid { font-size: 0.75em; } 
+            .horario-table th, .horario-table td { font-size: 0.7em; padding: 2px; } 
+            .horario-table th:first-child { width: 50px; } 
+            .header h1 { font-size: 1.4em; } 
+            .step-label { display: none; } 
+            .selector-grid { grid-template-columns: 1fr; } 
+            .eval-options { flex-direction: column; }
+            .eval-options label { min-width: 100%; text-align: left; padding: 10px 15px; }
+        }
+        @media print { 
+            @page { size: landscape; margin: 8mm; } 
+            body { background: white !important; padding: 0 !important; margin: 0 !important; } 
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } 
+            .container { box-shadow: none !important; max-width: 100% !important; margin: 0 !important; } 
+            .header, .steps-indicator, .screen:not(#screen-3), .oferta-header, .stats, .btn-agregar, .instruccion, .botones-inferiores, .footer, .back-btn, .conflict-warning, #loading-section, #error-section, #success-section, #vista-abierto, .modal, .btn-evaluar { display: none !important; } 
+            #screen-3, #app-main, #vista-escolarizado { display: block !important; } 
+            body.imprimiendo-abierto #vista-escolarizado { display: none !important; } 
+            body.imprimiendo-abierto #vista-abierto { display: block !important; } 
+            body.imprimiendo-abierto .oferta-header, body.imprimiendo-abierto .stats { display: block !important; } 
+            .horario-table-wrapper { overflow: visible !important; } 
+            .horario-table { width: 100% !important; table-layout: fixed !important; font-size: 8pt !important; } 
+            .horario-table th { background: #1a3a6b !important; color: white !important; padding: 4px 2px !important; font-size: 9pt !important; } 
+            .horario-table th:first-child { width: 50px !important; } 
+            .horario-table td { padding: 2px !important; border: 1px solid #999 !important; height: auto !important; overflow: hidden !important; } 
+            .horario-table td:first-child { background: #f0f0f0 !important; font-size: 8pt !important; } 
+            .horario-table .ee-card { padding: 3px 4px !important; font-size: 7pt !important; box-shadow: none !important; } 
+            .bloques-grid { width: 100% !important; font-size: 9pt !important; margin-bottom: 10px !important; } 
+            .bloques-grid th { background: #7c3aed !important; color: white !important; padding: 6px 4px !important; font-size: 9pt !important; border: 1px solid #6d28d9 !important; } 
+            .bloques-grid th:first-child { background: #1a3a6b !important; width: 80px !important; } 
+            .bloques-grid td { padding: 6px 4px !important; border: 1px solid #999 !important; } 
+            .bloques-grid td:first-child { background: #f8f9fa !important; font-size: 9pt !important; } 
+            .bloque-cell { min-height: 60px !important; } 
+            .bloque-cell.occupied { background: #e8f5e9 !important; border: 2px solid #28a745 !important; } 
+            .bloque-cell .ee-nombre { font-size: 8pt !important; color: #1a3a6b !important; } 
+            .bloque-cell .ee-info { font-size: 7pt !important; color: #666 !important; } 
+        }
     </style>
 </head>
 <body>
@@ -192,8 +244,15 @@
                 </div>
             </div>
         </div>
-        <div class="footer"><p><strong>Facultad de Ciencias y Técnicas de la Comunicación</strong> · Universidad Veracruzana · 2026</p><p>Verifica siempre la oferta oficial en <a href="https://www.uv.mx/veracruz/fcc/programacion-academica" target="_blank">www.uv.mx/veracruz/fcc/programacion-academica</a>.</p><p>Herramienta de apoyo diseñada por el docente <a href="mailto:alfreyes@uv.mx">Dr. Alfredo Reyes Gutiérrez</a> para sus Tutorados.</p></div>
+        <div class="footer">
+            <p><strong>Facultad de Ciencias y Técnicas de la Comunicación</strong> · Universidad Veracruzana · 2026</p>
+            <p>Verifica siempre la oferta oficial en <a href="https://www.uv.mx/veracruz/fcc/programacion-academica" target="_blank">www.uv.mx/veracruz/fcc/programacion-academica</a>.</p>
+            <p>Herramienta de apoyo diseñada por el docente <a href="mailto:alfreyes@uv.mx">Dr. Alfredo Reyes Gutiérrez</a> para sus Tutorados.</p>
+            <button class="btn-evaluar" onclick="openEvalModal()">📊 Calificar la herramienta</button>
+        </div>
     </div>
+
+    <!-- Modal de Agregar EE -->
     <div class="modal" id="ee-modal">
         <div class="modal-content">
             <div class="modal-header">➕ Agregar Experiencia Educativa</div>
@@ -207,7 +266,51 @@
             <button class="btn-cerrar-modal" onclick="closeModal()">Cerrar</button>
         </div>
     </div>
+
+    <!-- Modal de Evaluación -->
+    <div class="modal" id="eval-modal">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header">📊 Califica el Planeador de Horarios</div>
+            
+            <div id="eval-step-1">
+                <p style="margin-bottom: 20px; font-size: 1.1em; color: #666;">Primero, selecciona tu perfil para personalizar las preguntas:</p>
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button class="btn eval-role-btn" onclick="selectEvalRole('Estudiante')">
+                        <span style="font-size: 2em;">🎓</span>
+                        Estudiante (Tutorado)
+                    </button>
+                    <button class="btn btn-secondary eval-role-btn" onclick="selectEvalRole('Docente')">
+                        <span style="font-size: 2em;">👨‍🏫</span>
+                        Docente (Tutor)
+                    </button>
+                </div>
+            </div>
+
+            <div id="eval-step-2" style="display: none;">
+                <p style="margin-bottom: 20px; font-weight: bold; color: #1a3a6b; font-size: 1.1em;" id="eval-role-title"></p>
+                <form id="eval-form" onsubmit="submitEval(event)">
+                    <div id="eval-questions"></div>
+                    <textarea id="eval-comentarios" class="eval-comentarios" placeholder="Comentarios adicionales o sugerencias (opcional)..."></textarea>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="resetEval()" style="flex: 1;">Atrás</button>
+                        <button type="submit" class="btn" id="btn-submit-eval" style="flex: 1;">Enviar evaluación</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="eval-step-3" style="display: none; text-align: center; padding: 30px 20px;">
+                <div style="font-size: 4em; margin-bottom: 15px;">✅</div>
+                <h3 style="color: #28a745; margin-bottom: 10px; font-size: 1.5em;">¡Gracias por tu evaluación!</h3>
+                <p style="color: #666; line-height: 1.6;">Tu opinión es fundamental para seguir mejorando esta herramienta y brindar un mejor servicio a toda la comunidad Facico.</p>
+                <button class="btn" onclick="closeEvalModal()" style="margin-top: 25px; padding: 12px 40px;">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // ⚠️ IMPORTANTE: Reemplaza esta URL con la que obtuviste al implementar el Apps Script
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ8rQj_wrPDBgl-jM9r3mtigd3vMWaqTF2ulOII3WiiICmHuvu6zfz0OIm347Zi6eL/exec';
+        
         const API_KEY = 'AIzaSyBI4tHjYhVazAn6y8CW1k2kC0zcxLX07xI';
         const FOLDER_ID = '1fIDyI54BjKaUJ5aDXJDE1NsN_9CwHdAQ';
         const MAX_CREDITOS = 30;
@@ -233,6 +336,27 @@
             periodoNombre: 'Agosto 2026 - Enero 2027'
         };
         let historial = [];
+        
+        // Preguntas de evaluación por rol
+        const evalQuestions = {
+            'Estudiante': [
+                '¿Qué tan fácil fue armar tu horario con esta herramienta?',
+                '¿La información de los bloques y horarios fue clara y precisa?',
+                '¿La herramienta te ayudó a evitar choques de horario?',
+                '¿Qué tan intuitiva te pareció la interfaz de la herramienta?',
+                '¿Recomendarías esta herramienta a otros estudiantes?'
+            ],
+            'Docente': [
+                '¿Qué tan útil considera esta herramienta para apoyar a sus tutorados?',
+                '¿La visualización de bloques y oferta académica es clara para guiar a los estudiantes?',
+                '¿La herramienta reduce el tiempo de asesoría en la elección de materias?',
+                '¿Considera que la detección de choques de horario funciona correctamente?',
+                '¿Recomendaría implementar esta herramienta de forma oficial en la facultad?'
+            ]
+        };
+        const evalOptions = ['Totalmente de acuerdo', 'De acuerdo', 'Neutral', 'En desacuerdo', 'Totalmente en desacuerdo'];
+        let currentEvalRole = '';
+
         document.addEventListener('DOMContentLoaded', () => {
             const saved = localStorage.getItem('horarioFacico');
             if (saved) {
@@ -245,6 +369,7 @@
                 } catch(e) {}
             }
         });
+
         function guardarEstado() {
             localStorage.setItem('horarioFacico', JSON.stringify({
                 modalidad: appState.modalidad,
@@ -252,6 +377,7 @@
                 horarioSeleccionado: appState.horarioSeleccionado.map(e => e.crn)
             }));
         }
+
         function goToScreen(num) {
             if (num === 2 && !appState.modalidad) return;
             if (num === 3 && (!appState.modalidad || !appState.plan)) return;
@@ -261,6 +387,7 @@
             appState.currentScreen = num;
             updateStepsIndicator(); updateBackButton(); window.scrollTo(0, 0);
         }
+
         function goBack() { if (appState.currentScreen === 3) goToScreen(2); else if (appState.currentScreen === 2) goToScreen(1); }
         function updateStepsIndicator() {
             document.querySelectorAll('.step').forEach(step => {
@@ -281,6 +408,7 @@
             document.querySelectorAll('[data-plan]').forEach(card => card.classList.toggle('selected', card.dataset.plan === plan));
             document.getElementById('btn-next-2').disabled = false;
         }
+
         async function loadFromGoogleDrive() {
             try {
                 document.getElementById('loading-section').style.display = 'block';
@@ -305,7 +433,6 @@
                 let procesados = 0;
                 let erroresProcesamiento = [];
 
-                // 1. Procesar SYRSEIL primero
                 const seilKeys = Object.keys(archivosEncontrados).filter(k => k.startsWith('SEIL-'));
                 for (const key of seilKeys) {
                     const file = archivosEncontrados[key];
@@ -314,50 +441,30 @@
                         const nrcMap = await downloadAndProcessSEIL(file.id);
                         Object.assign(appState.nrcBloque, nrcMap);
                         procesados++;
-                        console.log(`✓ ${key}: ${Object.keys(nrcMap).length} NRCs con bloque`);
-                    } catch (err) {
-                        console.error(`Error procesando ${file.name}:`, err);
-                        erroresProcesamiento.push(`${file.name}: ${err.message}`);
-                    }
+                    } catch (err) { erroresProcesamiento.push(`${file.name}: ${err.message}`); }
                 }
 
-                // 2. Procesar NRC-SIN-BLOQUE
                 if (archivosEncontrados['NRC-SIN-BLOQUE']) {
                     try {
                         updateLoadingMessage(`Cargando NRC-SIN-BLOQUE.xlsx...`);
                         const nrcSinBloqueMap = await downloadAndProcessNRCSinBloque(archivosEncontrados['NRC-SIN-BLOQUE'].id);
-                        let nuevosNRC = 0;
                         for (const [crn, bloque] of Object.entries(nrcSinBloqueMap)) {
-                            if (!appState.nrcBloque[crn]) {
-                                appState.nrcBloque[crn] = bloque;
-                                nuevosNRC++;
-                            }
+                            if (!appState.nrcBloque[crn]) appState.nrcBloque[crn] = bloque;
                         }
                         procesados++;
-                        console.log(`✓ NRC-SIN-BLOQUE: ${nuevosNRC} NRCs agregados (total: ${Object.keys(appState.nrcBloque).length})`);
-                    } catch (err) {
-                        console.error('Error procesando NRC-SIN-BLOQUE:', err);
-                        erroresProcesamiento.push(`NRC-SIN-BLOQUE: ${err.message}`);
-                    }
+                    } catch (err) { erroresProcesamiento.push(`NRC-SIN-BLOQUE: ${err.message}`); }
                 }
 
-                // 3. Procesar Bloques-Abierto (incluye lectura de hoja "Periodo")
                 if (archivosEncontrados['BLOQUES-A']) {
                     try {
                         updateLoadingMessage(`Cargando Bloques-Abierto.xlsx...`);
                         const datosBloques = await downloadAndProcessBloques(archivosEncontrados['BLOQUES-A'].id);
                         appState.bloquesFechas = datosBloques.fechas;
-                        if (datosBloques.periodo) {
-                            appState.periodoNombre = datosBloques.periodo;
-                        }
+                        if (datosBloques.periodo) appState.periodoNombre = datosBloques.periodo;
                         procesados++;
-                    } catch (err) {
-                        console.error('Error procesando Bloques-Abierto:', err);
-                        erroresProcesamiento.push(`Bloques-Abierto: ${err.message}`);
-                    }
+                    } catch (err) { erroresProcesamiento.push(`Bloques-Abierto: ${err.message}`); }
                 }
 
-                // 4. Procesar SYRPRAC
                 const pracKeys = Object.keys(archivosEncontrados).filter(k => ['04-E', '04-A', '25-E', '25-A'].includes(k));
                 for (const key of pracKeys) {
                     const file = archivosEncontrados[key];
@@ -366,32 +473,26 @@
                         const data = await downloadAndProcessFile(file.id);
                         appState.datosCargados[key] = data;
                         procesados++;
-                        console.log(`✓ ${key}: ${data.length} EEs procesadas`);
-                    } catch (err) {
-                        console.error(`Error procesando ${file.name}:`, err);
-                        erroresProcesamiento.push(`${file.name}: ${err.message}`);
-                    }
+                    } catch (err) { erroresProcesamiento.push(`${file.name}: ${err.message}`); }
                 }
                 
                 const totalEE = Object.values(appState.datosCargados).reduce((sum, d) => sum + (d ? d.length : 0), 0);
                 
                 if (totalEE === 0) {
-                    if (erroresProcesamiento.length > 0) {
-                        throw new Error(`Error al procesar archivos:\n${erroresProcesamiento.join('\n')}\n\n💡 Posible causa: La restricción "HTTP Referrer" de tu API Key está bloqueando la descarga. Agrega "file:///*" a las restricciones en Google Cloud Console.`);
-                    } else {
-                        throw new Error('No se encontraron archivos SYRPRAC en la carpeta. Verifica que los nombres contengan "SYRPRAC", "04" o "25", y "-E" o "-A".');
-                    }
+                    if (erroresProcesamiento.length > 0) throw new Error(`Error al procesar:\n${erroresProcesamiento.join('\n')}`);
+                    else throw new Error('No se encontraron archivos SYRPRAC.');
                 }
                 
                 appState.datosCargadosOK = true;
                 updateBloquesFechas();
-                showSuccess(`✅ Datos cargados exitosamente (${totalEE} EEs, ${Object.keys(appState.nrcBloque).length} NRCs con bloque)`);
+                showSuccess(`✅ Datos cargados (${totalEE} EEs, ${Object.keys(appState.nrcBloque).length} NRCs con bloque)`);
                 initializeApp();
             } catch (error) {
                 showError('❌ Error: ' + error.message);
                 console.error(error);
             }
         }
+
         async function listFilesInFolder() {
             const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+trashed=false&key=${API_KEY}&fields=files(id,name,mimeType)`;
             const response = await fetch(url);
@@ -399,80 +500,65 @@
             if (data.error) throw new Error(`API Error: ${data.error.message}`);
             return data.files || [];
         }
+
         async function downloadAndProcessFile(fileId) {
             const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
             const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error HTTP ${response.status} al descargar. Verifica permisos de la API Key.`);
+            if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
             const blob = await response.blob();
-            const arrayBuffer = await blob.arrayBuffer();
-            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-            return processData(jsonData);
+            const workbook = XLSX.read(await blob.arrayBuffer(), { type: 'array' });
+            return processData(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: '' }));
         }
+
         async function downloadAndProcessBloques(fileId) {
             const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
             const blob = await response.blob();
-            const arrayBuffer = await blob.arrayBuffer();
-            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-            const resultado = { fechas: {}, periodo: 'Agosto 2026 - Enero 2027' }; // Valor por defecto
+            const workbook = XLSX.read(await blob.arrayBuffer(), { type: 'array' });
+            const resultado = { fechas: {}, periodo: 'Agosto 2026 - Enero 2027' };
             
-            // 1. Leer hoja "Abierto" para las fechas
             const hojaAbierto = workbook.SheetNames.find(n => n.toLowerCase().includes('abierto')) || workbook.SheetNames[0];
             if (hojaAbierto) {
-                const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[hojaAbierto], { header: 1, defval: '' });
-                resultado.fechas = processBloquesData(jsonData);
+                resultado.fechas = processBloquesData(XLSX.utils.sheet_to_json(workbook.Sheets[hojaAbierto], { header: 1, defval: '' }));
             }
             
-            // 2. Leer hoja "Periodo" para el nombre del periodo (celda A1)
             const hojaPeriodo = workbook.SheetNames.find(n => n.toLowerCase().includes('periodo'));
             if (hojaPeriodo) {
-                const ws = workbook.Sheets[hojaPeriodo];
-                const celdaA1 = ws['A1'];
+                const celdaA1 = workbook.Sheets[hojaPeriodo]['A1'];
                 if (celdaA1) {
                     const texto = String(celdaA1.w || celdaA1.v || '').trim();
                     if (texto) resultado.periodo = texto;
                 }
             }
-            
-            console.log('📅 Periodo detectado:', resultado.periodo);
             return resultado;
         }
+
         async function downloadAndProcessSEIL(fileId) {
             const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
             const blob = await response.blob();
-            const arrayBuffer = await blob.arrayBuffer();
-            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-            return processSEILData(jsonData);
+            const workbook = XLSX.read(await blob.arrayBuffer(), { type: 'array' });
+            return processSEILData(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: '' }));
         }
+
         async function downloadAndProcessNRCSinBloque(fileId) {
             const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
             const blob = await response.blob();
-            const arrayBuffer = await blob.arrayBuffer();
-            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            const workbook = XLSX.read(await blob.arrayBuffer(), { type: 'array' });
             const nrcMap = {};
             if (workbook.SheetNames.includes('2004')) {
-                const worksheet2004 = workbook.Sheets['2004'];
-                const jsonData2004 = XLSX.utils.sheet_to_json(worksheet2004, { header: 1, defval: '' });
-                Object.assign(nrcMap, processNRCSinBloqueSheet(jsonData2004, '04'));
+                Object.assign(nrcMap, processNRCSinBloqueSheet(XLSX.utils.sheet_to_json(workbook.Sheets['2004'], { header: 1, defval: '' }), '04'));
             }
             if (workbook.SheetNames.includes('2025')) {
-                const worksheet2025 = workbook.Sheets['2025'];
-                const jsonData2025 = XLSX.utils.sheet_to_json(worksheet2025, { header: 1, defval: '' });
-                Object.assign(nrcMap, processNRCSinBloqueSheet(jsonData2025, '25'));
+                Object.assign(nrcMap, processNRCSinBloqueSheet(XLSX.utils.sheet_to_json(workbook.Sheets['2025'], { header: 1, defval: '' }), '25'));
             }
             return nrcMap;
         }
+
         function processNRCSinBloqueSheet(data, plan) {
             const nrcMap = {};
             if (!data || data.length < 2) return nrcMap;
@@ -488,24 +574,19 @@
             if (headers.length === 0) headers = data[0].map(h => String(h || '').trim().toUpperCase());
             const idxNRC = headers.findIndex(h => h.includes('NRC') || h.includes('CRN'));
             const idxBloque = headers.findIndex(h => h.includes('BLOQUE'));
-            if (idxNRC < 0 || idxBloque < 0) {
-                console.warn(`NRC-SIN-BLOQUE hoja ${plan}: columnas no encontradas. Encabezados:`, headers);
-                return nrcMap;
-            }
+            if (idxNRC < 0 || idxBloque < 0) return nrcMap;
+            
             for (let i = headerRowIndex + 1; i < data.length; i++) {
                 const row = data[i];
                 if (!row || row.length === 0) continue;
-                const nrc = row[idxNRC];
-                const bloque = row[idxBloque];
+                const nrc = row[idxNRC], bloque = row[idxBloque];
                 if (!nrc || !bloque) continue;
-                const nrcStr = String(nrc).trim();
                 const bloqueNum = parseInt(bloque);
-                if (!isNaN(bloqueNum) && bloqueNum >= 1 && bloqueNum <= 5) {
-                    nrcMap[nrcStr] = bloqueNum;
-                }
+                if (!isNaN(bloqueNum) && bloqueNum >= 1 && bloqueNum <= 5) nrcMap[String(nrc).trim()] = bloqueNum;
             }
             return nrcMap;
         }
+
         function processBloquesData(data) {
             const bloques = {};
             let headerRow = null, fechasRow = null;
@@ -517,16 +598,15 @@
                 if (firstCell === 'fechas') fechasRow = i;
             }
             if (headerRow !== null && fechasRow !== null) {
-                const headerCells = data[headerRow];
-                const fechasCells = data[fechasRow];
                 for (let i = 1; i <= 5; i++) {
-                    const bloqueNombre = String(headerCells[i] || '').trim();
-                    const fechas = String(fechasCells[i] || '').trim();
-                    if (bloqueNombre && fechas) bloques[i] = fechas;
+                    const nombre = String(data[headerRow][i] || '').trim();
+                    const fechas = String(data[fechasRow][i] || '').trim();
+                    if (nombre && fechas) bloques[i] = fechas;
                 }
             }
             return bloques;
         }
+
         function processSEILData(data) {
             const nrcMap = {};
             if (!data || data.length < 2) return nrcMap;
@@ -542,24 +622,19 @@
             if (headers.length === 0) headers = data[0].map(h => String(h).trim());
             const idxCRN = headers.indexOf('SWBSEIL_CRN');
             const idxPTRM = headers.indexOf('SWBSEIL_PTRM_CODE');
-            if (idxCRN < 0 || idxPTRM < 0) {
-                console.warn('Columnas no encontradas en SYRSEIL. Encabezados:', headers);
-                return nrcMap;
-            }
+            if (idxCRN < 0 || idxPTRM < 0) return nrcMap;
+            
             for (let i = headerRowIndex + 1; i < data.length; i++) {
                 const row = data[i];
                 if (!row || row.length === 0) continue;
-                const crn = row[idxCRN];
-                const ptrm = row[idxPTRM];
+                const crn = row[idxCRN], ptrm = row[idxPTRM];
                 if (!crn || !ptrm) continue;
-                const crnStr = String(crn).trim();
                 const ptrmStr = String(ptrm).trim();
-                if (PTRM_TO_BLOQUE[ptrmStr]) {
-                    nrcMap[crnStr] = PTRM_TO_BLOQUE[ptrmStr];
-                }
+                if (PTRM_TO_BLOQUE[ptrmStr]) nrcMap[String(crn).trim()] = PTRM_TO_BLOQUE[ptrmStr];
             }
             return nrcMap;
         }
+
         function updateBloquesFechas() {
             for (let i = 1; i <= 5; i++) {
                 const fechas = appState.bloquesFechas[i] || 'Fechas por definir';
@@ -567,6 +642,7 @@
                 if (el) el.textContent = fechas;
             }
         }
+
         function processData(data) {
             if (!data || data.length < 2) return [];
             let headerRowIndex = 0, headers = [];
@@ -598,9 +674,7 @@
                 if (!titulo || !crn) continue;
                 const tituloStr = String(titulo).trim();
                 if (tituloStr.includes('CF_DESC_LEVL') || tituloStr === 'LICENCIATURA' || tituloStr === '') continue;
-                const salon = String(row[idx.salon] || '').trim();
-                const edificio = String(row[idx.edificio] || '').trim();
-                const salonCompleto = salon + (edificio ? ' (' + edificio + ')' : '');
+                
                 if (!crnMap[crn]) {
                     crnMap[crn] = {
                         nombre: tituloStr, creditos: parseInt(row[idx.creditos]) || 0,
@@ -609,6 +683,10 @@
                         maxEnrl: parseInt(row[idx.maxEnrl]) || 0, horarios: [], salonesPorDia: {}
                     };
                 }
+                const salon = String(row[idx.salon] || '').trim();
+                const edificio = String(row[idx.edificio] || '').trim();
+                const salonCompleto = salon + (edificio ? ' (' + edificio + ')' : '');
+                
                 const dias = [
                     { ini: idx.IL, fin: idx.FL, dia: 0 }, { ini: idx.IM, fin: idx.FM, dia: 1 },
                     { ini: idx.II, fin: idx.FI, dia: 2 }, { ini: idx.IJ, fin: idx.FJ, dia: 3 },
@@ -626,23 +704,19 @@
                 });
             }
             return Object.values(crnMap).map(ee => {
-                ee.bloqueInfo = clasificarBloque(ee.horarios);
+                const sabado = ee.horarios.filter(h => h.dia === 5);
+                ee.bloqueInfo = sabado.length === 0 ? { tipo: 'escolarizado', turno: null } : { tipo: 'abierto', turno: sabado.reduce((sum, h) => sum + h.inicio, 0) / sabado.length < 1400 ? 'M' : 'V' };
                 ee.bloqueAsignado = appState.nrcBloque[ee.crn] || null;
                 return ee;
             });
         }
-        function clasificarBloque(horarios) {
-            const sabado = horarios.filter(h => h.dia === 5);
-            if (sabado.length === 0) return { tipo: 'escolarizado', turno: null };
-            const promedio = sabado.reduce((sum, h) => sum + h.inicio, 0) / sabado.length;
-            const turno = promedio < 1400 ? 'M' : 'V';
-            return { tipo: 'abierto', turno: turno };
-        }
+
         function extraerAula(salonCompleto) {
             if (!salonCompleto) return 'Por asignar';
             const match = salonCompleto.match(/^([A-Z0-9\-]+(?:\s+[A-Z0-9\-]+)*)/);
             return match ? match[1].trim() : salonCompleto;
         }
+
         function initializeApp() {
             const key = `${appState.plan}-${appState.modalidad}`;
             const datos = appState.datosCargados[key];
@@ -655,15 +729,14 @@
             historial = [];
             document.getElementById('loading-section').style.display = 'none';
             document.getElementById('app-main').style.display = 'block';
+            
             const modalidadTxt = appState.modalidad === 'E' ? 'Escolarizado' : 'Abierto';
             const planTxt = appState.plan === '04' ? 'Plan 2004' : 'Plan 2025';
-            
-            // ✅ Aquí se usa el periodo dinámico leído del Excel
             document.getElementById('header-subtitle').textContent = `Periodo ${appState.periodoNombre} · ${modalidadTxt} · Sábados por bloques`;
-            
             document.getElementById('header-plan-badge').textContent = `${modalidadTxt} · ${planTxt}`;
             document.getElementById('oferta-title').textContent = `Oferta Académica · ${modalidadTxt} · ${planTxt}`;
             document.getElementById('stat-horas-label').textContent = appState.modalidad === 'A' ? 'Horas/Sábado' : 'Horas/Semana';
+            
             const filterTurno = document.getElementById('filter-turno');
             const filterBloque = document.getElementById('filter-bloque');
             if (appState.modalidad === 'E') {
@@ -673,6 +746,7 @@
                 filterTurno.style.display = 'block';
                 filterBloque.style.display = 'block';
             }
+            
             if (appState.modalidad === 'A') {
                 document.getElementById('vista-abierto').style.display = 'block';
                 document.getElementById('vista-escolarizado').style.display = 'none';
@@ -681,57 +755,63 @@
                 document.getElementById('vista-abierto').style.display = 'none';
                 document.getElementById('vista-escolarizado').style.display = 'block';
             }
+            
             populateAreaFilter();
             updateStats();
             renderVista();
         }
+
         function cambiarPlan() {
             appState.plan = appState.plan === '04' ? '25' : '04';
             appState.horarioSeleccionado = [];
             historial = [];
             initializeApp();
         }
-        function timeToMinutes(time) { const hours = Math.floor(time / 100); const minutes = time % 100; return hours * 60 + minutes; }
-        function formatTime(time) { const hours = Math.floor(time / 100); const minutes = time % 100; return `${hours}:${String(minutes).padStart(2, '0')}`; }
+
+        function timeToMinutes(time) { return Math.floor(time / 100) * 60 + (time % 100); }
+        function formatTime(time) { return `${Math.floor(time / 100)}:${String(time % 100).padStart(2, '0')}`; }
+
         function updateStats() {
             const totalEE = appState.horarioSeleccionado.length;
             const totalCreditos = appState.horarioSeleccionado.reduce((sum, ee) => sum + (ee.creditos || 0), 0);
             let totalMinutos = 0;
-            appState.horarioSeleccionado.forEach(ee => { ee.horarios.forEach(h => { totalMinutos += timeToMinutes(h.fin) - timeToMinutes(h.inicio); }); });
-            const totalHoras = (totalMinutos / 60).toFixed(1);
+            appState.horarioSeleccionado.forEach(ee => {
+                ee.horarios.forEach(h => { totalMinutos += timeToMinutes(h.fin) - timeToMinutes(h.inicio); });
+            });
             const choques = detectConflicts();
+            
             document.getElementById('stat-ee').textContent = totalEE;
             document.getElementById('stat-creditos').textContent = totalCreditos;
-            document.getElementById('stat-horas').textContent = totalHoras;
+            document.getElementById('stat-horas').textContent = (totalMinutos / 60).toFixed(1);
             document.getElementById('stat-choques').textContent = choques;
             document.getElementById('conflict-warning').classList.toggle('show', choques > 0);
             guardarEstado();
         }
+
         function renderVista() { if (appState.modalidad === 'A') renderBloquesGrid(); else renderHorarioTable(); }
+
         function renderBloquesGrid() {
             document.querySelectorAll('.bloque-cell').forEach(cell => { cell.className = 'bloque-cell empty'; cell.innerHTML = '—'; });
             appState.horarioSeleccionado.forEach(ee => {
-                const turno = ee.bloqueInfo.turno;
-                const bloque = ee.bloqueAsignado;
+                const turno = ee.bloqueInfo.turno, bloque = ee.bloqueAsignado;
                 if (!turno || !bloque) return;
-                const cell = document.querySelector(`.bloque-cell[data-turno="${turno}"][data-bloque="${bloque}"]`);
+                let cell = document.querySelector(`.bloque-cell[data-turno="${turno}"][data-bloque="${bloque}"]`);
                 if (cell && cell.classList.contains('empty')) {
                     cell.className = 'bloque-cell occupied';
-                    const nombreCorto = ee.nombre.length > 30 ? ee.nombre.substring(0, 30) + '...' : ee.nombre;
-                    cell.innerHTML = `<div class="ee-nombre">${nombreCorto}</div><div class="ee-info">NRC ${ee.crn}<br>${ee.docente.substring(0, 25)}<br>📍 ${Object.values(ee.salonesPorDia)[0] || 'Por asignar'}<br>🕐 ${ee.horarios.map(h => formatTime(h.inicio) + '-' + formatTime(h.fin)).join(', ')}</div>`;
+                    cell.innerHTML = `<div class="ee-nombre">${ee.nombre.length > 30 ? ee.nombre.substring(0, 30) + '...' : ee.nombre}</div><div class="ee-info">NRC ${ee.crn}<br>${ee.docente.substring(0, 25)}<br>📍 ${Object.values(ee.salonesPorDia)[0] || 'Por asignar'}<br>🕐 ${ee.horarios.map(h => formatTime(h.inicio) + '-' + formatTime(h.fin)).join(', ')}</div>`;
                 } else if (cell) {
                     for (let b = bloque + 1; b <= 5; b++) {
                         const nextCell = document.querySelector(`.bloque-cell[data-turno="${turno}"][data-bloque="${b}"]`);
                         if (nextCell && nextCell.classList.contains('empty')) {
                             nextCell.className = 'bloque-cell occupied';
-                            const nombreCorto = ee.nombre.length > 30 ? ee.nombre.substring(0, 30) + '...' : ee.nombre;
-                            nextCell.innerHTML = `<div class="ee-nombre">${nombreCorto}</div><div class="ee-info">NRC ${ee.crn}<br>${ee.docente.substring(0, 25)}<br>📍 ${Object.values(ee.salonesPorDia)[0] || 'Por asignar'}<br>🕐 ${ee.horarios.map(h => formatTime(h.inicio) + '-' + formatTime(h.fin)).join(', ')}</div>`;
+                            nextCell.innerHTML = `<div class="ee-nombre">${ee.nombre.length > 30 ? ee.nombre.substring(0, 30) + '...' : ee.nombre}</div><div class="ee-info">NRC ${ee.crn}<br>${ee.docente.substring(0, 25)}<br>📍 ${Object.values(ee.salonesPorDia)[0] || 'Por asignar'}<br>🕐 ${ee.horarios.map(h => formatTime(h.inicio) + '-' + formatTime(h.fin)).join(', ')}</div>`;
                             break;
                         }
                     }
                 }
             });
         }
+
         function cellClickBloque(turno, bloque) {
             const cell = document.querySelector(`.bloque-cell[data-turno="${turno}"][data-bloque="${bloque}"]`);
             if (cell.classList.contains('occupied')) {
@@ -746,113 +826,94 @@
                 }
             }
         }
+
         function renderHorarioTable() {
             const table = document.getElementById('horario-table');
             table.innerHTML = '';
             const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-            const horasInicio = 7, horasFin = 21, numDias = 5;
             const conflictEEs = detectConflictEEs();
-            const headerRow = document.createElement('tr');
-            headerRow.innerHTML = '<th>Hora</th>' + dias.map(d => `<th>${d}</th>`).join('');
-            table.appendChild(headerRow);
+            table.innerHTML = '<tr><th>Hora</th>' + dias.map(d => `<th>${d}</th>`).join('') + '</tr>';
+            
             const ocupacion = {};
-            for (let h = horasInicio; h <= horasFin; h++) { ocupacion[h] = {}; for (let d = 0; d < numDias; d++) ocupacion[h][d] = null; }
+            for (let h = 7; h <= 21; h++) { ocupacion[h] = {}; for (let d = 0; d < 5; d++) ocupacion[h][d] = null; }
+            
             appState.horarioSeleccionado.forEach(ee => {
                 ee.horarios.forEach(h => {
-                    if (h.dia >= 0 && h.dia < numDias) {
+                    if (h.dia >= 0 && h.dia < 5) {
                         const iniHora = Math.floor(timeToMinutes(h.inicio) / 60), finHora = Math.ceil(timeToMinutes(h.fin) / 60);
-                        const rowspan = finHora - iniHora;
                         if (ocupacion[iniHora] && ocupacion[iniHora][h.dia] === null) {
-                            ocupacion[iniHora][h.dia] = { ee, horario: h, esInicio: true, rowspan: Math.min(rowspan, horasFin - iniHora + 1) };
+                            ocupacion[iniHora][h.dia] = { ee, horario: h, esInicio: true, rowspan: Math.min(finHora - iniHora, 21 - iniHora + 1) };
                         }
-                        for (let hora = iniHora + 1; hora < finHora && hora <= horasFin; hora++) {
+                        for (let hora = iniHora + 1; hora < finHora && hora <= 21; hora++) {
                             if (ocupacion[hora] && ocupacion[hora][h.dia] === null) ocupacion[hora][h.dia] = { cubierto: true };
                         }
                     }
                 });
             });
-            for (let hora = horasInicio; hora <= horasFin; hora++) {
+            
+            for (let hora = 7; hora <= 21; hora++) {
                 const row = document.createElement('tr');
-                const horaCell = document.createElement('td');
-                horaCell.textContent = `${hora}:00`;
-                row.appendChild(horaCell);
-                for (let dia = 0; dia < numDias; dia++) {
+                row.innerHTML = `<td>${hora}:00</td>`;
+                for (let dia = 0; dia < 5; dia++) {
                     const ocup = ocupacion[hora][dia];
                     if (ocup && ocup.cubierto) continue;
                     const cell = document.createElement('td');
                     if (ocup && ocup.esInicio) {
                         const salonDelDia = ocup.ee.salonesPorDia[dia] || Object.values(ocup.ee.salonesPorDia)[0] || 'Por asignar';
-                        const aulaCorta = extraerAula(salonDelDia);
                         const duracion = Math.ceil((timeToMinutes(ocup.horario.fin) - timeToMinutes(ocup.horario.inicio)) / 60);
                         const idx = appState.horarioSeleccionado.findIndex(e => e.crn === ocup.ee.crn);
                         const color = PALETA_COLORES[idx % PALETA_COLORES.length];
-                        const esConflicto = conflictEEs.has(ocup.ee.crn);
                         if (ocup.rowspan > 1) cell.rowSpan = ocup.rowspan;
-                        cell.innerHTML = `<div class="ee-card ${esConflicto ? 'conflicto' : ''}" data-crn="${ocup.ee.crn}" style="background:${color.bg}; color:${color.text};"><div class="ee-nombre">${ocup.ee.nombre}</div><div class="ee-nrc">NRC ${ocup.ee.crn}</div><div class="ee-docente">${ocup.ee.docente}</div><div class="ee-horario">${formatTime(ocup.horario.inicio)}-${formatTime(ocup.horario.fin)} (${duracion}h)</div><div class="ee-salon">📍 ${aulaCorta}</div></div>`;
+                        cell.innerHTML = `<div class="ee-card ${conflictEEs.has(ocup.ee.crn) ? 'conflicto' : ''}" data-crn="${ocup.ee.crn}" style="background:${color.bg}; color:${color.text};"><div class="ee-nombre">${ocup.ee.nombre}</div><div class="ee-nrc">NRC ${ocup.ee.crn}</div><div class="ee-docente">${ocup.ee.docente}</div><div class="ee-horario">${formatTime(ocup.horario.inicio)}-${formatTime(ocup.horario.fin)} (${duracion}h)</div><div class="ee-salon">📍 ${extraerAula(salonDelDia)}</div></div>`;
                     }
                     row.appendChild(cell);
                 }
                 table.appendChild(row);
             }
+            
             document.querySelectorAll('.ee-card').forEach(card => {
                 card.addEventListener('click', function() {
-                    const crn = this.dataset.crn;
-                    const ee = appState.horarioSeleccionado.find(e => e.crn === crn);
+                    const ee = appState.horarioSeleccionado.find(e => e.crn === this.dataset.crn);
                     if (ee && confirm(`¿Quitar "${ee.nombre}" de tu horario?`)) {
                         historial.push([...appState.horarioSeleccionado]);
-                        appState.horarioSeleccionado = appState.horarioSeleccionado.filter(e => e.crn !== crn);
+                        appState.horarioSeleccionado = appState.horarioSeleccionado.filter(e => e.crn !== ee.crn);
                         updateStats(); renderHorarioTable();
                     }
                 });
             });
         }
+
         function detectConflicts() {
             let conflicts = 0;
             const conflictPairs = detectConflictEEs();
             const counted = new Set();
             for (let i = 0; i < appState.horarioSeleccionado.length; i++) {
                 for (let j = i + 1; j < appState.horarioSeleccionado.length; j++) {
-                    const ee1 = appState.horarioSeleccionado[i];
-                    const ee2 = appState.horarioSeleccionado[j];
-                    if (conflictPairs.has(ee1.crn) && conflictPairs.has(ee2.crn)) {
-                        if (tieneChoqueReal(ee1, ee2)) {
-                            const key = `${ee1.crn}-${ee2.crn}`;
-                            if (!counted.has(key)) { counted.add(key); conflicts++; }
-                        }
+                    const ee1 = appState.horarioSeleccionado[i], ee2 = appState.horarioSeleccionado[j];
+                    if (conflictPairs.has(ee1.crn) && conflictPairs.has(ee2.crn) && tieneChoqueReal(ee1, ee2)) {
+                        const key = `${ee1.crn}-${ee2.crn}`;
+                        if (!counted.has(key)) { counted.add(key); conflicts++; }
                     }
                 }
             }
             return conflicts;
         }
+
         function detectConflictEEs() {
             const conflictEEs = new Set();
             for (let i = 0; i < appState.horarioSeleccionado.length; i++) {
                 for (let j = i + 1; j < appState.horarioSeleccionado.length; j++) {
-                    const ee1 = appState.horarioSeleccionado[i];
-                    const ee2 = appState.horarioSeleccionado[j];
-                    if (tieneChoqueReal(ee1, ee2)) {
-                        conflictEEs.add(ee1.crn);
-                        conflictEEs.add(ee2.crn);
+                    if (tieneChoqueReal(appState.horarioSeleccionado[i], appState.horarioSeleccionado[j])) {
+                        conflictEEs.add(appState.horarioSeleccionado[i].crn);
+                        conflictEEs.add(appState.horarioSeleccionado[j].crn);
                     }
                 }
             }
             return conflictEEs;
         }
+
         function tieneChoqueReal(ee1, ee2) {
-            if (appState.modalidad === 'A') {
-                if (ee1.bloqueAsignado !== ee2.bloqueAsignado) return false;
-                if (ee1.bloqueInfo.turno !== ee2.bloqueInfo.turno) return false;
-                for (const h1 of ee1.horarios) {
-                    for (const h2 of ee2.horarios) {
-                        if (h1.dia === h2.dia) {
-                            const ini1 = timeToMinutes(h1.inicio), fin1 = timeToMinutes(h1.fin);
-                            const ini2 = timeToMinutes(h2.inicio), fin2 = timeToMinutes(h2.fin);
-                            if (ini1 < fin2 && ini2 < fin1) return true;
-                        }
-                    }
-                }
-                return false;
-            }
+            if (appState.modalidad === 'A' && (ee1.bloqueAsignado !== ee2.bloqueAsignado || ee1.bloqueInfo.turno !== ee2.bloqueInfo.turno)) return false;
             for (const h1 of ee1.horarios) {
                 for (const h2 of ee2.horarios) {
                     if (h1.dia === h2.dia) {
@@ -864,47 +925,48 @@
             }
             return false;
         }
+
         function populateAreaFilter() {
             const select = document.getElementById('filter-area');
             const areas = [...new Set(appState.experienciasEducativas.map(ee => ee.area).filter(a => a))].sort();
             select.innerHTML = '<option value="">📁 Todas las áreas</option>';
             areas.forEach(area => select.innerHTML += `<option value="${area}">${area}</option>`);
         }
+
         function openModal() {
-            const eeList = document.getElementById('ee-list');
             document.getElementById('search-ee').value = '';
             document.getElementById('filter-area').value = '';
             document.getElementById('filter-turno').value = '';
             document.getElementById('filter-bloque').value = '';
+            const eeList = document.getElementById('ee-list');
             eeList.innerHTML = '';
             const diasNombre = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-            const eesOrdenadas = [...appState.experienciasEducativas].sort((a, b) => a.nombre.localeCompare(b.nombre));
-            eesOrdenadas.forEach(ee => {
+            
+            [...appState.experienciasEducativas].sort((a, b) => a.nombre.localeCompare(b.nombre)).forEach(ee => {
                 const item = document.createElement('div');
                 item.className = 'ee-item';
                 item.dataset.search = `${ee.nombre} ${ee.docente} ${ee.crn} ${ee.area}`.toLowerCase();
                 item.dataset.area = ee.area || '';
                 item.dataset.turno = ee.bloqueInfo.turno || '';
                 item.dataset.bloque = ee.bloqueAsignado || '';
-                const horariosDetallados = ee.horarios.map(h => {
-                    const salonDelDia = ee.salonesPorDia[h.dia] || Object.values(ee.salonesPorDia)[0] || '';
-                    const aula = extraerAula(salonDelDia);
-                    return `${diasNombre[h.dia]} ${formatTime(h.inicio)}-${formatTime(h.fin)} (${aula})`;
-                }).join(' · ');
+                
+                const horariosDetallados = ee.horarios.map(h => `${diasNombre[h.dia]} ${formatTime(h.inicio)}-${formatTime(h.fin)} (${extraerAula(ee.salonesPorDia[h.dia] || Object.values(ee.salonesPorDia)[0] || '')})`).join(' · ');
                 const yaAgregada = appState.horarioSeleccionado.some(e => e.crn === ee.crn);
                 if (yaAgregada) item.classList.add('added');
-                const bloqueInfo = ee.bloqueAsignado ? ` · <strong>Bloque ${ee.bloqueAsignado}</strong>` : '';
-                item.innerHTML = `<h4>${ee.nombre} ${yaAgregada ? '✓ (Ya agregada)' : ''}</h4><p><span class="area-badge">${ee.areaCode || 'N/A'}</span> <strong>NRC:</strong> ${ee.crn} · <strong>Créditos:</strong> ${ee.creditos}${bloqueInfo}</p><p><strong>Docente:</strong> ${ee.docente}</p><p><strong>Horario:</strong> ${horariosDetallados}</p><p><strong>Turno:</strong> ${ee.bloqueInfo.turno === 'M' ? 'Matutino' : ee.bloqueInfo.turno === 'V' ? 'Vespertino' : 'Escolarizado'}</p>`;
+                
+                item.innerHTML = `<h4>${ee.nombre} ${yaAgregada ? '✓ (Ya agregada)' : ''}</h4><p><span class="area-badge">${ee.areaCode || 'N/A'}</span> <strong>NRC:</strong> ${ee.crn} · <strong>Créditos:</strong> ${ee.creditos}${ee.bloqueAsignado ? ` · <strong>Bloque ${ee.bloqueAsignado}</strong>` : ''}</p><p><strong>Docente:</strong> ${ee.docente}</p><p><strong>Horario:</strong> ${horariosDetallados}</p><p><strong>Turno:</strong> ${ee.bloqueInfo.turno === 'M' ? 'Matutino' : ee.bloqueInfo.turno === 'V' ? 'Vespertino' : 'Escolarizado'}</p>`;
                 if (!yaAgregada) item.onclick = () => addEEToHorario(ee);
                 eeList.appendChild(item);
             });
             document.getElementById('ee-modal').classList.add('active');
         }
+
         function filterEEList() {
             const search = document.getElementById('search-ee').value.toLowerCase();
             const areaFilter = document.getElementById('filter-area').value;
             const turnoFilter = document.getElementById('filter-turno').value;
             const bloqueFilter = document.getElementById('filter-bloque').value;
+            
             document.querySelectorAll('.ee-item').forEach(item => {
                 const matchSearch = item.dataset.search.includes(search);
                 const matchArea = !areaFilter || item.dataset.area === areaFilter;
@@ -915,75 +977,157 @@
                 item.style.display = (matchSearch && matchArea && matchTurno && matchBloque) ? 'block' : 'none';
             });
         }
+
         function closeModal() { document.getElementById('ee-modal').classList.remove('active'); }
+
         function addEEToHorario(ee) {
             if (appState.horarioSeleccionado.find(e => e.crn === ee.crn)) { alert('Esta EE ya está en tu horario'); return; }
-            const tieneChoque = appState.horarioSeleccionado.some(e => tieneChoqueReal(e, ee));
-            if (tieneChoque) {
-                if (!confirm('⚠️ Esta EE tiene choque de horario con otra. ¿Deseas agregarla de todos modos?')) {
-                    return;
-                }
-            }
+            if (tieneChoqueReal(appState.horarioSeleccionado.find(e => true), ee) && !confirm('⚠️ Esta EE tiene choque de horario. ¿Deseas agregarla de todos modos?')) return;
             historial.push([...appState.horarioSeleccionado]);
             appState.horarioSeleccionado.push(ee);
             updateStats(); renderVista(); closeModal();
         }
+
         function clearHorario() {
-            if (appState.horarioSeleccionado.length === 0) {
-                alert('El horario ya está vacío');
-                return;
-            }
+            if (appState.horarioSeleccionado.length === 0) { alert('El horario ya está vacío'); return; }
             if (confirm(`¿Estás seguro de limpiar todo el horario?\n\nTienes ${appState.horarioSeleccionado.length} experiencia(s) educativa(s) agregada(s).`)) {
                 historial.push([...appState.horarioSeleccionado]);
                 appState.horarioSeleccionado = [];
                 updateStats(); renderVista();
             }
         }
+
         function deshacer() {
-            if (historial.length === 0) {
-                alert('No hay acciones para deshacer');
-                return;
-            }
+            if (historial.length === 0) { alert('No hay acciones para deshacer'); return; }
             appState.horarioSeleccionado = historial.pop();
             updateStats(); renderVista();
         }
+
         function exportarCSV() {
-            if (appState.horarioSeleccionado.length === 0) {
-                alert('No hay experiencias educativas en tu horario');
-                return;
-            }
+            if (appState.horarioSeleccionado.length === 0) { alert('No hay experiencias educativas en tu horario'); return; }
             let csv = 'Día,Hora Inicio,Hora Fin,Experiencia Educativa,NRC,Docente,Salón,Créditos\n';
             const diasNombre = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
             appState.horarioSeleccionado.forEach(ee => {
                 ee.horarios.forEach(h => {
-                    const salonDelDia = ee.salonesPorDia[h.dia] || Object.values(ee.salonesPorDia)[0] || 'Por asignar';
-                    csv += `${diasNombre[h.dia]},${formatTime(h.inicio)},${formatTime(h.fin)},"${ee.nombre}",${ee.crn},"${ee.docente}","${salonDelDia}",${ee.creditos}\n`;
+                    csv += `${diasNombre[h.dia]},${formatTime(h.inicio)},${formatTime(h.fin)},"${ee.nombre}",${ee.crn},"${ee.docente}","${ee.salonesPorDia[h.dia] || Object.values(ee.salonesPorDia)[0] || 'Por asignar'}",${ee.creditos}\n`;
                 });
             });
             const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
+            a.href = URL.createObjectURL(blob);
             a.download = `horario-${appState.modalidad === 'E' ? 'escolarizado' : 'abierto'}-${appState.plan === '04' ? '2004' : '2025'}.csv`;
             a.click();
-            URL.revokeObjectURL(url);
         }
+
         function printHorario() {
-            if (appState.modalidad === 'A') {
-                document.body.classList.add('imprimiendo-abierto');
-            } else {
-                document.body.classList.remove('imprimiendo-abierto');
-            }
+            document.body.classList.toggle('imprimiendo-abierto', appState.modalidad === 'A');
             setTimeout(() => {
                 window.print();
-                setTimeout(() => {
-                    document.body.classList.remove('imprimiendo-abierto');
-                }, 1000);
+                setTimeout(() => { document.body.classList.remove('imprimiendo-abierto'); }, 1000);
             }, 100);
         }
+
         function updateLoadingMessage(msg) { document.getElementById('loading-message').textContent = msg; }
-        function showError(message) { document.getElementById('loading-section').style.display = 'none'; document.getElementById('error-section').textContent = message; document.getElementById('error-section').style.display = 'block'; }
-        function showSuccess(message) { document.getElementById('success-section').textContent = message; document.getElementById('success-section').style.display = 'block'; setTimeout(() => { document.getElementById('success-section').style.display = 'none'; }, 5000); }
+        function showError(message) {
+            document.getElementById('loading-section').style.display = 'none';
+            document.getElementById('error-section').textContent = message;
+            document.getElementById('error-section').style.display = 'block';
+        }
+        function showSuccess(message) {
+            document.getElementById('success-section').textContent = message;
+            document.getElementById('success-section').style.display = 'block';
+            setTimeout(() => { document.getElementById('success-section').style.display = 'none'; }, 5000);
+        }
+
+        // ==========================================
+        // LÓGICA DEL MODAL DE EVALUACIÓN
+        // ==========================================
+        function openEvalModal() {
+            document.getElementById('eval-modal').classList.add('active');
+            resetEval();
+        }
+
+        function closeEvalModal() {
+            document.getElementById('eval-modal').classList.remove('active');
+        }
+
+        function selectEvalRole(rol) {
+            currentEvalRole = rol;
+            document.getElementById('eval-step-1').style.display = 'none';
+            document.getElementById('eval-step-2').style.display = 'block';
+            document.getElementById('eval-role-title').textContent = rol === 'Estudiante' ? '🎓 Evaluación para Estudiantes (Tutorados)' : '👨‍🏫 Evaluación para Docentes (Tutores)';
+            
+            const container = document.getElementById('eval-questions');
+            container.innerHTML = '';
+            
+            evalQuestions[rol].forEach((pregunta, index) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'eval-question';
+                qDiv.innerHTML = `<p>${index + 1}. ${pregunta}</p><div class="eval-options">`;
+                
+                evalOptions.forEach((opcion, val) => {
+                    const valor = 5 - val; // 5 a 1
+                    qDiv.innerHTML += `
+                        <label>
+                            <input type="radio" name="p${index + 1}" value="${valor}" required>
+                            <span>${opcion}</span>
+                        </label>
+                    `;
+                });
+                qDiv.innerHTML += '</div>';
+                container.appendChild(qDiv);
+            });
+        }
+
+        function resetEval() {
+            document.getElementById('eval-step-1').style.display = 'block';
+            document.getElementById('eval-step-2').style.display = 'none';
+            document.getElementById('eval-step-3').style.display = 'none';
+            document.getElementById('eval-form').reset();
+            currentEvalRole = '';
+        }
+
+        async function submitEval(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btn-submit-eval');
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+            
+            const formData = new FormData(event.target);
+            const data = {
+                rol: currentEvalRole,
+                p1: formData.get('p1'),
+                p2: formData.get('p2'),
+                p3: formData.get('p3'),
+                p4: formData.get('p4'),
+                p5: formData.get('p5'),
+                comentarios: document.getElementById('eval-comentarios').value
+            };
+
+            try {
+                // Si el usuario no ha configurado la URL, mostramos un mensaje de éxito simulado para que no se rompa la UX
+                if (GOOGLE_SCRIPT_URL === 'TU_URL_DE_APPS_SCRIPT_AQUI') {
+                    console.warn('URL de Apps Script no configurada. Datos de evaluación:', data);
+                    // Simulamos éxito para que el usuario vea el flujo
+                } else {
+                    const response = await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors', // Necesario para Apps Script
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                }
+                
+                document.getElementById('eval-step-2').style.display = 'none';
+                document.getElementById('eval-step-3').style.display = 'block';
+            } catch (error) {
+                console.error('Error al enviar evaluación:', error);
+                alert('Hubo un error al enviar la evaluación. Por favor, intenta de nuevo.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Enviar evaluación';
+            }
+        }
     </script>
 </body>
 </html>
