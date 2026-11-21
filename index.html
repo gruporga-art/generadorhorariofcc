@@ -6,14 +6,14 @@
     <title>Planeador de Horarios Facico | Universidad Veracruzana</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; min-height: 100vh; }
         .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; min-height: 100vh; }
         .header { background: #1a3a6b; color: white; padding: 20px; text-align: center; border-bottom: 4px solid #28a745; position: relative; }
         .header .uv-badge { background: #28a745; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.85em; font-weight: bold; display: inline-block; margin-bottom: 10px; }
         .header h1 { font-size: 1.8em; margin-bottom: 5px; }
         .header h1::before { content: '📅 '; }
-        .header .subtitle { font-size: 1em; opacity: 0.9; margin-bottom: 10px; }
+        .header .subtitle { font-size: 1em; opacity: 0.9; margin-bottom: 10px; min-height: 1.2em; }
         .header .plan-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.9em; display: inline-block; }
         .back-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.5); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9em; transition: all 0.3s; }
         .back-btn:active { background: rgba(255,255,255,0.4); }
@@ -117,8 +117,6 @@
         .btn-cerrar-modal:active { background: #545b62; }
         .conflict-warning { background: #fff3cd; border: 2px solid #ffc107; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; }
         .conflict-warning.show { display: block; }
-        
-        /* Estilos evaluación */
         .eval-role-btn { flex: 1; padding: 20px; font-size: 1.1em; display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .eval-role-btn:active { transform: scale(0.97); }
         .eval-question { margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #1a3a6b; }
@@ -184,7 +182,8 @@
             <button class="back-btn" id="back-btn" style="display:none;" onclick="goBack()">← Cambiar</button>
             <div class="uv-badge">UNIVERSIDAD VERACRUZANA</div>
             <h1>Planeador de Horarios Facico</h1>
-            <div class="subtitle" id="header-subtitle">Periodo Agosto 2026 - Enero 2027</div>
+            <!-- El periodo se actualizará dinámicamente tras leer el Excel -->
+            <div class="subtitle" id="header-subtitle">Selecciona tu modalidad y plan</div>
             <div class="plan-badge" id="header-plan-badge">Selecciona tu plan</div>
         </div>
         <div class="content">
@@ -334,7 +333,7 @@
             datosCargados: { '04-E': null, '04-A': null, '25-E': null, '25-A': null },
             bloquesFechas: {}, nrcBloque: {},
             experienciasEducativas: [], horarioSeleccionado: [], datosCargadosOK: false,
-            periodoNombre: 'Agosto 2026 - Enero 2027'
+            periodoNombre: 'Por definir' // Valor inicial neutro
         };
         let historial = [];
         
@@ -425,13 +424,11 @@
                     if (file) archivosEncontrados[key] = file;
                 }
 
-                let procesados = 0;
                 const seilKeys = Object.keys(archivosEncontrados).filter(k => k.startsWith('SEIL-'));
                 for (const key of seilKeys) {
                     try {
                         updateLoadingMessage(`Cargando ${archivosEncontrados[key].name}...`);
                         Object.assign(appState.nrcBloque, await downloadAndProcessSEIL(archivosEncontrados[key].id));
-                        procesados++;
                     } catch (err) { console.error(err); }
                 }
 
@@ -442,7 +439,6 @@
                         for (const [crn, bloque] of Object.entries(map)) {
                             if (!appState.nrcBloque[crn]) appState.nrcBloque[crn] = bloque;
                         }
-                        procesados++;
                     } catch (err) { console.error(err); }
                 }
 
@@ -451,8 +447,9 @@
                         updateLoadingMessage(`Cargando Bloques-Abierto.xlsx...`);
                         const datos = await downloadAndProcessBloques(archivosEncontrados['BLOQUES-A'].id);
                         appState.bloquesFechas = datos.fechas;
-                        if (datos.periodo) appState.periodoNombre = datos.periodo;
-                        procesados++;
+                        if (datos.periodo && datos.periodo !== 'Por definir') {
+                            appState.periodoNombre = datos.periodo;
+                        }
                     } catch (err) { console.error(err); }
                 }
 
@@ -461,7 +458,6 @@
                     try {
                         updateLoadingMessage(`Cargando ${archivosEncontrados[key].name}...`);
                         appState.datosCargados[key] = await downloadAndProcessFile(archivosEncontrados[key].id);
-                        procesados++;
                     } catch (err) { console.error(err); }
                 }
                 
@@ -496,10 +492,12 @@
             const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`);
             if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
             const wb = XLSX.read(await (await res.blob()).arrayBuffer(), { type: 'array' });
-            const resultado = { fechas: {}, periodo: 'Agosto 2026 - Enero 2027' };
+            const resultado = { fechas: {}, periodo: 'Por definir' };
             
             const hojaAbierto = wb.SheetNames.find(n => n.toLowerCase().includes('abierto')) || wb.SheetNames[0];
-            if (hojaAbierto) resultado.fechas = processBloquesData(XLSX.utils.sheet_to_json(wb.Sheets[hojaAbierto], { header: 1, defval: '' }));
+            if (hojaAbierto) {
+                resultado.fechas = processBloquesData(XLSX.utils.sheet_to_json(wb.Sheets[hojaAbierto], { header: 1, defval: '' }));
+            }
             
             const hojaPeriodo = wb.SheetNames.find(n => n.toLowerCase().includes('periodo'));
             if (hojaPeriodo) {
@@ -695,7 +693,9 @@
             
             const modalidadTxt = appState.modalidad === 'E' ? 'Escolarizado' : 'Abierto';
             const planTxt = appState.plan === '04' ? 'Plan 2004' : 'Plan 2025';
-            document.getElementById('header-subtitle').textContent = `Periodo ${appState.periodoNombre} · ${modalidadTxt} · Sábados por bloques`;
+            
+            // ✅ Aquí se actualiza el encabezado SOLO después de tener los datos del Excel
+            document.getElementById('header-subtitle').textContent = `Periodo: ${appState.periodoNombre} · ${modalidadTxt}`;
             document.getElementById('header-plan-badge').textContent = `${modalidadTxt} · ${planTxt}`;
             document.getElementById('oferta-title').textContent = `Oferta Académica · ${modalidadTxt} · ${planTxt}`;
             document.getElementById('stat-horas-label').textContent = appState.modalidad === 'A' ? 'Horas/Sábado' : 'Horas/Semana';
@@ -913,9 +913,8 @@
                 item.innerHTML = `<h4>${ee.nombre} ${yaAgregada ? '✓ (Ya agregada)' : ''}</h4><p><span class="area-badge">${ee.areaCode || 'N/A'}</span> <strong>NRC:</strong> ${ee.crn} · <strong>Créditos:</strong> ${ee.creditos}${ee.bloqueAsignado ? ` · <strong>Bloque ${ee.bloqueAsignado}</strong>` : ''}</p><p><strong>Docente:</strong> ${ee.docente}</p><p><strong>Horario:</strong> ${horariosDetallados}</p><p><strong>Turno:</strong> ${ee.bloqueInfo.turno === 'M' ? 'Matutino' : ee.bloqueInfo.turno === 'V' ? 'Vespertino' : 'Escolarizado'}</p>`;
                 
                 if (!yaAgregada) {
-                    // CORRECCIÓN MÓVIL: Usar addEventListener en lugar de .onclick para mejor compatibilidad táctil
                     item.addEventListener('click', function(e) {
-                        e.preventDefault(); // Previene comportamientos extraños de scroll en móviles
+                        e.preventDefault();
                         addEEToHorario(ee);
                     });
                 }
@@ -1029,7 +1028,7 @@
                 qDiv.innerHTML = `<p>${index + 1}. ${pregunta}</p><div class="eval-options">`;
                 
                 evalOptions.forEach((opcion, val) => {
-                    const valor = 5 - val; // 5 a 1
+                    const valor = 5 - val;
                     qDiv.innerHTML += `
                         <label>
                             <input type="radio" name="p${index + 1}" value="${valor}" required>
@@ -1071,12 +1070,9 @@
                 if (GOOGLE_SCRIPT_URL === 'TU_URL_DE_APPS_SCRIPT_AQUI') {
                     console.warn('URL de Apps Script no configurada. Datos:', data);
                 } else {
-                    // CORRECCIÓN EXCEL: Usar 'text/plain' evita el bloqueo CORS preflight en Apps Script
                     await fetch(GOOGLE_SCRIPT_URL, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'text/plain;charset=utf-8'
-                        },
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify(data)
                     });
                 }
