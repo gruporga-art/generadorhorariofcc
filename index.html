@@ -732,7 +732,7 @@
             
             const modalidadTxt = appState.modalidad === 'E' ? 'Escolarizado' : 'Abierto';
             const planTxt = appState.plan === '04' ? 'Plan 2004' : 'Plan 2025';
-            document.getElementById('header-subtitle').textContent = `Periodo ${appState.periodoNombre} · ${modalidadTxt} · Sábados por bloques`;
+            document.getElementById('header-subtitle').textContent = `Periodo ${appState.periodoNombre} · ${modalidadTxt} · o Sábados por bloques`;
             document.getElementById('header-plan-badge').textContent = `${modalidadTxt} · ${planTxt}`;
             document.getElementById('oferta-title').textContent = `Oferta Académica · ${modalidadTxt} · ${planTxt}`;
             document.getElementById('stat-horas-label').textContent = appState.modalidad === 'A' ? 'Horas/Sábado' : 'Horas/Semana';
