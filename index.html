@@ -1143,12 +1143,38 @@ function imprimir(){
 }
 
 /* ===================== EVALUACIÓN ===================== */
+/* ===================== EVALUACIÓN ===================== */
+function evalConfigurada(){
+  return SCRIPT_URL && SCRIPT_URL.indexOf('https://script.google.com/macros/s/') === 0 && SCRIPT_URL.indexOf('/exec') > 0;
+}
+
 function abrirEval(){ resetEval(); $('modalEval').classList.add('on'); }
 function cerrarEval(){ $('modalEval').classList.remove('on'); }
+
 function resetEval(){
   $('ev1').style.display='block'; $('ev2').style.display='none'; $('ev3').style.display='none';
   $('evForm').reset(); $('evComent').value=''; S.rol='';
+  let a = $('evAviso'); if(a){ a.style.display='none'; a.textContent=''; }
+  if(!evalConfigurada()){
+    avisoEval('⚠️ Falta configurar la URL del Apps Script en el código (constante SCRIPT_URL). La evaluación NO se guardará hasta que la pegues.', true);
+  }
 }
+
+function avisoEval(msg, esError){
+  let a = $('evAviso');
+  if(!a){
+    a = document.createElement('div');
+    a.id = 'evAviso';
+    a.style.cssText = 'padding:12px 14px;border-radius:11px;margin-bottom:14px;font-size:.87rem;line-height:1.5;white-space:pre-wrap';
+    $('ev2').insertBefore(a, $('evForm'));
+  }
+  a.textContent = msg;
+  a.style.display = 'block';
+  a.style.background = esError ? '#fdecee' : '#e8f7ee';
+  a.style.border = esError ? '1.5px solid #f5c2c7' : '1.5px solid #b7e4c7';
+  a.style.color = esError ? '#8b1f2b' : '#1a6b34';
+}
+
 function elegirRol(rol){
   S.rol = rol;
   $('ev1').style.display='none'; $('ev2').style.display='block';
@@ -1157,26 +1183,90 @@ function elegirRol(rol){
     '<div class="pregunta"><p>'+(i+1)+'. '+esc(p)+'</p><div class="opts">'
     + ESCALA.map((o,j)=>'<label><input type="radio" name="p'+(i+1)+'" value="'+(5-j)+'" required><span>'+esc(o)+'</span></label>').join('')
     + '</div></div>').join('');
+  if(!evalConfigurada()){
+    avisoEval('⚠️ Falta configurar SCRIPT_URL. Puedes responder, pero no se guardará en la hoja de cálculo.', true);
+  }
 }
+
+function respaldoLocal(payload){
+  try{
+    const k='evalPendientesFacico';
+    const arr=JSON.parse(localStorage.getItem(k)||'[]');
+    arr.push(Object.assign({fecha:new Date().toISOString()},payload));
+    localStorage.setItem(k, JSON.stringify(arr));
+  }catch(e){}
+}
+
 async function enviarEval(ev){
   ev.preventDefault();
-  const b = $('btnEnv'); b.disabled=true; b.textContent='Enviando…';
+  const b = $('btnEnv');
+
   const fd = new FormData(ev.target);
   const payload = {
-    rol:S.rol, p1:fd.get('p1'), p2:fd.get('p2'), p3:fd.get('p3'), p4:fd.get('p4'), p5:fd.get('p5'),
+    rol: S.rol,
+    p1: fd.get('p1'), p2: fd.get('p2'), p3: fd.get('p3'), p4: fd.get('p4'), p5: fd.get('p5'),
     comentarios: $('evComent').value.trim(),
-    periodo: S.periodo||'', modalidad: S.mod==='E'?'Escolarizado':(S.mod==='A'?'Abierto':''), plan: S.plan==='04'?'2004':(S.plan==='25'?'2025':'')
+    periodo: S.periodo || '',
+    modalidad: S.mod==='E' ? 'Escolarizado' : (S.mod==='A' ? 'Abierto' : ''),
+    plan: S.plan==='04' ? '2004' : (S.plan==='25' ? '2025' : ''),
+    origen: location.hostname || 'local'
   };
+
+  if(!evalConfigurada()){
+    respaldoLocal(payload);
+    avisoEval('❌ No se envió: la constante SCRIPT_URL del HTML todavía dice "TU_URL_DE_APPS_SCRIPT_AQUI" o es inválida.\n\nTu respuesta quedó guardada localmente como respaldo. Pega la URL /exec del Apps Script y vuelve a intentar.', true);
+    return;
+  }
+
+  b.disabled = true; b.textContent = 'Enviando…';
+  let ok = false, detalle = '';
+
+  // Intento 1: POST legible (permite confirmar el guardado real)
   try{
-    if(SCRIPT_URL && SCRIPT_URL!=='TU_URL_DE_APPS_SCRIPT_AQUI'){
-      await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
-    } else {
-      console.warn('Configura SCRIPT_URL para guardar en Google Sheets. Datos:', payload);
+    const r = await fetch(SCRIPT_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload),
+      redirect:'follow'
+    });
+    const txt = await r.text();
+    try{
+      const j = JSON.parse(txt);
+      ok = (j.result === 'success');
+      if(!ok) detalle = j.error || txt.slice(0,200);
+    }catch(_){
+      detalle = 'La respuesta no es JSON (probablemente pide iniciar sesión). Revisa "Quién tiene acceso: Cualquier persona".';
     }
+  }catch(e){ detalle = 'POST bloqueado: '+e.message; }
+
+  // Intento 2: GET simple (no dispara preflight CORS)
+  if(!ok){
+    try{
+      const u = SCRIPT_URL + (SCRIPT_URL.indexOf('?')>-1?'&':'?') + 'data=' + encodeURIComponent(JSON.stringify(payload));
+      const r2 = await fetch(u, { method:'GET', redirect:'follow' });
+      const t2 = await r2.text();
+      try{ const j2 = JSON.parse(t2); ok = (j2.result==='success'); if(!ok) detalle = j2.error || detalle; }
+      catch(_){ detalle = 'Tampoco respondió JSON por GET. Verifica el despliegue.'; }
+    }catch(e){
+      // Intento 3: envío ciego (llega aunque no podamos leer la respuesta)
+      try{
+        await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors',
+          headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload) });
+        ok = true; detalle = 'Enviado sin confirmación de lectura (modo no-cors).';
+      }catch(e2){ detalle = 'Todos los intentos fallaron: '+e2.message; }
+    }
+  }
+
+  b.disabled = false; b.textContent = 'Enviar evaluación';
+
+  if(ok){
     $('ev2').style.display='none'; $('ev3').style.display='block';
-  }catch(e){
-    alert('No se pudo enviar la evaluación. Revisa tu conexión e inténtalo de nuevo.');
-  }finally{ b.disabled=false; b.textContent='Enviar evaluación'; }
+    console.log('Evaluación enviada.', detalle);
+  }else{
+    respaldoLocal(payload);
+    avisoEval('❌ No se pudo guardar en la hoja de cálculo.\n\nDetalle: '+detalle
+      +'\n\nChecklist:\n1) Apps Script → Implementar → Administrar → lápiz → Versión: "Nueva versión".\n2) Quién tiene acceso: "Cualquier persona".\n3) Abre la URL /exec en el navegador: debe decir "Servicio activo".\n\nTu respuesta quedó guardada localmente como respaldo.', true);
+  }
 }
 
 /* ===================== CIERRE DE MODALES ===================== */
