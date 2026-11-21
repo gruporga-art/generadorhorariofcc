@@ -2,11 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Planeador de Horarios Facico | Universidad Veracruzana</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; min-height: 100vh; }
         .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; min-height: 100vh; }
         .header { background: #1a3a6b; color: white; padding: 20px; text-align: center; border-bottom: 4px solid #28a745; position: relative; }
@@ -16,7 +16,7 @@
         .header .subtitle { font-size: 1em; opacity: 0.9; margin-bottom: 10px; }
         .header .plan-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.9em; display: inline-block; }
         .back-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.5); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9em; transition: all 0.3s; }
-        .back-btn:hover { background: rgba(255,255,255,0.3); }
+        .back-btn:active { background: rgba(255,255,255,0.4); }
         .content { padding: 20px; }
         .screen { display: none; animation: fadeIn 0.4s ease-in; }
         .screen.active { display: block; }
@@ -34,27 +34,27 @@
         .section-subtitle { color: #666; margin-bottom: 25px; line-height: 1.6; }
         .selector-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 20px; }
         .option-card { padding: 30px; border: 3px solid #e0e0e0; border-radius: 15px; cursor: pointer; transition: all 0.3s; background: #f9f9f9; text-align: center; }
-        .option-card:hover { border-color: #1a3a6b; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(26, 58, 107, 0.15); }
+        .option-card:active { transform: scale(0.98); }
         .option-card.selected { border-color: #28a745; background: linear-gradient(135deg, #1a3a6b 0%, #28a745 100%); color: white; transform: translateY(-5px); box-shadow: 0 10px 25px rgba(26, 58, 107, 0.3); }
         .option-card .icon { font-size: 3em; margin-bottom: 15px; }
         .option-card h3 { font-size: 1.5em; margin-bottom: 10px; }
         .option-card p { font-size: 0.95em; line-height: 1.6; }
         .nav-buttons { display: flex; justify-content: space-between; gap: 15px; margin-top: 30px; }
         .btn { background: #28a745; color: white; border: none; padding: 15px 35px; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: all 0.3s; }
-        .btn:hover:not(:disabled) { background: #218838; transform: translateY(-2px); }
+        .btn:active:not(:disabled) { transform: scale(0.97); background: #1e7e34; }
         .btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .btn-secondary { background: #6c757d; }
-        .btn-secondary:hover:not(:disabled) { background: #5a6268; }
+        .btn-secondary:active:not(:disabled) { background: #545b62; }
         .oferta-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .oferta-title { font-size: 1.3em; color: #1a3a6b; font-weight: bold; }
         .btn-cambiar { background: white; border: 2px solid #1a3a6b; color: #1a3a6b; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9em; transition: all 0.3s; }
-        .btn-cambiar:hover { background: #1a3a6b; color: white; }
+        .btn-cambiar:active { background: #1a3a6b; color: white; }
         .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
         .stat-card { background: white; border: 2px solid #e0e0e0; border-left: 4px solid #28a745; border-radius: 10px; padding: 20px; text-align: center; }
         .stat-value { font-size: 2.5em; font-weight: bold; color: #1a3a6b; margin-bottom: 5px; }
         .stat-label { font-size: 0.9em; color: #666; }
         .btn-agregar { width: 100%; background: #28a745; color: white; border: none; padding: 18px; border-radius: 10px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 20px; }
-        .btn-agregar:hover { background: #218838; }
+        .btn-agregar:active { background: #1e7e34; transform: scale(0.98); }
         .btn-agregar::before { content: '➕ '; }
         .instruccion { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 20px; }
         .instruccion::before { content: '👆 '; }
@@ -66,7 +66,7 @@
         .bloques-grid td { border: 1px solid #e0e0e0; padding: 12px 8px; text-align: center; vertical-align: middle; }
         .bloques-grid td:first-child { background: #f8f9fa; font-weight: bold; color: #1a3a6b; font-size: 1.05em; }
         .bloque-cell { cursor: pointer; transition: all 0.3s; min-height: 80px; overflow: hidden; }
-        .bloque-cell:hover { background: #f0f4ff; }
+        .bloque-cell:active { background: #d1e7dd; }
         .bloque-cell.empty { color: #ccc; font-size: 1.5em; }
         .bloque-cell.occupied { background: #e8f5e9; border: 2px solid #28a745; }
         .bloque-cell .ee-nombre { font-weight: bold; color: #1a3a6b; font-size: 0.9em; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -79,21 +79,18 @@
         .horario-table td { border: 1px solid #d0d0d0; padding: 2px; vertical-align: top; height: 55px; overflow: hidden; }
         .horario-table td:first-child { background: #f0f0f0; font-weight: bold; text-align: center; font-size: 0.9em; padding: 8px 4px; vertical-align: middle; }
         .horario-table .ee-card { color: white; padding: 6px 8px; border-radius: 5px; cursor: pointer; transition: all 0.3s; height: 100%; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15); overflow: hidden; }
-        .horario-table .ee-card:hover { transform: scale(1.02); box-shadow: 0 4px 8px rgba(0,0,0,0.25); z-index: 10; position: relative; }
+        .horario-table .ee-card:active { transform: scale(0.97); }
         .horario-table .ee-card .ee-nombre { font-weight: bold; font-size: 0.85em; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .horario-table .ee-card .ee-nrc, .horario-table .ee-card .ee-docente, .horario-table .ee-card .ee-horario, .horario-table .ee-card .ee-salon { font-size: 0.75em; opacity: 0.9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .horario-table .ee-card.conflicto { animation: pulseConflicto 1.5s infinite; box-shadow: 0 0 0 3px #ff0000, 0 4px 8px rgba(255,0,0,0.4); }
         @keyframes pulseConflicto { 0%, 100% { box-shadow: 0 0 0 3px #ff0000, 0 4px 8px rgba(255,0,0,0.4); } 50% { box-shadow: 0 0 0 5px #ff0000, 0 4px 12px rgba(255,0,0,0.6); } }
         .botones-inferiores { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
         .btn-inferior { padding: 12px; border: none; border-radius: 10px; font-size: 1em; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .btn-inferior:active { transform: scale(0.97); }
         .btn-imprimir { background: #6c757d; color: white; }
-        .btn-imprimir:hover { background: #5a6268; }
         .btn-limpiar { background: #dc3545; color: white; }
-        .btn-limpiar:hover { background: #c82333; }
         .btn-deshacer { background: #17a2b8; color: white; }
-        .btn-deshacer:hover { background: #138496; }
         .btn-exportar { background: #fd7e14; color: white; }
-        .btn-exportar:hover { background: #e8590c; }
         .footer { background: #f8f9fa; border-top: 4px solid #28a745; padding: 20px; text-align: center; color: #666; font-size: 0.85em; line-height: 1.6; }
         .footer a { color: #1a3a6b; text-decoration: none; }
         .loading { text-align: center; padding: 40px; color: #1a3a6b; }
@@ -103,37 +100,43 @@
         .success { background: #efe; border: 2px solid #cfc; color: #3c3; padding: 20px; border-radius: 10px; margin: 20px 0; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 15px; padding: 25px; max-width: 900px; width: 90%; max-height: 85vh; overflow-y: auto; }
+        .modal-content { background: white; border-radius: 15px; padding: 25px; max-width: 900px; width: 90%; max-height: 85vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .modal-header { font-size: 1.5em; color: #1a3a6b; margin-bottom: 20px; font-weight: bold; }
         .search-box { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; margin-bottom: 15px; font-size: 1em; }
         .search-box:focus { outline: none; border-color: #1a3a6b; }
         .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
         .filter-bar select { padding: 10px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 0.95em; background: white; flex: 1; min-width: 150px; }
-        .ee-list { max-height: 500px; overflow-y: auto; }
-        .ee-item { padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: all 0.3s; }
-        .ee-item:hover { border-color: #1a3a6b; background: #f0f4ff; }
+        .ee-list { max-height: 500px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .ee-item { padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; touch-action: manipulation; }
+        .ee-item:active { transform: scale(0.98); background: #e0e7ff; border-color: #1a3a6b; }
         .ee-item h4 { color: #1a3a6b; margin-bottom: 5px; }
         .ee-item p { font-size: 0.9em; color: #666; margin: 3px 0; }
         .ee-item.added { opacity: 0.5; cursor: not-allowed; background: #f0f0f0; }
         .area-badge { display: inline-block; background: #e0e0e0; color: #333; padding: 3px 8px; border-radius: 5px; font-size: 0.8em; margin-right: 5px; }
         .btn-cerrar-modal { background: #6c757d; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-size: 1em; cursor: pointer; margin-top: 15px; }
+        .btn-cerrar-modal:active { background: #545b62; }
         .conflict-warning { background: #fff3cd; border: 2px solid #ffc107; color: #856404; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; }
         .conflict-warning.show { display: block; }
         
-        /* ESTILOS DEL MODAL DE EVALUACIÓN */
+        /* Estilos evaluación */
         .eval-role-btn { flex: 1; padding: 20px; font-size: 1.1em; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .eval-role-btn:active { transform: scale(0.97); }
         .eval-question { margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #1a3a6b; }
         .eval-question p { font-weight: bold; color: #1a3a6b; margin-bottom: 10px; font-size: 0.95em; }
         .eval-options { display: flex; gap: 10px; flex-wrap: wrap; }
-        .eval-options label { flex: 1; min-width: 80px; padding: 8px; background: white; border: 2px solid #e0e0e0; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.2s; font-size: 0.85em; }
+        .eval-options label { flex: 1; min-width: 80px; padding: 8px; background: white; border: 2px solid #e0e0e0; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.2s; font-size: 0.85em; touch-action: manipulation; }
+        .eval-options label:active { transform: scale(0.95); }
         .eval-options input[type="radio"] { display: none; }
         .eval-options input[type="radio"]:checked + span { font-weight: bold; }
         .eval-options label:has(input:checked) { border-color: #28a745; background: #e8f5e9; color: #155724; }
         .eval-comentarios { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; margin-top: 15px; resize: vertical; min-height: 80px; font-family: inherit; font-size: 0.95em; }
         .eval-comentarios:focus { outline: none; border-color: #1a3a6b; }
-        .btn-evaluar { background: #7c3aed; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 1em; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-top: 10px; }
-        .btn-evaluar:hover { background: #6d28d9; transform: translateY(-2px); }
-        
+        .btn-evaluar { background: #7c3aed; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 1em; font-weight: bold; cursor: pointer; transition: all 0.3s; margin-top: 10px; width: 100%; }
+        .btn-evaluar:active { background: #6d28d9; transform: scale(0.98); }
+        .btn-submit-eval { background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 1em; font-weight: bold; cursor: pointer; transition: all 0.3s; flex: 1; }
+        .btn-submit-eval:active:not(:disabled) { background: #1e7e34; transform: scale(0.98); }
+        .btn-submit-eval:disabled { opacity: 0.6; cursor: wait; }
+
         @media (max-width: 768px) { 
             .stats { grid-template-columns: repeat(2, 1fr); } 
             .botones-inferiores { grid-template-columns: repeat(2, 1fr); } 
@@ -293,7 +296,7 @@
                     <textarea id="eval-comentarios" class="eval-comentarios" placeholder="Comentarios adicionales o sugerencias (opcional)..."></textarea>
                     <div style="display: flex; gap: 10px; margin-top: 20px;">
                         <button type="button" class="btn btn-secondary" onclick="resetEval()" style="flex: 1;">Atrás</button>
-                        <button type="submit" class="btn" id="btn-submit-eval" style="flex: 1;">Enviar evaluación</button>
+                        <button type="submit" class="btn-submit-eval" id="btn-submit-eval">Enviar evaluación</button>
                     </div>
                 </form>
             </div>
@@ -308,9 +311,7 @@
     </div>
 
     <script>
-        // ⚠️ IMPORTANTE: Reemplaza esta URL con la que obtuviste al implementar el Apps Script
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ8rQj_wrPDBgl-jM9r3mtigd3vMWaqTF2ulOII3WiiICmHuvu6zfz0OIm347Zi6eL/exec';
-        
+        const GOOGLE_SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI'; // ⚠️ REEMPLAZA ESTO
         const API_KEY = 'AIzaSyBI4tHjYhVazAn6y8CW1k2kC0zcxLX07xI';
         const FOLDER_ID = '1fIDyI54BjKaUJ5aDXJDE1NsN_9CwHdAQ';
         const MAX_CREDITOS = 30;
@@ -337,7 +338,6 @@
         };
         let historial = [];
         
-        // Preguntas de evaluación por rol
         const evalQuestions = {
             'Estudiante': [
                 '¿Qué tan fácil fue armar tu horario con esta herramienta?',
@@ -417,71 +417,56 @@
                 document.getElementById('success-section').style.display = 'none';
                 
                 const files = await listFilesInFolder();
-                console.log('Archivos encontrados:', files);
-                
                 if (!files || files.length === 0) throw new Error('No se encontraron archivos en la carpeta de Google Drive.');
                 
                 const archivosEncontrados = {};
                 for (const [key, pattern] of Object.entries(FILE_PATTERNS)) {
                     const file = files.find(f => pattern.test(f.name));
-                    if (file) {
-                        archivosEncontrados[key] = file;
-                        console.log(`✓ ${key}: ${file.name}`);
-                    }
+                    if (file) archivosEncontrados[key] = file;
                 }
 
                 let procesados = 0;
-                let erroresProcesamiento = [];
-
                 const seilKeys = Object.keys(archivosEncontrados).filter(k => k.startsWith('SEIL-'));
                 for (const key of seilKeys) {
-                    const file = archivosEncontrados[key];
                     try {
-                        updateLoadingMessage(`Cargando ${file.name}...`);
-                        const nrcMap = await downloadAndProcessSEIL(file.id);
-                        Object.assign(appState.nrcBloque, nrcMap);
+                        updateLoadingMessage(`Cargando ${archivosEncontrados[key].name}...`);
+                        Object.assign(appState.nrcBloque, await downloadAndProcessSEIL(archivosEncontrados[key].id));
                         procesados++;
-                    } catch (err) { erroresProcesamiento.push(`${file.name}: ${err.message}`); }
+                    } catch (err) { console.error(err); }
                 }
 
                 if (archivosEncontrados['NRC-SIN-BLOQUE']) {
                     try {
                         updateLoadingMessage(`Cargando NRC-SIN-BLOQUE.xlsx...`);
-                        const nrcSinBloqueMap = await downloadAndProcessNRCSinBloque(archivosEncontrados['NRC-SIN-BLOQUE'].id);
-                        for (const [crn, bloque] of Object.entries(nrcSinBloqueMap)) {
+                        const map = await downloadAndProcessNRCSinBloque(archivosEncontrados['NRC-SIN-BLOQUE'].id);
+                        for (const [crn, bloque] of Object.entries(map)) {
                             if (!appState.nrcBloque[crn]) appState.nrcBloque[crn] = bloque;
                         }
                         procesados++;
-                    } catch (err) { erroresProcesamiento.push(`NRC-SIN-BLOQUE: ${err.message}`); }
+                    } catch (err) { console.error(err); }
                 }
 
                 if (archivosEncontrados['BLOQUES-A']) {
                     try {
                         updateLoadingMessage(`Cargando Bloques-Abierto.xlsx...`);
-                        const datosBloques = await downloadAndProcessBloques(archivosEncontrados['BLOQUES-A'].id);
-                        appState.bloquesFechas = datosBloques.fechas;
-                        if (datosBloques.periodo) appState.periodoNombre = datosBloques.periodo;
+                        const datos = await downloadAndProcessBloques(archivosEncontrados['BLOQUES-A'].id);
+                        appState.bloquesFechas = datos.fechas;
+                        if (datos.periodo) appState.periodoNombre = datos.periodo;
                         procesados++;
-                    } catch (err) { erroresProcesamiento.push(`Bloques-Abierto: ${err.message}`); }
+                    } catch (err) { console.error(err); }
                 }
 
                 const pracKeys = Object.keys(archivosEncontrados).filter(k => ['04-E', '04-A', '25-E', '25-A'].includes(k));
                 for (const key of pracKeys) {
-                    const file = archivosEncontrados[key];
                     try {
-                        updateLoadingMessage(`Cargando ${file.name}...`);
-                        const data = await downloadAndProcessFile(file.id);
-                        appState.datosCargados[key] = data;
+                        updateLoadingMessage(`Cargando ${archivosEncontrados[key].name}...`);
+                        appState.datosCargados[key] = await downloadAndProcessFile(archivosEncontrados[key].id);
                         procesados++;
-                    } catch (err) { erroresProcesamiento.push(`${file.name}: ${err.message}`); }
+                    } catch (err) { console.error(err); }
                 }
                 
                 const totalEE = Object.values(appState.datosCargados).reduce((sum, d) => sum + (d ? d.length : 0), 0);
-                
-                if (totalEE === 0) {
-                    if (erroresProcesamiento.length > 0) throw new Error(`Error al procesar:\n${erroresProcesamiento.join('\n')}`);
-                    else throw new Error('No se encontraron archivos SYRPRAC.');
-                }
+                if (totalEE === 0) throw new Error('No se encontraron archivos SYRPRAC válidos.');
                 
                 appState.datosCargadosOK = true;
                 updateBloquesFechas();
@@ -489,43 +474,36 @@
                 initializeApp();
             } catch (error) {
                 showError('❌ Error: ' + error.message);
-                console.error(error);
             }
         }
 
         async function listFilesInFolder() {
             const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+trashed=false&key=${API_KEY}&fields=files(id,name,mimeType)`;
-            const response = await fetch(url);
-            const data = await response.json();
-            if (data.error) throw new Error(`API Error: ${data.error.message}`);
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.error) throw new Error(data.error.message);
             return data.files || [];
         }
 
         async function downloadAndProcessFile(fileId) {
-            const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
-            const blob = await response.blob();
-            const workbook = XLSX.read(await blob.arrayBuffer(), { type: 'array' });
-            return processData(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: '' }));
+            const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`);
+            if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
+            const wb = XLSX.read(await (await res.blob()).arrayBuffer(), { type: 'array' });
+            return processData(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '' }));
         }
 
         async function downloadAndProcessBloques(fileId) {
-            const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
-            const blob = await response.blob();
-            const workbook = XLSX.read(await blob.arrayBuffer(), { type: 'array' });
+            const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`);
+            if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
+            const wb = XLSX.read(await (await res.blob()).arrayBuffer(), { type: 'array' });
             const resultado = { fechas: {}, periodo: 'Agosto 2026 - Enero 2027' };
             
-            const hojaAbierto = workbook.SheetNames.find(n => n.toLowerCase().includes('abierto')) || workbook.SheetNames[0];
-            if (hojaAbierto) {
-                resultado.fechas = processBloquesData(XLSX.utils.sheet_to_json(workbook.Sheets[hojaAbierto], { header: 1, defval: '' }));
-            }
+            const hojaAbierto = wb.SheetNames.find(n => n.toLowerCase().includes('abierto')) || wb.SheetNames[0];
+            if (hojaAbierto) resultado.fechas = processBloquesData(XLSX.utils.sheet_to_json(wb.Sheets[hojaAbierto], { header: 1, defval: '' }));
             
-            const hojaPeriodo = workbook.SheetNames.find(n => n.toLowerCase().includes('periodo'));
+            const hojaPeriodo = wb.SheetNames.find(n => n.toLowerCase().includes('periodo'));
             if (hojaPeriodo) {
-                const celdaA1 = workbook.Sheets[hojaPeriodo]['A1'];
+                const celdaA1 = wb.Sheets[hojaPeriodo]['A1'];
                 if (celdaA1) {
                     const texto = String(celdaA1.w || celdaA1.v || '').trim();
                     if (texto) resultado.periodo = texto;
@@ -535,27 +513,19 @@
         }
 
         async function downloadAndProcessSEIL(fileId) {
-            const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
-            const blob = await response.blob();
-            const workbook = XLSX.read(await blob.arrayBuffer(), { type: 'array' });
-            return processSEILData(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: '' }));
+            const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`);
+            if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
+            const wb = XLSX.read(await (await res.blob()).arrayBuffer(), { type: 'array' });
+            return processSEILData(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '' }));
         }
 
         async function downloadAndProcessNRCSinBloque(fileId) {
-            const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
-            const blob = await response.blob();
-            const workbook = XLSX.read(await blob.arrayBuffer(), { type: 'array' });
+            const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`);
+            if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
+            const wb = XLSX.read(await (await res.blob()).arrayBuffer(), { type: 'array' });
             const nrcMap = {};
-            if (workbook.SheetNames.includes('2004')) {
-                Object.assign(nrcMap, processNRCSinBloqueSheet(XLSX.utils.sheet_to_json(workbook.Sheets['2004'], { header: 1, defval: '' }), '04'));
-            }
-            if (workbook.SheetNames.includes('2025')) {
-                Object.assign(nrcMap, processNRCSinBloqueSheet(XLSX.utils.sheet_to_json(workbook.Sheets['2025'], { header: 1, defval: '' }), '25'));
-            }
+            if (wb.SheetNames.includes('2004')) Object.assign(nrcMap, processNRCSinBloqueSheet(XLSX.utils.sheet_to_json(wb.Sheets['2004'], { header: 1, defval: '' }), '04'));
+            if (wb.SheetNames.includes('2025')) Object.assign(nrcMap, processNRCSinBloqueSheet(XLSX.utils.sheet_to_json(wb.Sheets['2025'], { header: 1, defval: '' }), '25'));
             return nrcMap;
         }
 
@@ -564,10 +534,9 @@
             if (!data || data.length < 2) return nrcMap;
             let headerRowIndex = 0, headers = [];
             for (let i = 0; i < Math.min(5, data.length); i++) {
-                const row = data[i];
-                if (row && (String(row[0] || '').toUpperCase().includes('NRC') || String(row[0] || '').toUpperCase().includes('CRN'))) {
+                if (data[i] && (String(data[i][0] || '').toUpperCase().includes('NRC') || String(data[i][0] || '').toUpperCase().includes('CRN'))) {
                     headerRowIndex = i;
-                    headers = row.map(h => String(h || '').trim().toUpperCase());
+                    headers = data[i].map(h => String(h || '').trim().toUpperCase());
                     break;
                 }
             }
@@ -577,9 +546,8 @@
             if (idxNRC < 0 || idxBloque < 0) return nrcMap;
             
             for (let i = headerRowIndex + 1; i < data.length; i++) {
-                const row = data[i];
-                if (!row || row.length === 0) continue;
-                const nrc = row[idxNRC], bloque = row[idxBloque];
+                if (!data[i] || data[i].length === 0) continue;
+                const nrc = data[i][idxNRC], bloque = data[i][idxBloque];
                 if (!nrc || !bloque) continue;
                 const bloqueNum = parseInt(bloque);
                 if (!isNaN(bloqueNum) && bloqueNum >= 1 && bloqueNum <= 5) nrcMap[String(nrc).trim()] = bloqueNum;
@@ -591,9 +559,8 @@
             const bloques = {};
             let headerRow = null, fechasRow = null;
             for (let i = 0; i < data.length; i++) {
-                const row = data[i];
-                if (!row) continue;
-                const firstCell = String(row[0] || '').trim().toLowerCase();
+                if (!data[i]) continue;
+                const firstCell = String(data[i][0] || '').trim().toLowerCase();
                 if (firstCell === 'bloques' || firstCell.includes('bloque')) headerRow = i;
                 if (firstCell === 'fechas') fechasRow = i;
             }
@@ -612,10 +579,9 @@
             if (!data || data.length < 2) return nrcMap;
             let headerRowIndex = 0, headers = [];
             for (let i = 0; i < Math.min(10, data.length); i++) {
-                const row = data[i];
-                if (row && row.includes('SWBSEIL_CRN') && row.includes('SWBSEIL_PTRM_CODE')) {
+                if (data[i] && data[i].includes('SWBSEIL_CRN') && data[i].includes('SWBSEIL_PTRM_CODE')) {
                     headerRowIndex = i;
-                    headers = row.map(h => String(h).trim());
+                    headers = data[i].map(h => String(h).trim());
                     break;
                 }
             }
@@ -625,9 +591,8 @@
             if (idxCRN < 0 || idxPTRM < 0) return nrcMap;
             
             for (let i = headerRowIndex + 1; i < data.length; i++) {
-                const row = data[i];
-                if (!row || row.length === 0) continue;
-                const crn = row[idxCRN], ptrm = row[idxPTRM];
+                if (!data[i] || data[i].length === 0) continue;
+                const crn = data[i][idxCRN], ptrm = data[i][idxPTRM];
                 if (!crn || !ptrm) continue;
                 const ptrmStr = String(ptrm).trim();
                 if (PTRM_TO_BLOQUE[ptrmStr]) nrcMap[String(crn).trim()] = PTRM_TO_BLOQUE[ptrmStr];
@@ -637,9 +602,8 @@
 
         function updateBloquesFechas() {
             for (let i = 1; i <= 5; i++) {
-                const fechas = appState.bloquesFechas[i] || 'Fechas por definir';
                 const el = document.getElementById(`fecha-bloque-${i}`);
-                if (el) el.textContent = fechas;
+                if (el) el.textContent = appState.bloquesFechas[i] || 'Fechas por definir';
             }
         }
 
@@ -647,10 +611,9 @@
             if (!data || data.length < 2) return [];
             let headerRowIndex = 0, headers = [];
             for (let i = 0; i < Math.min(5, data.length); i++) {
-                const row = data[i];
-                if (row && row.includes('TITULO') && row.includes('SSBSECT_CRN')) {
+                if (data[i] && data[i].includes('TITULO') && data[i].includes('SSBSECT_CRN')) {
                     headerRowIndex = i;
-                    headers = row.map(h => String(h).trim());
+                    headers = data[i].map(h => String(h).trim());
                     break;
                 }
             }
@@ -668,23 +631,22 @@
             };
             const crnMap = {};
             for (let i = headerRowIndex + 1; i < data.length; i++) {
-                const row = data[i];
-                if (!row || row.length === 0) continue;
-                const titulo = row[idx.titulo], crn = row[idx.crn];
+                if (!data[i] || data[i].length === 0) continue;
+                const titulo = data[i][idx.titulo], crn = data[i][idx.crn];
                 if (!titulo || !crn) continue;
                 const tituloStr = String(titulo).trim();
                 if (tituloStr.includes('CF_DESC_LEVL') || tituloStr === 'LICENCIATURA' || tituloStr === '') continue;
                 
                 if (!crnMap[crn]) {
                     crnMap[crn] = {
-                        nombre: tituloStr, creditos: parseInt(row[idx.creditos]) || 0,
-                        crn: String(crn), docente: String(row[idx.docente] || '').trim() || 'Por asignar',
-                        area: String(row[idx.area] || '').trim(), areaCode: String(row[idx.areaCode] || '').trim(),
-                        maxEnrl: parseInt(row[idx.maxEnrl]) || 0, horarios: [], salonesPorDia: {}
+                        nombre: tituloStr, creditos: parseInt(data[i][idx.creditos]) || 0,
+                        crn: String(crn), docente: String(data[i][idx.docente] || '').trim() || 'Por asignar',
+                        area: String(data[i][idx.area] || '').trim(), areaCode: String(data[i][idx.areaCode] || '').trim(),
+                        maxEnrl: parseInt(data[i][idx.maxEnrl]) || 0, horarios: [], salonesPorDia: {}
                     };
                 }
-                const salon = String(row[idx.salon] || '').trim();
-                const edificio = String(row[idx.edificio] || '').trim();
+                const salon = String(data[i][idx.salon] || '').trim();
+                const edificio = String(data[i][idx.edificio] || '').trim();
                 const salonCompleto = salon + (edificio ? ' (' + edificio + ')' : '');
                 
                 const dias = [
@@ -695,10 +657,11 @@
                 ];
                 dias.forEach(d => {
                     if (d.ini < 0 || d.fin < 0) return;
-                    const ini = parseInt(row[d.ini]), fin = parseInt(row[d.fin]);
+                    const ini = parseInt(data[i][d.ini]), fin = parseInt(data[i][d.fin]);
                     if (!isNaN(ini) && !isNaN(fin) && ini > 0 && fin > 0 && fin > ini) {
-                        const existe = crnMap[crn].horarios.some(eh => eh.dia === d.dia && eh.inicio === ini && eh.fin === fin);
-                        if (!existe) crnMap[crn].horarios.push({ dia: d.dia, inicio: ini, fin: fin });
+                        if (!crnMap[crn].horarios.some(eh => eh.dia === d.dia && eh.inicio === ini && eh.fin === fin)) {
+                            crnMap[crn].horarios.push({ dia: d.dia, inicio: ini, fin: fin });
+                        }
                         if (salonCompleto) crnMap[crn].salonesPorDia[d.dia] = salonCompleto;
                     }
                 });
@@ -732,20 +695,13 @@
             
             const modalidadTxt = appState.modalidad === 'E' ? 'Escolarizado' : 'Abierto';
             const planTxt = appState.plan === '04' ? 'Plan 2004' : 'Plan 2025';
-            document.getElementById('header-subtitle').textContent = `Periodo ${appState.periodoNombre} · ${modalidadTxt} · o Sábados por bloques`;
+            document.getElementById('header-subtitle').textContent = `Periodo ${appState.periodoNombre} · ${modalidadTxt} · Sábados por bloques`;
             document.getElementById('header-plan-badge').textContent = `${modalidadTxt} · ${planTxt}`;
             document.getElementById('oferta-title').textContent = `Oferta Académica · ${modalidadTxt} · ${planTxt}`;
             document.getElementById('stat-horas-label').textContent = appState.modalidad === 'A' ? 'Horas/Sábado' : 'Horas/Semana';
             
-            const filterTurno = document.getElementById('filter-turno');
-            const filterBloque = document.getElementById('filter-bloque');
-            if (appState.modalidad === 'E') {
-                filterTurno.style.display = 'none';
-                filterBloque.style.display = 'none';
-            } else {
-                filterTurno.style.display = 'block';
-                filterBloque.style.display = 'block';
-            }
+            document.getElementById('filter-turno').style.display = appState.modalidad === 'E' ? 'none' : 'block';
+            document.getElementById('filter-bloque').style.display = appState.modalidad === 'E' ? 'none' : 'block';
             
             if (appState.modalidad === 'A') {
                 document.getElementById('vista-abierto').style.display = 'block';
@@ -955,7 +911,14 @@
                 if (yaAgregada) item.classList.add('added');
                 
                 item.innerHTML = `<h4>${ee.nombre} ${yaAgregada ? '✓ (Ya agregada)' : ''}</h4><p><span class="area-badge">${ee.areaCode || 'N/A'}</span> <strong>NRC:</strong> ${ee.crn} · <strong>Créditos:</strong> ${ee.creditos}${ee.bloqueAsignado ? ` · <strong>Bloque ${ee.bloqueAsignado}</strong>` : ''}</p><p><strong>Docente:</strong> ${ee.docente}</p><p><strong>Horario:</strong> ${horariosDetallados}</p><p><strong>Turno:</strong> ${ee.bloqueInfo.turno === 'M' ? 'Matutino' : ee.bloqueInfo.turno === 'V' ? 'Vespertino' : 'Escolarizado'}</p>`;
-                if (!yaAgregada) item.onclick = () => addEEToHorario(ee);
+                
+                if (!yaAgregada) {
+                    // CORRECCIÓN MÓVIL: Usar addEventListener en lugar de .onclick para mejor compatibilidad táctil
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault(); // Previene comportamientos extraños de scroll en móviles
+                        addEEToHorario(ee);
+                    });
+                }
                 eeList.appendChild(item);
             });
             document.getElementById('ee-modal').classList.add('active');
@@ -1105,15 +1068,15 @@
             };
 
             try {
-                // Si el usuario no ha configurado la URL, mostramos un mensaje de éxito simulado para que no se rompa la UX
                 if (GOOGLE_SCRIPT_URL === 'TU_URL_DE_APPS_SCRIPT_AQUI') {
-                    console.warn('URL de Apps Script no configurada. Datos de evaluación:', data);
-                    // Simulamos éxito para que el usuario vea el flujo
+                    console.warn('URL de Apps Script no configurada. Datos:', data);
                 } else {
-                    const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    // CORRECCIÓN EXCEL: Usar 'text/plain' evita el bloqueo CORS preflight en Apps Script
+                    await fetch(GOOGLE_SCRIPT_URL, {
                         method: 'POST',
-                        mode: 'no-cors', // Necesario para Apps Script
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8'
+                        },
                         body: JSON.stringify(data)
                     });
                 }
