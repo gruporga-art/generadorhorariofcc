@@ -9,16 +9,16 @@
 :root{
   --navy-900:#0b1f3d; --navy-800:#122c53; --navy-700:#1a3a6b; --navy-500:#2f5da3; --navy-300:#7fa3d6;
   --uv-green:#28a745; --uv-green-d:#1c7a33; --mint:#20c997;
-  --block:#7c3aed; --block-d:#5b21b6; --amber:#f59e0b; --amber-d:#b45309;
-  --danger:#e03131; --danger-d:#9b1c1c; --info:#17a2b8;
+  --block:#7c3aed; --block-d:#5b21b6; --amber:#f59e0b;
+  --danger:#e03131; --info:#17a2b8;
   --ink:#0d1b2e; --ink-2:#3d5170; --ink-3:#6b7f9c;
-  --paper:#eaeff6; --surface:#ffffff; --surface-2:#f5f8fc; --warm:#f8f5ef;
+  --paper:#eaeff6; --surface:#ffffff; --surface-2:#f5f8fc;
   --line:#dde5ef; --line-2:#c9d6e6;
   --scrim:rgba(9,22,42,.74);
   --sh-1:0 4px 14px rgba(11,31,61,.08);
   --sh-2:0 14px 38px rgba(11,31,61,.16);
   --sh-3:0 30px 70px rgba(6,16,32,.42);
-  --r-s:9px; --r-m:13px; --r-l:19px;
+  --r-m:13px; --r-l:19px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
@@ -38,7 +38,7 @@ body::before{
 }
 @keyframes drift{from{transform:translate3d(-1.4%,-1%,0) scale(1.02)}to{transform:translate3d(1.6%,1.4%,0) scale(1.06)}}
 body::after{
-  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.32;
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.3;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E");
   mix-blend-mode:multiply;
 }
@@ -51,7 +51,6 @@ body::after{
 
 .app{max-width:1380px;margin:0 auto;background:var(--surface);border-radius:var(--r-l);box-shadow:var(--sh-2);overflow:hidden;position:relative}
 
-/* ══ HEADER ══ */
 .hdr{position:relative;color:#fff;padding:26px 22px 22px;text-align:center;overflow:hidden;
   background:linear-gradient(132deg,var(--navy-900) 0%,var(--navy-700) 48%,#26548f 100%);
   border-bottom:5px solid var(--uv-green)}
@@ -65,11 +64,7 @@ body::after{
 .hdr .sub{font-size:.95rem;opacity:.95;min-height:1.35em;margin-bottom:12px}
 .chips{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
 .chip-h{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.32);padding:6px 15px;border-radius:30px;
-  font-size:.82rem;font-weight:600;backdrop-filter:blur(6px)}
-.chip-h.live{cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.2s}
-.chip-h.live:hover{background:rgba(255,255,255,.28)}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 3px rgba(245,158,11,.28)}
-.dot.on{background:var(--mint);box-shadow:0 0 0 3px rgba(32,201,151,.3)}
+  font-size:.82rem;font-weight:600;backdrop-filter:blur(6px);color:#fff}
 .back{position:absolute;top:15px;left:15px;z-index:3;background:rgba(255,255,255,.14);color:#fff;
   border:1.5px solid rgba(255,255,255,.44);padding:8px 15px;border-radius:10px;cursor:pointer;font-size:.84rem;font-weight:700;transition:.2s;touch-action:manipulation}
 .back:hover{background:rgba(255,255,255,.3);transform:translateX(-2px)}
@@ -77,7 +72,6 @@ body::after{
 
 .body{padding:22px}
 
-/* ══ STEPS ══ */
 .steps{display:flex;justify-content:center;align-items:center;gap:9px;margin-bottom:24px;padding:13px;
   background:linear-gradient(120deg,#f4f8fd,#eaf1f9);border:1px solid var(--line);border-radius:var(--r-m)}
 .st{display:flex;align-items:center;gap:8px}
@@ -89,7 +83,6 @@ body::after{
 .st.ok span{color:var(--uv-green-d)}
 .stl{width:32px;height:2px;background:#d8e2ee;border-radius:2px}
 
-/* ══ SCREENS ══ */
 .scr{display:none}
 .scr.on{display:block;animation:rise .44s cubic-bezier(.2,.75,.3,1)}
 @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
@@ -116,22 +109,20 @@ body::after{
 
 .row{display:flex;justify-content:space-between;gap:14px;margin-top:26px;flex-wrap:wrap}
 .btn{border:none;border-radius:12px;padding:14px 30px;font-size:1rem;font-weight:800;color:#fff;cursor:pointer;transition:.2s;touch-action:manipulation;
-  background:linear-gradient(132deg,var(--uv-green),var(--uv-green-d));box-shadow:0 9px 22px rgba(40,167,69,.3)}
+  background:linear-gradient(132deg,var(--uv-green),var(--uv-green-d));box-shadow:0 9px 22px rgba(40,167,69,.3);font-family:inherit}
 .btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 30px rgba(40,167,69,.4)}
 .btn:active:not(:disabled){transform:scale(.97)}
 .btn:disabled{opacity:.42;cursor:not-allowed;box-shadow:none}
 .btn.gray{background:linear-gradient(132deg,#8394a9,#5a6b82);box-shadow:0 9px 22px rgba(90,107,130,.26)}
-.btn.navy{background:linear-gradient(132deg,var(--navy-500),var(--navy-700));box-shadow:0 9px 22px rgba(26,58,107,.3)}
 .btn.block{background:linear-gradient(132deg,#9061f2,var(--block-d));box-shadow:0 9px 22px rgba(124,58,237,.32)}
 .btn.sm{padding:10px 18px;font-size:.87rem;border-radius:10px}
 
-/* ══ LOADER ══ */
 .load{text-align:center;padding:46px 20px}
 .load .lm{font-size:1.06rem;font-weight:800;color:var(--navy-700);margin-bottom:7px}
 .load .lf{font-size:.88rem;color:var(--ink-3);min-height:1.4em;margin-bottom:20px}
 .pbar{max-width:540px;margin:0 auto;height:28px;background:#d8e2ee;border-radius:30px;position:relative;overflow:hidden;
   box-shadow:inset 0 2px 6px rgba(11,31,61,.18)}
-.pfill{height:100%;width:0;border-radius:30px;transition:width .45s cubic-bezier(.3,.85,.3,1);
+.pfill{height:100%;width:0;border-radius:30px;transition:width .45s cubic-bezier(.3,.85,.3,1);position:relative;
   background:linear-gradient(90deg,var(--uv-green),var(--mint) 58%,var(--info));box-shadow:0 0 20px rgba(32,201,151,.6)}
 .pfill::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.42),transparent);
   transform:translateX(-100%);animation:sheen 1.5s linear infinite}
@@ -149,11 +140,10 @@ body::after{
 .note-box.pur.on{display:block}
 .note-box ul{margin:8px 0 0 18px}.note-box li{margin:3px 0}
 
-/* ══ TOOLBAR ══ */
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
 .top .t{font-size:1.2rem;font-weight:800;color:var(--navy-700)}
 .mini{background:#fff;border:2px solid var(--navy-700);color:var(--navy-700);padding:8px 17px;border-radius:10px;cursor:pointer;
-  font-size:.85rem;font-weight:800;transition:.2s;touch-action:manipulation}
+  font-size:.85rem;font-weight:800;transition:.2s;touch-action:manipulation;font-family:inherit}
 .mini:hover{background:var(--navy-700);color:#fff}
 .mini:active{transform:scale(.96)}
 
@@ -177,7 +167,7 @@ body::after{
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:linear-gradient(120deg,#f4f8fd,#eef4fa);
   border:1px solid var(--line);border-radius:var(--r-m);padding:12px;margin-bottom:14px}
 .add{flex:1 1 260px;border:none;border-radius:11px;padding:14px;font-size:1.02rem;font-weight:800;color:#fff;cursor:pointer;
-  background:linear-gradient(132deg,var(--uv-green),var(--mint));box-shadow:0 9px 24px rgba(40,167,69,.3);transition:.2s;touch-action:manipulation}
+  background:linear-gradient(132deg,var(--uv-green),var(--mint));box-shadow:0 9px 24px rgba(40,167,69,.3);transition:.2s;touch-action:manipulation;font-family:inherit}
 .add:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(40,167,69,.42)}
 .add:active{transform:scale(.985)}
 .tsel{padding:10px 12px;border:2px solid var(--line-2);border-radius:10px;background:#fff;font-size:.85rem;font-weight:700;
@@ -194,7 +184,7 @@ body::after{
 .tog:has(input:checked) i::after{transform:translateX(14px)}
 
 .acts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
-.act{border:none;border-radius:11px;padding:13px 8px;font-size:.9rem;font-weight:800;color:#fff;cursor:pointer;transition:.2s;touch-action:manipulation}
+.act{border:none;border-radius:11px;padding:13px 8px;font-size:.9rem;font-weight:800;color:#fff;cursor:pointer;transition:.2s;touch-action:manipulation;font-family:inherit}
 .act:hover{transform:translateY(-2px);filter:brightness(1.08)}
 .act:active{transform:scale(.96)}
 .act.p{background:linear-gradient(132deg,#8394a9,#5a6b82)}
@@ -203,11 +193,10 @@ body::after{
 .act.c{background:linear-gradient(132deg,#ff6b6b,#c92a2a)}
 .hint{text-align:center;color:var(--ink-3);font-size:.85rem;margin-bottom:14px}
 
-/* ══ GRIDS ══ */
 .wrap{width:100%;overflow-x:auto;border-radius:var(--r-m);border:1px solid var(--line);background:#fff}
 .malla{width:100%;border-collapse:collapse;table-layout:fixed;min-width:660px}
 .malla th{background:linear-gradient(180deg,var(--navy-700),var(--navy-800));color:#fff;padding:13px 5px;font-size:.88rem;font-weight:800;
-  border:1px solid var(--navy-900);letter-spacing:.01em}
+  border:1px solid var(--navy-900)}
 .malla th:first-child{width:76px}
 .malla td{border:1px solid #e1e8f1;padding:3px;height:60px;vertical-align:top;background:#fff}
 .malla td:first-child{background:linear-gradient(180deg,#f2f6fb,#e7eef7);font-weight:800;text-align:center;font-size:.83rem;
@@ -247,21 +236,16 @@ body::after{
 .bloques.compact .bee .n{font-size:.7rem}
 .bloques.compact .bee .d{font-size:.62rem}
 
-/* ══ FOOTER ══ */
 .foot{background:linear-gradient(180deg,#f6f9fc,#eaf1f8);border-top:5px solid var(--uv-green);padding:22px;text-align:center;
   color:var(--ink-2);font-size:.83rem;line-height:1.72}
 .foot a{color:var(--navy-700);font-weight:700;text-decoration:none}
 .foot a:hover{text-decoration:underline}
 .fbtns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:13px}
 .eval-btn{border:none;border-radius:12px;padding:12px 26px;font-size:.94rem;font-weight:800;color:#fff;cursor:pointer;transition:.2s;
-  background:linear-gradient(132deg,#9061f2,var(--block-d));box-shadow:0 9px 24px rgba(124,58,237,.34);touch-action:manipulation}
+  background:linear-gradient(132deg,#9061f2,var(--block-d));box-shadow:0 9px 24px rgba(124,58,237,.34);touch-action:manipulation;font-family:inherit}
 .eval-btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(124,58,237,.46)}
 .eval-btn:active{transform:scale(.97)}
-.cfg-btn{border:2px solid var(--line-2);background:#fff;color:var(--ink-2);border-radius:12px;padding:11px 20px;font-size:.86rem;
-  font-weight:800;cursor:pointer;transition:.2s;touch-action:manipulation}
-.cfg-btn:hover{border-color:var(--navy-500);color:var(--navy-700)}
 
-/* ══ MODALS ══ */
 .modal{display:none;position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(5px);z-index:900;align-items:center;justify-content:center;padding:16px}
 .modal.on{display:flex;animation:fade .24s}
 @keyframes fade{from{opacity:0}to{opacity:1}}
@@ -291,10 +275,9 @@ body::after{
 .tag.s{background:linear-gradient(132deg,#fff2d6,#ffe0a3);color:#8a5a00}
 .empty{text-align:center;padding:34px 16px;color:#8496ad;font-size:.93rem}
 
-/* ══ EVAL ══ */
 .roles{display:flex;gap:14px;flex-wrap:wrap}
 .role{flex:1;min-width:196px;border:none;border-radius:15px;padding:22px 14px;color:#fff;cursor:pointer;font-weight:800;font-size:1rem;
-  display:flex;flex-direction:column;align-items:center;gap:10px;transition:.22s;touch-action:manipulation}
+  display:flex;flex-direction:column;align-items:center;gap:10px;transition:.22s;touch-action:manipulation;font-family:inherit}
 .role em{font-size:2.4rem;font-style:normal}
 .role.a{background:linear-gradient(132deg,var(--uv-green),var(--uv-green-d));box-shadow:0 9px 24px rgba(40,167,69,.32)}
 .role.b{background:linear-gradient(132deg,var(--navy-500),var(--navy-700));box-shadow:0 9px 24px rgba(26,58,107,.32)}
@@ -315,33 +298,14 @@ body::after{
 .thanks .big{font-size:3.6rem;margin-bottom:12px}
 .thanks h3{color:var(--uv-green-d);font-size:1.38rem;margin-bottom:10px}
 .thanks p{color:var(--ink-2);line-height:1.65}
-
-/* ══ SETUP ══ */
-.setup{background:linear-gradient(160deg,#f6f2ff,#eef4fc);border:1.5px solid #d9c9ff;border-radius:var(--r-m);padding:17px;margin-bottom:16px}
-.setup h4{color:var(--block-d);font-size:1.02rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-.setup .p{font-size:.87rem;color:var(--ink-2);line-height:1.6;margin-bottom:12px}
-.step-n{display:flex;gap:11px;margin-bottom:13px;align-items:flex-start}
-.step-n b{flex:none;width:25px;height:25px;border-radius:50%;background:linear-gradient(132deg,#9061f2,var(--block-d));color:#fff;
-  display:grid;place-items:center;font-size:.78rem;margin-top:1px}
-.step-n div{flex:1;font-size:.87rem;color:var(--ink-2);line-height:1.58}
-.step-n a{color:var(--block-d);font-weight:800}
-.code{background:var(--navy-900);color:#c8e6d4;border-radius:11px;padding:13px;font-family:ui-monospace,Consolas,monospace;font-size:.7rem;
-  line-height:1.5;max-height:190px;overflow:auto;white-space:pre;margin:9px 0;border:1px solid #1e3a63}
-.code::-webkit-scrollbar-track{background:#122c53}
-.code::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--mint),var(--uv-green));border-color:#122c53}
-.urlrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}
-.urlrow input{flex:1;min-width:230px;padding:12px;border:2px solid var(--line-2);border-radius:11px;font-size:.86rem;font-family:ui-monospace,Consolas,monospace}
-.urlrow input:focus{outline:none;border-color:var(--block)}
 .status{margin-top:12px;padding:11px 13px;border-radius:10px;font-size:.85rem;line-height:1.55;display:none;white-space:pre-wrap}
 .status.on{display:block}
-.status.good{background:#e7f7ee;border:1.5px solid #b4e3c6;color:#186b34}
 .status.bad{background:#fdeced;border:1.5px solid #f3c3c7;color:#8b1f2b}
 .status.mid{background:#fff8e4;border:1.5px solid #ffe08c;color:#7a5806}
 .queuebar{display:none;align-items:center;gap:10px;flex-wrap:wrap;background:#fff8e4;border:1.5px solid #ffe08c;border-radius:11px;
   padding:11px 13px;margin-bottom:14px;font-size:.85rem;color:#7a5806;font-weight:700}
 .queuebar.on{display:flex}
 
-/* ══ TOAST ══ */
 .toasts{position:fixed;right:16px;bottom:16px;z-index:1200;display:flex;flex-direction:column;gap:9px;max-width:min(92vw,380px)}
 .toast{background:var(--navy-900);color:#fff;border-radius:12px;padding:13px 15px;font-size:.87rem;line-height:1.5;box-shadow:var(--sh-3);
   border-left:4px solid var(--mint);animation:slidein .3s cubic-bezier(.2,.85,.3,1)}
@@ -403,7 +367,6 @@ body::after{
     <div class="sub" id="sub">Selecciona tu modalidad y plan</div>
     <div class="chips">
       <span class="chip-h" id="chipPlan">Licenciatura en Ciencias de la Comunicación</span>
-      <button class="chip-h live" id="chipConn" onclick="openCfg()"><span class="dot" id="connDot"></span><span id="connTxt">Evaluaciones: sin conectar</span></button>
     </div>
   </header>
 
@@ -414,7 +377,6 @@ body::after{
       <div class="st" data-s="3"><b>3</b><span>Mi Horario</span></div>
     </nav>
 
-    <!-- P1 -->
     <section class="scr on" id="s1">
       <h2 class="h2">Paso 1 · ¿En qué modalidad estudias?</h2>
       <p class="lead">La Facultad de Ciencias y Técnicas de la Comunicación ofrece la licenciatura en dos modalidades. Al elegir la tuya, la herramienta descarga <strong>únicamente</strong> los archivos que necesitas.</p>
@@ -429,7 +391,6 @@ body::after{
       <div class="row"><span></span><button class="btn" id="n1" disabled onclick="go(2)">Siguiente →</button></div>
     </section>
 
-    <!-- P2 -->
     <section class="scr" id="s2">
       <h2 class="h2">Paso 2 · ¿A qué plan de estudios perteneces?</h2>
       <p class="lead">Esto determina qué Experiencias Educativas verás disponibles para armar tu horario.</p>
@@ -443,7 +404,6 @@ body::after{
         <button class="btn" id="n2" disabled onclick="go(3)">Ver mi oferta académica →</button></div>
     </section>
 
-    <!-- P3 -->
     <section class="scr" id="s3">
       <div class="load" id="load" style="display:none">
         <div class="lm" id="lm">📡 Conectando con Google Drive…</div>
@@ -527,12 +487,10 @@ body::after{
     <p>Herramienta de apoyo diseñada por el docente <a href="mailto:alfreyes@uv.mx">Dr. Alfredo Reyes Gutiérrez</a> para sus Tutorados.</p>
     <div class="fbtns">
       <button class="eval-btn" onclick="openEval()">📊 Calificar la herramienta</button>
-      <button class="cfg-btn" onclick="openCfg()">⚙️ Conexión de evaluaciones</button>
     </div>
   </footer>
 </div>
 
-<!-- MODAL EE -->
 <div class="modal" id="mEE"><div class="box">
   <div class="bt">➕ Agregar Experiencia Educativa</div>
   <input class="search" id="qEE" placeholder="🔍 Buscar por nombre, docente o NRC…" oninput="filtEE()">
@@ -548,7 +506,6 @@ body::after{
   <button class="btn gray sm" style="margin-top:14px" onclick="closeM('mEE')">Cerrar</button>
 </div></div>
 
-<!-- MODAL EVAL -->
 <div class="modal" id="mEv"><div class="box narrow">
   <div class="bt">📊 Califica el Planeador de Horarios</div>
   <div class="queuebar" id="qbar">
@@ -556,7 +513,6 @@ body::after{
     <button class="btn sm block" onclick="flushQueue(true)">Reintentar envío</button>
     <button class="btn sm gray" onclick="queueCSV()">Descargar pendientes</button>
   </div>
-  <div id="evSetup"></div>
   <div id="ev1">
     <p class="lead">Selecciona tu perfil para personalizar las preguntas:</p>
     <div class="roles">
@@ -584,73 +540,14 @@ body::after{
   </div></div>
 </div></div>
 
-<!-- MODAL CONFIG -->
-<div class="modal" id="mCfg"><div class="box narrow">
-  <div class="bt">⚙️ Conexión de evaluaciones · Google Sheets</div>
-  <div id="cfgBody"></div>
-  <div class="row"><button class="btn gray sm" onclick="closeM('mCfg')">Cerrar</button>
-    <button class="btn sm navy" onclick="openEval()">Ir a la evaluación →</button></div>
-</div></div>
-
 <div class="toasts" id="toasts"></div>
 
 <script>
-/* ═══════════ CONFIGURACIÓN ═══════════ */
+/* ══════════ CONFIGURACIÓN (sin interfaz de conexión) ══════════ */
 const API_KEY   = 'AIzaSyBI4tHjYhVazAn6y8CW1k2kC0zcxLX07xI';
 const FOLDER_ID = '1fIDyI54BjKaUJ5aDXJDE1NsN_9CwHdAQ';
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1392gk8uHgunTMhcEuxal933y_ypYe-sdpwNYoET2QtY/edit';
-const K = {url:'facico.scriptUrl', queue:'facico.evalQueue', view:'facico.view'};
-
-const APPS_SCRIPT = `const HOJA = 'Evaluación';
-const HEAD = ['Fecha','Rol','P1','P2','P3','P4','P5','Comentarios','Periodo','Modalidad','Plan','Origen'];
-
-function hoja_(){
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let h = ss.getSheetByName(HOJA);
-  if(!h){
-    const n = s => String(s).toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').trim();
-    h = ss.getSheets().find(x => n(x.getName()) === 'evaluacion');
-  }
-  if(!h){ h = ss.insertSheet(HOJA); }
-  if(h.getLastRow() === 0){ h.appendRow(HEAD); }
-  return h;
-}
-function json_(o){
-  return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
-}
-function guardar_(d){
-  const h = hoja_();
-  h.appendRow([new Date(), d.rol||'', Number(d.p1)||'', Number(d.p2)||'', Number(d.p3)||'',
-    Number(d.p4)||'', Number(d.p5)||'', d.comentarios||'', d.periodo||'', d.modalidad||'',
-    d.plan||'', d.origen||'web']);
-  SpreadsheetApp.flush();
-}
-function doGet(e){
-  try{
-    if(e && e.parameter && e.parameter.data){ guardar_(JSON.parse(e.parameter.data)); return json_({result:'success',via:'GET'}); }
-    const h = hoja_();
-    return json_({result:'ok', mensaje:'Servicio activo', hoja:h.getName(), filas:h.getLastRow()});
-  }catch(err){ return json_({result:'error', error:String(err)}); }
-}
-function doPost(e){
-  try{
-    let d = null;
-    if(e && e.postData && e.postData.contents) d = JSON.parse(e.postData.contents);
-    else if(e && e.parameter && e.parameter.data) d = JSON.parse(e.parameter.data);
-    else if(e && e.parameter && e.parameter.rol) d = e.parameter;
-    if(!d) throw new Error('Sin datos');
-    guardar_(d);
-    return json_({result:'success',via:'POST'});
-  }catch(err){
-    try{
-      const ss = SpreadsheetApp.getActiveSpreadsheet();
-      let l = ss.getSheetByName('_Errores');
-      if(!l){ l = ss.insertSheet('_Errores'); l.appendRow(['Fecha','Error','Contenido']); }
-      l.appendRow([new Date(), String(err), (e&&e.postData)?String(e.postData.contents).slice(0,400):'sin postData']);
-    }catch(_){}
-    return json_({result:'error', error:String(err)});
-  }
-}`;
+const SCRIPT_URL= 'https://script.google.com/macros/s/AKfycbxs7BauP3gNdZx1hFmHj0oE8FtxLDFDKRWynxCRlMVTycmCzYznIwf2P56XK4_6OdWV/exec';
+const K = {queue:'facico.evalQueue', view:'facico.view'};
 
 const PTRM={'10':1,'11':2,'12':3,'13':4,'14':5};
 const DIAS=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
@@ -673,7 +570,7 @@ const QS={
 };
 const SCALE=['Totalmente de acuerdo','De acuerdo','Neutral','En desacuerdo','Totalmente en desacuerdo'];
 
-/* ═══════════ ESTADO ═══════════ */
+/* ══════════ ESTADO ══════════ */
 const S={p:1,m:null,pl:null,data:{},fechas:{},periodo:null,bl:{'04':{},'25':{}},ees:[],sel:[],hist:[],rol:'',
   view:{dens:'comoda',doc:true,sal:true,hit:true}};
 const $=id=>document.getElementById(id);
@@ -690,81 +587,17 @@ function toast(msg,kind){
 function openM(id){$(id).classList.add('on')}
 function closeM(id){$(id).classList.remove('on')}
 
-/* ═══════════ CONEXIÓN ═══════════ */
-const getUrl=()=>{try{return (localStorage.getItem(K.url)||'').trim()}catch(e){return ''}};
-const setUrl=u=>{try{localStorage.setItem(K.url,u)}catch(e){}};
-const validUrl=u=>/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec/.test(u);
-function connState(){
-  const u=getUrl(), ok=validUrl(u);
-  $('connDot').classList.toggle('on',ok);
-  $('connTxt').textContent = ok?'Evaluaciones: conectadas':'Evaluaciones: sin conectar';
-}
-function setupHTML(target){
-  return `<div class="setup">
-    <h4>🔌 Conecta la hoja de cálculo <span style="font-size:.74rem;font-weight:700;color:#7a5806;background:#fff2d6;padding:3px 9px;border-radius:20px">solo una vez</span></h4>
-    <p class="p">Las respuestas se guardan en tu hoja <strong>Evaluación</strong>. La configuración queda en este navegador: no necesitas volver a editar el código HTML.</p>
-    <div class="step-n"><b>1</b><div>Abre tu hoja <a href="${SHEET_URL}" target="_blank" rel="noopener">Evaluación ↗</a> y entra a <strong>Extensiones → Apps Script</strong>.</div></div>
-    <div class="step-n"><b>2</b><div>Borra el código que aparezca y pega este:
-      <pre class="code" id="code_${target}">${esc(APPS_SCRIPT)}</pre>
-      <button class="btn sm block" type="button" onclick="copyCode('code_${target}')">📋 Copiar código</button></div></div>
-    <div class="step-n"><b>3</b><div><strong>Implementar → Administrar implementaciones → ✏️ → Versión: “Nueva versión”</strong>.<br>
-      Ejecutar como: <strong>Yo</strong> · Quién tiene acceso: <strong>Cualquier persona</strong>. Copia la URL que termina en <code>/exec</code>.</div></div>
-    <div class="step-n"><b>4</b><div>Pega la URL aquí y prueba la conexión:
-      <div class="urlrow">
-        <input id="url_${target}" type="url" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(getUrl())}">
-        <button class="btn sm" type="button" onclick="saveUrl('${target}')">Probar y guardar</button>
-      </div></div></div>
-    <div class="status" id="st_${target}"></div>
-  </div>`;
-}
-function copyCode(id){
-  const txt=APPS_SCRIPT;
-  navigator.clipboard?.writeText(txt).then(()=>toast('Código de Apps Script copiado ✔')).catch(()=>{
-    const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select();
-    try{document.execCommand('copy');toast('Código copiado ✔')}catch(e){toast('Selecciona el código y cópialo manualmente','warn')}
-    ta.remove();
-  });
-}
-function stat(target,kind,msg){
-  const el=$('st_'+target); if(!el)return;
-  el.className='status on '+kind; el.textContent=msg;
-}
-async function saveUrl(target){
-  const inp=$('url_'+target); const u=(inp?.value||'').trim();
-  if(!validUrl(u)){ stat(target,'bad','❌ La URL debe tener este formato:\nhttps://script.google.com/macros/s/AKfyc…/exec\n\nRevisa que sea la URL de la implementación (no la del editor) y que termine en /exec.'); return; }
-  stat(target,'mid','⏳ Probando conexión…');
-  try{
-    const r=await fetch(u,{method:'GET',redirect:'follow'});
-    const t=await r.text();
-    let j=null; try{j=JSON.parse(t)}catch(e){}
-    if(j && (j.result==='ok'||j.result==='success')){
-      setUrl(u); connState(); renderQueue();
-      stat(target,'good',`✅ ¡Conexión establecida!\nHoja: ${j.hoja||'Evaluación'} · registros actuales: ${j.filas!=null?j.filas:'—'}\n\nYa puedes enviar evaluaciones.`);
-      toast('Conexión con Google Sheets establecida ✔');
-      if(target==='cfg') setTimeout(()=>{closeM('mCfg')},1400);
-    }else if(j && j.result==='error'){
-      stat(target,'bad','❌ El script respondió con error:\n'+j.error+'\n\nVerifica que pegaste el código completo y creaste una “Nueva versión”.');
-    }else{
-      stat(target,'bad','❌ La respuesta no es del script (probablemente pide iniciar sesión).\n\nSolución: Implementar → Administrar implementaciones → ✏️ → Versión “Nueva versión” → Quién tiene acceso: “Cualquier persona”.');
-    }
-  }catch(e){
-    setUrl(u); connState(); renderQueue();
-    stat(target,'mid','⚠️ URL guardada, pero el navegador no pudo leer la respuesta ('+e.message+').\n\nEsto suele ser CORS. La herramienta enviará las evaluaciones por un método alterno que sí llega a Google. Envía una evaluación de prueba y revisa la hoja.');
-  }
-}
-function openCfg(){ $('cfgBody').innerHTML=setupHTML('cfg'); openM('mCfg'); }
-
-/* ═══════════ COLA LOCAL ═══════════ */
+/* ══════════ COLA LOCAL DE EVALUACIONES ══════════ */
 const getQ=()=>{try{return JSON.parse(localStorage.getItem(K.queue)||'[]')}catch(e){return []}};
 const setQ=a=>{try{localStorage.setItem(K.queue,JSON.stringify(a))}catch(e){}};
 function pushQ(p){const a=getQ();a.push(Object.assign({ts:new Date().toISOString()},p));setQ(a);renderQueue();}
 function renderQueue(){
-  const n=getQ().length, bar=$('qbar');
-  bar.classList.toggle('on',n>0);
+  const n=getQ().length;
+  $('qbar').classList.toggle('on',n>0);
   $('qtxt').textContent = n===1?'📦 1 evaluación pendiente de envío':`📦 ${n} evaluaciones pendientes de envío`;
 }
 async function deliver(payload){
-  const u=getUrl(); if(!validUrl(u)) return {ok:false,why:'sin-url'};
+  const u=SCRIPT_URL;
   try{
     const r=await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),redirect:'follow'});
     const t=await r.text(); let j=null; try{j=JSON.parse(t)}catch(e){}
@@ -772,9 +605,10 @@ async function deliver(payload){
     if(j&&j.result==='error') return {ok:false,why:j.error};
   }catch(e){}
   try{
-    const r2=await fetch(u+(u.includes('?')?'&':'?')+'data='+encodeURIComponent(JSON.stringify(payload)),{redirect:'follow'});
+    const r2=await fetch(u+'?data='+encodeURIComponent(JSON.stringify(payload)),{redirect:'follow'});
     const t2=await r2.text(); let j2=null; try{j2=JSON.parse(t2)}catch(e){}
     if(j2&&j2.result==='success') return {ok:true,mode:'confirmado'};
+    if(j2&&j2.result==='error') return {ok:false,why:j2.error};
   }catch(e){}
   try{
     if(navigator.sendBeacon){
@@ -785,19 +619,18 @@ async function deliver(payload){
   const pinged=await new Promise(res=>{
     const img=new Image(); const t=setTimeout(()=>res(false),9000);
     img.onload=img.onerror=()=>{clearTimeout(t);res(true)};
-    img.src=u+(u.includes('?')?'&':'?')+'data='+encodeURIComponent(JSON.stringify(payload))+'&_='+Date.now();
+    img.src=u+'?data='+encodeURIComponent(JSON.stringify(payload))+'&_='+Date.now();
   });
-  return pinged?{ok:true,mode:'enviado'}:{ok:false,why:'No se pudo contactar al script. Revisa la URL y el despliegue.'};
+  return pinged?{ok:true,mode:'enviado'}:{ok:false,why:'sin conexión con el servicio'};
 }
 async function flushQueue(manual){
   const q=getQ(); if(!q.length){ if(manual) toast('No hay evaluaciones pendientes'); return; }
-  if(!validUrl(getUrl())){ if(manual){openCfg();toast('Configura la conexión para enviar las pendientes','warn');} return; }
   if(manual) toast('Reintentando '+q.length+' evaluación(es)…');
   const rest=[]; let sent=0;
   for(const it of q){ const r=await deliver(it); if(r.ok) sent++; else rest.push(it); }
   setQ(rest); renderQueue();
   if(sent) toast(sent+' evaluación(es) enviada(s) ✔');
-  if(rest.length&&manual) toast(rest.length+' siguen pendientes. Verifica la conexión.','warn');
+  if(rest.length&&manual) toast(rest.length+' siguen pendientes. Intenta más tarde.','warn');
 }
 function queueCSV(){
   const q=getQ(); if(!q.length){toast('No hay pendientes');return;}
@@ -806,7 +639,7 @@ function queueCSV(){
   dl(rows,'evaluaciones-pendientes.csv');
 }
 
-/* ═══════════ NAVEGACIÓN ═══════════ */
+/* ══════════ NAVEGACIÓN ══════════ */
 function go(n){
   if(n===2&&!S.m) return;
   if(n===3&&(!S.m||!S.pl)) return;
@@ -826,13 +659,13 @@ function swapPlan(){
   S.sel=[];S.hist=[]; const k=S.pl+'-'+S.m; S.data[k]?boot():load();
 }
 
-/* ═══════════ VISTA ═══════════ */
+/* ══════════ VISTA ══════════ */
 function loadView(){ try{const v=JSON.parse(localStorage.getItem(K.view)||'null'); if(v)Object.assign(S.view,v);}catch(e){} }
 function saveView(){ try{localStorage.setItem(K.view,JSON.stringify(S.view))}catch(e){} }
-function setView(k,v){ S.view[k]=v; saveView(); if(S.sel.length||S.ees.length) paint(); }
+function setView(k,v){ S.view[k]=v; saveView(); if(S.ees.length){ stats(); paint(); } }
 function syncView(){ $('vDens').value=S.view.dens; $('vDoc').checked=S.view.doc; $('vSal').checked=S.view.sal; $('vHit').checked=S.view.hit; }
 
-/* ═══════════ DRIVE ═══════════ */
+/* ══════════ GOOGLE DRIVE ══════════ */
 function match(name,key){
   const n=String(name).toUpperCase(); if(!n.endsWith('.XLSX'))return false;
   if(key==='BLOQUES-A') return n.includes('BLOQUE')&&n.includes('ABIERTO');
@@ -986,7 +819,7 @@ function parseOferta(rows,plan){
   });
 }
 
-/* ═══════════ BOOT ═══════════ */
+/* ══════════ ARRANQUE ══════════ */
 function boot(){
   const k=S.pl+'-'+S.m, d=S.data[k];
   if(!d||!d.length){$('load').style.display='none';$('err').textContent='⚠️ No hay datos para esta combinación.';$('err').style.display='block';return;}
@@ -1012,7 +845,7 @@ function boot(){
   stats(); paint();
 }
 
-/* ═══════════ CHOQUES ═══════════ */
+/* ══════════ CHOQUES ══════════ */
 function clash(a,b){
   if(S.m==='A'){ if(!a.bloque||!b.bloque||a.bloque!==b.bloque) return false; }
   for(const x of a.horarios) for(const y of b.horarios){
@@ -1024,7 +857,7 @@ function clash(a,b){
 function hitSet(){const s=new Set();for(let i=0;i<S.sel.length;i++)for(let j=i+1;j<S.sel.length;j++)if(clash(S.sel[i],S.sel[j])){s.add(S.sel[i].nrc);s.add(S.sel[j].nrc);}return s;}
 function hitCount(){let n=0;for(let i=0;i<S.sel.length;i++)for(let j=i+1;j<S.sel.length;j++)if(clash(S.sel[i],S.sel[j]))n++;return n;}
 
-/* ═══════════ STATS ═══════════ */
+/* ══════════ ESTADÍSTICAS ══════════ */
 function areaKey(e){
   const a=(e.area||'').toUpperCase();
   if(a.includes('BASIC'))return 'BAS';
@@ -1059,7 +892,7 @@ function stats(){
   } else w.classList.remove('on');
 }
 
-/* ═══════════ PINTADO ═══════════ */
+/* ══════════ PINTADO ══════════ */
 function color(nrc){const i=S.sel.findIndex(e=>e.nrc===nrc);return PAL[(i<0?0:i)%PAL.length];}
 function paint(){ S.m==='A'?paintB():paintM(); }
 function paintB(){
@@ -1118,7 +951,7 @@ function paintM(){
   t.querySelectorAll('.ee').forEach(el=>el.addEventListener('click',()=>drop(el.dataset.n)));
 }
 
-/* ═══════════ MUTACIONES ═══════════ */
+/* ══════════ MUTACIONES ══════════ */
 function add(e){
   if(S.sel.some(x=>x.nrc===e.nrc)){toast('Esa experiencia ya está en tu horario','warn');return;}
   if(S.sel.some(x=>clash(x,e)) && !confirm('⚠️ Esta experiencia choca con otra ya seleccionada.\n\n¿Agregarla de todos modos?'))return;
@@ -1160,7 +993,7 @@ function doPrint(){
   setTimeout(()=>{window.print();setTimeout(()=>document.body.classList.remove('pa'),1200)},120);
 }
 
-/* ═══════════ MODAL EE ═══════════ */
+/* ══════════ MODAL EE ══════════ */
 function openEE(){
   $('qEE').value=''; $('fAr').value=''; $('fTu').value=''; $('fBl').value='';
   const L=$('lEE'); L.innerHTML='';
@@ -1197,13 +1030,12 @@ function filtEE(){
   else if(v) v.style.display='none';
 }
 
-/* ═══════════ EVALUACIÓN ═══════════ */
+/* ══════════ EVALUACIÓN ══════════ */
 function openEval(){ resetEval(); renderQueue(); openM('mEv'); }
 function resetEval(){
   $('ev1').style.display='block'; $('ev2').style.display='none'; $('ev3').style.display='none';
   $('evF').reset(); $('evC').value=''; S.rol='';
   $('evSt').className='status'; $('evSt').textContent='';
-  $('evSetup').innerHTML = validUrl(getUrl()) ? '' : setupHTML('ev');
 }
 function pickRole(r){
   S.rol=r; $('ev1').style.display='none'; $('ev2').style.display='block';
@@ -1211,50 +1043,43 @@ function pickRole(r){
   $('qs').innerHTML=QS[r].map((p,i)=>'<div class="q"><p>'+(i+1)+'. '+esc(p)+'</p><div class="opts">'+
     SCALE.map((o,j)=>'<label><input type="radio" name="p'+(i+1)+'" value="'+(5-j)+'" required><span>'+esc(o)+'</span></label>').join('')+
     '</div></div>').join('');
-  if(!validUrl(getUrl())){
-    $('evSt').className='status on mid';
-    $('evSt').textContent='⚠️ Aún no hay conexión con la hoja de cálculo. Puedes responder: tu evaluación se guardará en este dispositivo y se enviará en cuanto conectes (botón ⚙️ Conexión de evaluaciones).';
-  }
 }
 async function sendEval(ev){
   ev.preventDefault();
   const btn=$('evB'); const fd=new FormData(ev.target);
   const payload={rol:S.rol,p1:fd.get('p1'),p2:fd.get('p2'),p3:fd.get('p3'),p4:fd.get('p4'),p5:fd.get('p5'),
-    comentarios:$('evC').value.trim(),periodo:S.periodo||'',
-    modalidad:S.m==='E'?'Escolarizado':(S.m==='A'?'Abierto':''),plan:S.pl==='04'?'2004':(S.pl==='25'?'2025':''),
+    comentarios:$('evC').value.trim(),periodo:S.periodo||'No cargado',
+    modalidad:S.m==='E'?'Escolarizado':(S.m==='A'?'Abierto':'Sin seleccionar'),
+    plan:S.pl==='04'?'2004':(S.pl==='25'?'2025':'Sin seleccionar'),
     origen:location.hostname||'local'};
-  if(!validUrl(getUrl())){
-    pushQ(payload);
-    $('ev2').style.display='none'; $('ev3').style.display='block';
-    $('evMsg').textContent='Tu evaluación quedó guardada en este dispositivo. En cuanto se configure la conexión con Google Sheets (botón ⚙️), se enviará automáticamente. ¡Gracias!';
-    toast('Evaluación guardada localmente 📦','warn');
-    return;
-  }
   btn.disabled=true; btn.textContent='Enviando…';
-  $('evSt').className='status on mid'; $('evSt').textContent='⏳ Enviando a la hoja de cálculo…';
+  $('evSt').className='status on mid'; $('evSt').textContent='⏳ Enviando tu evaluación…';
   const r=await deliver(payload);
   btn.disabled=false; btn.textContent='Enviar evaluación';
   if(r.ok){
     $('ev2').style.display='none'; $('ev3').style.display='block';
-    $('evMsg').textContent = r.mode==='confirmado'
-      ? '✅ Tu evaluación se registró correctamente en la hoja “Evaluación”. ¡Gracias por ayudarnos a mejorar!'
-      : '✅ Tu evaluación fue enviada a Google Sheets. Si no la ves de inmediato, revisa la hoja en unos segundos. ¡Gracias!';
+    $('evMsg').textContent='✅ Tu evaluación se registró correctamente. ¡Gracias por ayudarnos a mejorar esta herramienta!';
     toast('Evaluación registrada ✔');
     flushQueue(false);
   }else{
     pushQ(payload);
-    $('evSt').className='status on bad';
-    $('evSt').textContent='❌ No se pudo registrar: '+(r.why||'error desconocido')+'\n\nTu respuesta quedó guardada como pendiente. Abre ⚙️ Conexión de evaluaciones, verifica la URL y crea una “Nueva versión” del despliegue con acceso “Cualquier persona”.';
-    toast('Evaluación guardada como pendiente 📦','bad');
+    $('ev2').style.display='none'; $('ev3').style.display='block';
+    $('evMsg').textContent='Tu evaluación quedó guardada y se enviará automáticamente en cuanto vuelva la conexión. ¡Gracias!';
+    toast('Evaluación guardada 📦','warn');
   }
 }
 
-/* ═══════════ INIT ═══════════ */
+/* ══════════ INIT ══════════ */
+(function purgeLegacy(){
+  try{localStorage.removeItem('facico.scriptUrl')}catch(e){}
+  ['chipConn','mCfg','cfgBody','evSetup'].forEach(id=>{const el=document.getElementById(id); if(el) el.remove();});
+  document.querySelectorAll('.cfg-btn,.setup,.code,.urlrow').forEach(el=>el.remove());
+})();
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on')}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.on').forEach(m=>m.classList.remove('on'))});
-loadView(); connState(); renderQueue();
+loadView(); renderQueue();
 window.addEventListener('online',()=>flushQueue(false));
-setTimeout(()=>{ if(validUrl(getUrl())&&getQ().length) flushQueue(false); },1200);
+setTimeout(()=>{ if(getQ().length) flushQueue(false); },1500);
 </script>
 </body>
 </html>
