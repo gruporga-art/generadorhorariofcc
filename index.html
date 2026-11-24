@@ -180,6 +180,8 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
   border-radius:var(--r-m);padding:17px 12px;text-align:center;transition:.24s}
 .stat:hover{transform:translateY(-3px);box-shadow:var(--sh-1)}
 .stat b{display:block;font-size:2.1rem;font-weight:800;color:var(--navy-700);line-height:1.08;font-variant-numeric:tabular-nums}
+.stat b.tick{animation:tick .42s cubic-bezier(.3,.85,.3,1)}
+@keyframes tick{0%{transform:scale(1)}38%{transform:scale(1.13);color:var(--uv-green-d)}100%{transform:scale(1)}}
 .stat span{font-size:.78rem;color:var(--ink-3);margin-top:4px;display:block}
 .stat.hot{border-left-color:var(--danger)}.stat.hot b{color:var(--danger)}
 
@@ -368,8 +370,6 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
   .pin{font-size:7pt!important;background:rgba(0,0,0,.22)!important;box-shadow:none!important}
   .ee.hit,.bee.hit{animation:none!important;box-shadow:0 0 0 2px var(--danger)!important}
   .cell,.void{min-height:50px!important}
-
-  /* ── Las observaciones se imprimen en una SEGUNDA HOJA ── */
   .obs.on{display:block!important;break-before:page!important;page-break-before:always!important;
     margin-top:0!important;box-shadow:none!important;border-color:#c9a227!important;break-inside:auto}
   .obs .obs-b{display:block!important;padding:8px 0 0!important;animation:none!important}
@@ -469,7 +469,7 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
         <div class="stats">
           <div class="stat"><b id="kEE">0</b><span>Experiencias Educativas</span></div>
           <div class="stat"><b id="kCR">0</b><span>Créditos</span></div>
-          <div class="stat"><b id="kHR">0.0</b><span id="kHRL">Horas/Semana</span></div>
+          <div class="stat"><b id="kHR">0</b><span id="kHRL">Horas/Semana</span></div>
           <div class="stat" id="stCh"><b id="kCH">0</b><span>Choques</span></div>
         </div>
 
@@ -520,7 +520,6 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 
         <div id="vE" style="display:none"><div class="wrap"><table class="malla" id="tblM"></table></div></div>
 
-        <!-- ══ OBSERVACIONES · al final del grid, plegable ══ -->
         <div class="obs" id="obs">
           <p class="obs-print-head" id="obsPrintHead"></p>
           <button class="obs-h" id="obsH" onclick="toggleObs()" aria-expanded="false" aria-controls="obsB">
@@ -676,7 +675,6 @@ const $=id=>document.getElementById(id);
 const mn=t=>Math.floor(t/100)*60+(t%100);
 const hm=t=>Math.floor(t/100)+':'+String(t%100).padStart(2,'0');
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-/* Nombres de Experiencias Educativas: SIEMPRE MAYÚSCULAS */
 const up=s=>String(s==null?'':s).replace(/\s+/g,' ').trim().toUpperCase();
 const aula=s=>{if(!s)return'';const m=String(s).match(/^([A-Z0-9]+(?:[- ][A-Z0-9]+)*)/i);return m?m[1].trim():String(s).split('(')[0].trim()};
 const norm=s=>String(s==null?'':s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
@@ -814,9 +812,7 @@ function saveView(){try{localStorage.setItem(K.view,JSON.stringify(S.view))}catc
 function setView(k,v){S.view[k]=v;saveView();if(S.ees.length){stats();paint()}}
 function syncView(){$('vDens').value=S.view.dens;$('vDoc').checked=S.view.doc;$('vSal').checked=S.view.sal;
   $('vAnt').checked=S.view.ant;$('vHit').checked=S.view.hit}
-function toggleObs(){
-  S.view.obsOpen=!S.view.obsOpen;saveView();applyObs();
-}
+function toggleObs(){S.view.obsOpen=!S.view.obsOpen;saveView();applyObs()}
 function applyObs(){
   const box=$('obs'),open=!!S.view.obsOpen;
   box.classList.toggle('open',open);
@@ -1059,7 +1055,7 @@ function clash(a,b){
 function hitSet(){const s=new Set();for(let i=0;i<S.sel.length;i++)for(let j=i+1;j<S.sel.length;j++)if(clash(S.sel[i],S.sel[j])){s.add(S.sel[i].nrc);s.add(S.sel[j].nrc)}return s}
 function hitCount(){let n=0;for(let i=0;i<S.sel.length;i++)for(let j=i+1;j<S.sel.length;j++)if(clash(S.sel[i],S.sel[j]))n++;return n}
 
-/* ══════════ OBSERVACIONES (plegable, tras el grid) ══════════ */
+/* ══════════ OBSERVACIONES ══════════ */
 function renderObs(){
   const con=S.view.ant?S.sel.filter(e=>e.antecedentes&&e.antecedentes.length):[];
   const box=$('obs');
@@ -1091,12 +1087,27 @@ function areaKey(e){
   if(a.includes('termin'))return 'TER';
   return 'OTR';
 }
+/* El contador del encabezado muestra SOLO horas completas.
+   Las sesiones terminan en :59, por eso cada bloque se redondea
+   hacia arriba antes de sumarse (11:00–12:59 = 2 h). */
+function horasCompletas(){
+  let h=0;
+  S.sel.forEach(e=>e.horarios.forEach(x=>{h+=Math.round((mn(x.fin)-mn(x.ini))/60)}));
+  return h;
+}
+function setStat(id,val){
+  const el=$(id),v=String(val);
+  if(el.textContent===v)return;
+  el.textContent=v;
+  el.classList.remove('tick');void el.offsetWidth;el.classList.add('tick');
+}
 function stats(){
   const cr=S.sel.reduce((s,e)=>s+e.creditos,0);
-  let mm=0;S.sel.forEach(e=>e.horarios.forEach(h=>mm+=mn(h.fin)-mn(h.ini)));
   const ch=hitCount();
-  $('kEE').textContent=S.sel.length;$('kCR').textContent=cr;
-  $('kHR').textContent=(mm/60).toFixed(1);$('kCH').textContent=ch;
+  setStat('kEE',S.sel.length);
+  setStat('kCR',cr);
+  setStat('kHR',horasCompletas());
+  setStat('kCH',ch);
   $('stCh').classList.toggle('hot',ch>0);
   $('wCh').classList.toggle('on',ch>0&&S.view.hit);
   const mix=$('mix');
