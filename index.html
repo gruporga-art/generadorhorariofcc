@@ -131,26 +131,42 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .note-box.pur.on{display:block}
 .note-box ul{margin:8px 0 0 18px}.note-box li{margin:3px 0}
 
-/* ── Panel de observaciones / antecedentes ── */
-.obs{display:none;margin-bottom:16px;border:1.5px solid #ffd98a;border-radius:var(--r-m);overflow:hidden;
+/* ══ OBSERVACIONES · plegable, al final del grid ══ */
+.obs{display:none;margin-top:16px;border:1.5px solid #ffd98a;border-radius:var(--r-m);overflow:hidden;
   background:linear-gradient(180deg,#fffdf6,#fff8e8);box-shadow:var(--sh-1)}
 .obs.on{display:block}
-.obs-h{display:flex;align-items:center;gap:9px;padding:12px 15px;background:linear-gradient(120deg,#fff3d6,#ffe9bd);
-  border-bottom:1px solid #ffd98a;font-weight:800;color:var(--amber-d);font-size:.95rem;flex-wrap:wrap}
-.obs-h .cnt{margin-left:auto;background:var(--amber);color:#3a2600;font-size:.74rem;padding:3px 10px;border-radius:20px;font-weight:800}
-.obs-b{padding:12px 15px}
-.obs-lead{font-size:.83rem;color:#7a5806;line-height:1.55;margin-bottom:10px}
+.obs-h{display:flex;align-items:center;gap:10px;width:100%;padding:13px 15px;border:none;cursor:pointer;text-align:left;
+  background:linear-gradient(120deg,#fff3d6,#ffe9bd);font-weight:800;color:var(--amber-d);font-size:.94rem;
+  font-family:inherit;transition:.18s;touch-action:manipulation;flex-wrap:wrap}
+.obs-h:hover{background:linear-gradient(120deg,#ffeebd,#ffe0a3)}
+.obs-h:active{transform:scale(.995)}
+.obs-h .chev{flex:none;width:22px;height:22px;border-radius:7px;background:rgba(180,83,9,.14);display:grid;place-items:center;
+  font-size:.72rem;transition:transform .28s cubic-bezier(.3,.85,.3,1)}
+.obs.open .obs-h .chev{transform:rotate(90deg)}
+.obs.open .obs-h{border-bottom:1px solid #ffd98a}
+.obs-h .lbl{flex:1;min-width:180px;line-height:1.35}
+.obs-h .cnt{background:var(--amber);color:#3a2600;font-size:.73rem;padding:3px 11px;border-radius:20px;font-weight:800;white-space:nowrap}
+.obs-h .cnt.pulse{animation:cntpulse .8s ease-out}
+@keyframes cntpulse{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(245,158,11,.7)}
+  40%{transform:scale(1.14);box-shadow:0 0 0 8px rgba(245,158,11,0)}
+  100%{transform:scale(1);box-shadow:0 0 0 0 rgba(245,158,11,0)}}
+.obs-h .hintx{font-size:.74rem;font-weight:700;opacity:.72;white-space:nowrap}
+.obs-b{display:none;padding:13px 15px;animation:obsin .3s ease-out}
+.obs.open .obs-b{display:block}
+@keyframes obsin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.obs-lead{font-size:.83rem;color:#7a5806;line-height:1.55;margin-bottom:11px}
 .obs-list{display:flex;flex-direction:column;gap:8px}
 .obs-item{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #ffe6b0;border-left:4px solid var(--amber);
   border-radius:10px;padding:10px 12px;font-size:.85rem;line-height:1.5}
 .obs-item.ok{border-left-color:var(--uv-green);border-color:#c9e9d4}
 .obs-item .oi{font-size:1.05rem;flex:none;line-height:1.3}
 .obs-item .ot{flex:1;color:var(--ink-2)}
-.obs-item .ot b{color:var(--navy-700)}
+.obs-item .ot b{color:var(--navy-700);letter-spacing:.01em}
 .obs-item .req{display:inline-block;background:#fff3d6;color:var(--amber-d);border:1px solid #ffdf9e;
-  padding:2px 8px;border-radius:7px;font-size:.78rem;font-weight:800;margin-top:4px}
+  padding:2px 8px;border-radius:7px;font-size:.78rem;font-weight:800;margin:4px 4px 0 0}
 .obs-item.ok .req{background:#e7f7ee;color:var(--uv-green-d);border-color:#b4e3c6}
-.obs-foot{font-size:.78rem;color:#8a6a1a;margin-top:10px;line-height:1.5;font-style:italic}
+.obs-foot{font-size:.78rem;color:#8a6a1a;margin-top:11px;line-height:1.5;font-style:italic}
+.obs-print-head{display:none}
 
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
 .top .t{font-size:1.2rem;font-weight:800;color:var(--navy-700)}
@@ -166,7 +182,6 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .stat b{display:block;font-size:2.1rem;font-weight:800;color:var(--navy-700);line-height:1.08;font-variant-numeric:tabular-nums}
 .stat span{font-size:.78rem;color:var(--ink-3);margin-top:4px;display:block}
 .stat.hot{border-left-color:var(--danger)}.stat.hot b{color:var(--danger)}
-.stat.ant{border-left-color:var(--amber)}.stat.ant b{color:var(--amber-d)}
 
 .mix{display:none;margin-bottom:16px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-m);padding:13px 15px}
 .mix.on{display:block}
@@ -217,18 +232,19 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
   cursor:pointer;overflow:hidden;transition:transform .16s,box-shadow .16s;box-shadow:0 3px 11px rgba(11,31,61,.22);touch-action:manipulation;position:relative}
 .ee:hover{transform:scale(1.03);box-shadow:0 10px 24px rgba(11,31,61,.34);z-index:6}
 .ee:active{transform:scale(.97)}
-.ee .n{font-weight:800;font-size:.775rem;line-height:1.22;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ee .n{font-weight:800;font-size:.775rem;line-height:1.22;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;letter-spacing:.01em}
 .ee .d{font-size:.675rem;opacity:.96;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ee .ant{font-size:.64rem;background:rgba(0,0,0,.26);border-radius:5px;padding:1px 5px;margin-top:2px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.ee.hasant .n,.bee.hasant .n{padding-right:17px}
+.pin{position:absolute;top:4px;right:5px;font-size:.72rem;line-height:1;
+  background:rgba(0,0,0,.28);border-radius:6px;padding:2px 4px;pointer-events:none;
+  box-shadow:0 1px 4px rgba(0,0,0,.22)}
 .malla.compact .ee{padding:4px 6px}
 .malla.compact .ee .n{font-size:.7rem;-webkit-line-clamp:1}
 .malla.compact .ee .d{font-size:.62rem}
-.malla.compact .ee .ant{display:none}
+.malla.compact .pin{font-size:.62rem;padding:1px 3px;top:3px;right:3px}
 .ee.hit,.bee.hit{animation:beat 1.45s infinite}
 @keyframes beat{0%,100%{box-shadow:0 0 0 3px var(--danger),0 4px 14px rgba(224,49,49,.48)}
   50%{box-shadow:0 0 0 6px var(--danger),0 8px 24px rgba(224,49,49,.7)}}
-.ee .pin{position:absolute;top:4px;right:5px;font-size:.7rem;opacity:.95}
 
 .bloques{width:100%;border-collapse:collapse;table-layout:fixed;min-width:680px}
 .bloques th{background:linear-gradient(180deg,#8b5cf6,var(--block-d));color:#fff;padding:12px 6px;border:1px solid var(--block-d);font-weight:800}
@@ -241,16 +257,15 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .cell.compact{min-height:64px}
 .void{min-height:92px;display:grid;place-items:center;color:#c6d1df;font-size:1.4rem}
 .cell.compact .void{min-height:64px}
-.bee{border-radius:10px;padding:8px;color:#fff;cursor:pointer;overflow:hidden;transition:.16s;box-shadow:0 3px 11px rgba(11,31,61,.2);touch-action:manipulation}
+.bee{position:relative;border-radius:10px;padding:8px;color:#fff;cursor:pointer;overflow:hidden;transition:.16s;box-shadow:0 3px 11px rgba(11,31,61,.2);touch-action:manipulation}
 .bee:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(11,31,61,.32)}
 .bee:active{transform:scale(.97)}
-.bee .n{font-weight:800;font-size:.775rem;line-height:1.24;margin-bottom:4px}
+.bee .n{font-weight:800;font-size:.775rem;line-height:1.24;margin-bottom:4px;letter-spacing:.01em}
 .bee .d{font-size:.675rem;opacity:.96;line-height:1.45}
-.bee .ant{font-size:.64rem;background:rgba(0,0,0,.26);border-radius:5px;padding:2px 5px;margin-top:4px;font-weight:700;line-height:1.35}
 .bloques.compact .bee{padding:5px 6px}
 .bloques.compact .bee .n{font-size:.7rem}
 .bloques.compact .bee .d{font-size:.62rem}
-.bloques.compact .bee .ant{display:none}
+.bloques.compact .pin{font-size:.62rem;padding:1px 3px;top:3px;right:3px}
 
 .foot{background:linear-gradient(180deg,#f6f9fc,#eaf1f8);border-top:5px solid var(--uv-green);padding:22px;text-align:center;color:var(--ink-2);font-size:.83rem;line-height:1.72}
 .foot a{color:var(--navy-700);font-weight:700;text-decoration:none}
@@ -278,7 +293,7 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .item{padding:14px;border:2px solid var(--line);border-radius:13px;margin-bottom:10px;cursor:pointer;background:#fff;transition:.17s;touch-action:manipulation}
 .item:hover{border-color:var(--navy-500);background:#f4f9ff;transform:translateX(3px)}
 .item:active{transform:scale(.985);background:#e7f1ff}
-.item h4{color:var(--navy-700);font-size:.99rem;margin-bottom:6px;line-height:1.32}
+.item h4{color:var(--navy-700);font-size:.99rem;margin-bottom:6px;line-height:1.32;letter-spacing:.01em}
 .item p{font-size:.84rem;color:var(--ink-2);margin:3px 0;line-height:1.48}
 .item.done{opacity:.5;cursor:not-allowed;background:#f3f6fa}
 .item.done:hover{transform:none;border-color:var(--line);background:#f3f6fa}
@@ -330,22 +345,16 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 
 .print-head{display:none}
 @media print{
-  @page{size:landscape;margin:9mm}
+  @page{size:landscape;margin:10mm}
   body{background:#fff!important;padding:0!important}
   body::before,body::after{display:none!important}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  .app{box-shadow:none!important;border-radius:0!important;max-width:100%!important}
+  .app{box-shadow:none!important;border-radius:0!important;max-width:100%!important;overflow:visible!important}
   .hdr,.steps,.foot,.modal,.load,.note-box,.top,.stats,.mix,.toolbar,.acts,.hint,.toasts,#s1,#s2{display:none!important}
-  #s3{display:block!important}#main{display:block!important}.body{padding:0!important}
+  #s3{display:block!important}#main{display:block!important}.body{padding:0!important;overflow:visible!important}
   .print-head{display:block!important;text-align:center;margin-bottom:9px;border-bottom:2.5px solid var(--uv-green);padding-bottom:7px}
   .print-head h2{font-size:13pt;color:var(--navy-700)}
   .print-head p{font-size:9pt;color:#444;margin-top:3px}
-  .obs.on{display:block!important;margin-bottom:8px!important;box-shadow:none!important}
-  .obs-h{font-size:9.5pt!important;padding:6px 9px!important}
-  .obs-b{padding:6px 9px!important}
-  .obs-lead,.obs-foot{font-size:7.5pt!important}
-  .obs-item{font-size:8pt!important;padding:5px 8px!important;break-inside:avoid}
-  .obs-item .req{font-size:7.5pt!important}
   #vE{display:block!important}#vA{display:none!important}
   body.pa #vE{display:none!important}body.pa #vA{display:block!important}
   .wrap{overflow:visible!important;border:none!important}
@@ -356,9 +365,23 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
   .ee,.bee{box-shadow:none!important;border-radius:3px!important;padding:4px!important}
   .ee .n,.bee .n{font-size:7.3pt!important;-webkit-line-clamp:3!important}
   .ee .d,.bee .d{font-size:6.3pt!important}
-  .ee .ant,.bee .ant{font-size:6pt!important;background:rgba(0,0,0,.2)!important;display:block!important}
+  .pin{font-size:7pt!important;background:rgba(0,0,0,.22)!important;box-shadow:none!important}
   .ee.hit,.bee.hit{animation:none!important;box-shadow:0 0 0 2px var(--danger)!important}
   .cell,.void{min-height:50px!important}
+
+  /* ── Las observaciones se imprimen en una SEGUNDA HOJA ── */
+  .obs.on{display:block!important;break-before:page!important;page-break-before:always!important;
+    margin-top:0!important;box-shadow:none!important;border-color:#c9a227!important;break-inside:auto}
+  .obs .obs-b{display:block!important;padding:8px 0 0!important;animation:none!important}
+  .obs-h{background:#fff3d6!important;border-bottom:1.5px solid #c9a227!important;padding:8px 10px!important;
+    font-size:11pt!important;cursor:default!important}
+  .obs-h .chev,.obs-h .hintx{display:none!important}
+  .obs-h .cnt{font-size:8.5pt!important}
+  .obs-print-head{display:block!important;font-size:8.5pt;color:#555;margin:0 0 8px;padding-bottom:5px;border-bottom:1px solid #ddd}
+  .obs-lead{font-size:8.5pt!important;margin-bottom:8px!important}
+  .obs-item{font-size:9pt!important;padding:7px 10px!important;break-inside:avoid;page-break-inside:avoid}
+  .obs-item .req{font-size:8.5pt!important}
+  .obs-foot{font-size:8pt!important;margin-top:9px!important}
 }
 @media(max-width:860px){
   body{padding:10px 8px 32px}
@@ -376,6 +399,7 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
   .toolbar{padding:10px}
   .add{flex:1 1 100%}
   .toasts{right:9px;left:9px;bottom:9px;max-width:none}
+  .obs-h .hintx{display:none}
 }
 </style>
 </head>
@@ -462,25 +486,14 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
           </select>
           <label class="tog"><input type="checkbox" id="vDoc" checked onchange="setView('doc',this.checked)"><i></i>Docente</label>
           <label class="tog"><input type="checkbox" id="vSal" checked onchange="setView('sal',this.checked)"><i></i>Salón</label>
-          <label class="tog"><input type="checkbox" id="vAnt" checked onchange="setView('ant',this.checked)"><i></i>Antecedentes</label>
+          <label class="tog"><input type="checkbox" id="vAnt" checked onchange="setView('ant',this.checked)"><i></i>📌 Antecedentes</label>
           <label class="tog"><input type="checkbox" id="vHit" checked onchange="setView('hit',this.checked)"><i></i>Resaltar choques</label>
         </div>
 
         <div class="note-box warn" id="wCh">⚠️ <strong>¡Choque de horario detectado!</strong> Las experiencias en conflicto tienen borde rojo pulsante. Toca una para quitarla.</div>
         <div class="note-box pur" id="wSin"></div>
 
-        <!-- ══ PANEL DE OBSERVACIONES · ANTECEDENTES ══ -->
-        <div class="obs" id="obs">
-          <div class="obs-h">📌 Observaciones · Antecedentes de tus Experiencias Educativas
-            <span class="cnt" id="obsCnt">0</span></div>
-          <div class="obs-b">
-            <p class="obs-lead">Las siguientes experiencias que agregaste <strong>requieren tener acreditada otra Experiencia Educativa previamente</strong>. Verifica tu avance curricular antes de tu inscripción en línea.</p>
-            <div class="obs-list" id="obsList"></div>
-            <p class="obs-foot">Este recordatorio es informativo: el planeador no consulta tu kardex. Confirma tus antecedentes con tu tutor o en Mi UV.</p>
-          </div>
-        </div>
-
-        <div class="hint">👆 Toca una Experiencia Educativa en la cuadrícula para quitarla de tu horario.</div>
+        <div class="hint">👆 Toca una Experiencia Educativa en la cuadrícula para quitarla de tu horario. El 📌 indica que requiere antecedente.</div>
 
         <div id="vA" style="display:none">
           <div class="wrap">
@@ -506,6 +519,22 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
         </div>
 
         <div id="vE" style="display:none"><div class="wrap"><table class="malla" id="tblM"></table></div></div>
+
+        <!-- ══ OBSERVACIONES · al final del grid, plegable ══ -->
+        <div class="obs" id="obs">
+          <p class="obs-print-head" id="obsPrintHead"></p>
+          <button class="obs-h" id="obsH" onclick="toggleObs()" aria-expanded="false" aria-controls="obsB">
+            <span class="chev">▶</span>
+            <span class="lbl">📌 Observaciones · Antecedentes de tus Experiencias Educativas</span>
+            <span class="cnt" id="obsCnt">0</span>
+            <span class="hintx" id="obsHint">Ver detalle</span>
+          </button>
+          <div class="obs-b" id="obsB">
+            <p class="obs-lead">Las siguientes experiencias que agregaste <strong>requieren tener acreditada otra Experiencia Educativa previamente</strong>. Verifica tu avance curricular antes de tu inscripción en línea.</p>
+            <div class="obs-list" id="obsList"></div>
+            <p class="obs-foot">Este recordatorio es informativo: el planeador no consulta tu kardex. Confirma tus antecedentes con tu tutor o en Mi UV.</p>
+          </div>
+        </div>
 
         <div class="acts">
           <button class="act p" onclick="doPrint()">🖨️ Imprimir / PDF</button>
@@ -580,33 +609,32 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 
 <script>
 /* ══════════════════════════════════════════════════════════════
-   CATÁLOGO DE ANTECEDENTES  ·  EDITABLE
+   CATÁLOGO DE ANTECEDENTES · EDITABLE
    Fuente: "Antecendentes plan 2004 Escolarizado y Abierto.pdf"
            "Antecendentes plan 2025 Escolarizado y Abierto.pdf"
-   Aplica a AMBAS modalidades (Escolarizado y Abierto).
-   Formato:  ['NOMBRE DE LA EE', ['ANTECEDENTE 1', 'ANTECEDENTE 2']]
-   Para agregar un antecedente, añade una línea. No toques la lógica.
+   Aplica a AMBAS modalidades. Todo en MAYÚSCULAS.
+   Formato: ['NOMBRE DE LA EE', ['ANTECEDENTE 1', 'ANTECEDENTE 2']]
    ══════════════════════════════════════════════════════════════ */
 const ANTECEDENTES = {
   '04': [
-    ['INGLES II',                                                   ['INGLES I']],
-    ['CULTURA E IDENTIDAD EN AMERICA LATINA II',                    ['CULTURA E IDENTIDAD EN AMERICA LATINA I']],
-    ['FILOSOFIA DE LA COMUNICACION',                                ['INTRODUCCION A LA FILOSOFIA DE LA COMUNICACION']],
-    ['TEORIA DE LA COMUNICACION I',                                 ['INTRODUCCION A LA TEORIA DE LA COMUNICACION']],
-    ['TEORIA DE LA COMUNICACION II',                                ['TEORIA DE LA COMUNICACION I']],
-    ['TALLER DE FOTOGRAFIA II',                                     ['TALLER DE FOTOGRAFIA I']],
-    ['TEORIA DEL LENGUAJE',                                         ['INTRODUCCION A LA TEORIA DEL LENGUAJE']],
-    ['ESTRATEGIAS PARA LA PRODUCCION DE PUBLICIDAD Y PROPAGANDA',   ['DISEÑO Y CREATIVIDAD GRAFICA EN PUBLICIDAD']],
-    ['TALLER DE HIPERMEDIA II',                                     ['TALLER DE HIPERMEDIA I']],
-    ['TALLER DE TELEVISION Y VIDEO II',                             ['TALLER DE TELEVISION Y VIDEO I']],
-    ['DISEÑO EDITORIAL ASISTIDO POR COMPUTADORA',                   ['TALLER DE DISEÑO EDITORIAL']]
+    ['INGLES II',                                                 ['INGLES I']],
+    ['CULTURA E IDENTIDAD EN AMERICA LATINA II',                  ['CULTURA E IDENTIDAD EN AMERICA LATINA I']],
+    ['FILOSOFIA DE LA COMUNICACION',                              ['INTRODUCCION A LA FILOSOFIA DE LA COMUNICACION']],
+    ['TEORIA DE LA COMUNICACION I',                               ['INTRODUCCION A LA TEORIA DE LA COMUNICACION']],
+    ['TEORIA DE LA COMUNICACION II',                              ['TEORIA DE LA COMUNICACION I']],
+    ['TALLER DE FOTOGRAFIA II',                                   ['TALLER DE FOTOGRAFIA I']],
+    ['TEORIA DEL LENGUAJE',                                       ['INTRODUCCION A LA TEORIA DEL LENGUAJE']],
+    ['ESTRATEGIAS PARA LA PRODUCCION DE PUBLICIDAD Y PROPAGANDA', ['DISEÑO Y CREATIVIDAD GRAFICA EN PUBLICIDAD']],
+    ['TALLER DE HIPERMEDIA II',                                   ['TALLER DE HIPERMEDIA I']],
+    ['TALLER DE TELEVISION Y VIDEO II',                           ['TALLER DE TELEVISION Y VIDEO I']],
+    ['DISEÑO EDITORIAL ASISTIDO POR COMPUTADORA',                 ['TALLER DE DISEÑO EDITORIAL']]
   ],
   '25': [
-    ['LENGUA II',                       ['LENGUA I']],
-    ['FOTOGRAFIA ESPECIALIZADA',        ['FOTOGRAFIA BASICA']],
-    ['HIPERMEDIA',                      ['MULTIMEDIOS']],
+    ['LENGUA II',                           ['LENGUA I']],
+    ['FOTOGRAFIA ESPECIALIZADA',            ['FOTOGRAFIA BASICA']],
+    ['HIPERMEDIA',                          ['MULTIMEDIOS']],
     ['TEORIAS CLASICAS DE LA COMUNICACION', ['GENESIS Y EVOLUCION DE LA COMUNICACION']],
-    ['PERIODISMO NARRATIVO MULTIMEDIA', ['TEXTOS PERIODISTICOS INFORMATIVOS']]
+    ['PERIODISMO NARRATIVO MULTIMEDIA',     ['TEXTOS PERIODISTICOS INFORMATIVOS']]
   ]
 };
 
@@ -641,12 +669,15 @@ const SCALE=['Totalmente de acuerdo','De acuerdo','Neutral','En desacuerdo','Tot
 
 /* ══════════ ESTADO ══════════ */
 const S={p:1,m:null,pl:null,data:{},fechas:{},periodo:null,termDesc:null,perSrc:'',
-  bl:{'04':{},'25':{}},ees:[],sel:[],hist:[],rol:'',view:{dens:'comoda',doc:true,sal:true,ant:true,hit:true}};
+  bl:{'04':{},'25':{}},ees:[],sel:[],hist:[],rol:'',obsPrev:0,
+  view:{dens:'comoda',doc:true,sal:true,ant:true,hit:true,obsOpen:false}};
 
 const $=id=>document.getElementById(id);
 const mn=t=>Math.floor(t/100)*60+(t%100);
 const hm=t=>Math.floor(t/100)+':'+String(t%100).padStart(2,'0');
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* Nombres de Experiencias Educativas: SIEMPRE MAYÚSCULAS */
+const up=s=>String(s==null?'':s).replace(/\s+/g,' ').trim().toUpperCase();
 const aula=s=>{if(!s)return'';const m=String(s).match(/^([A-Z0-9]+(?:[- ][A-Z0-9]+)*)/i);return m?m[1].trim():String(s).split('(')[0].trim()};
 const norm=s=>String(s==null?'':s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
 function bonito(s){const t=String(s||'').replace(/\s+/g,' ').trim();if(!t)return '';
@@ -660,9 +691,7 @@ function toast(msg,kind){
 function openM(id){$(id).classList.add('on')}
 function closeM(id){$(id).classList.remove('on')}
 
-/* ══════════════════════════════════════════════════════════════
-   MOTOR DE COINCIDENCIA DE NOMBRES (oferta abreviada ↔ catálogo)
-   ══════════════════════════════════════════════════════════════ */
+/* ══════════ COINCIDENCIA DE NOMBRES ══════════ */
 function nk(s){
   return String(s==null?'':s).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^A-Z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
@@ -675,32 +704,27 @@ function tokMatch(a,b){
   if(b.length>=4&&a.startsWith(b))return true;
   return false;
 }
-/* Devuelve un puntaje 0..1 de qué tanto "corto" corresponde a "largo" */
 function scoreNombre(corto,largo){
-  const a=tk(corto), b=tk(largo);
+  const a=tk(corto),b=tk(largo);
   if(!a.length||!b.length)return 0;
   if(a.length>b.length)return 0;
-  const lastA=a[a.length-1], lastB=b[b.length-1];
-  const aRom=ROMANOS.includes(lastA), bRom=ROMANOS.includes(lastB);
+  const lastA=a[a.length-1],lastB=b[b.length-1];
+  const aRom=ROMANOS.includes(lastA),bRom=ROMANOS.includes(lastB);
   if(aRom!==bRom)return 0;
   if(aRom&&bRom&&lastA!==lastB)return 0;
-  let j=0, hits=0;
+  let j=0,hits=0;
   for(let i=0;i<a.length;i++){
     let found=false;
-    while(j<b.length){
-      if(tokMatch(a[i],b[j])){found=true;j++;break}
-      j++;
-    }
+    while(j<b.length){if(tokMatch(a[i],b[j])){found=true;j++;break}j++}
     if(!found)return 0;
     hits++;
   }
   if(hits!==a.length)return 0;
   return a.length/b.length;
 }
-/* Busca los antecedentes de una EE de la oferta dentro del catálogo del plan */
 function buscaAntecedentes(nombreOferta,plan){
   const cat=ANTECEDENTES[plan]||[];
-  let best=null, bestScore=0, tie=false;
+  let best=null,bestScore=0,tie=false;
   for(const [nombre,reqs] of cat){
     const sc=scoreNombre(nombreOferta,nombre);
     if(sc<0.62)continue;
@@ -708,12 +732,9 @@ function buscaAntecedentes(nombreOferta,plan){
     else if(Math.abs(sc-bestScore)<=0.001){tie=true}
   }
   if(!best||tie)return [];
-  return best.reqs.map(r=>bonito(r));
+  return best.reqs.map(r=>up(r));
 }
-/* ¿Algún horario seleccionado corresponde a este antecedente? */
-function antecedenteEnHorario(nombreAnt){
-  return S.sel.some(e=>scoreNombre(e.nombre,nombreAnt)>=0.62);
-}
+function antecedenteEnHorario(nombreAnt){return S.sel.some(e=>scoreNombre(e.nombre,nombreAnt)>=0.62)}
 
 /* ══════════ COLA DE EVALUACIONES ══════════ */
 const getQ=()=>{try{return JSON.parse(localStorage.getItem(K.queue)||'[]')}catch(e){return []}};
@@ -784,7 +805,7 @@ function pickP(p){S.pl=p;document.querySelectorAll('[data-p]').forEach(c=>c.clas
 function swapPlan(){
   S.pl=S.pl==='04'?'25':'04';
   document.querySelectorAll('[data-p]').forEach(c=>c.classList.toggle('sel',c.dataset.p===S.pl));
-  S.sel=[];S.hist=[];const k=S.pl+'-'+S.m;S.data[k]?boot():load();
+  S.sel=[];S.hist=[];S.obsPrev=0;const k=S.pl+'-'+S.m;S.data[k]?boot():load();
 }
 
 /* ══════════ VISTA ══════════ */
@@ -793,6 +814,15 @@ function saveView(){try{localStorage.setItem(K.view,JSON.stringify(S.view))}catc
 function setView(k,v){S.view[k]=v;saveView();if(S.ees.length){stats();paint()}}
 function syncView(){$('vDens').value=S.view.dens;$('vDoc').checked=S.view.doc;$('vSal').checked=S.view.sal;
   $('vAnt').checked=S.view.ant;$('vHit').checked=S.view.hit}
+function toggleObs(){
+  S.view.obsOpen=!S.view.obsOpen;saveView();applyObs();
+}
+function applyObs(){
+  const box=$('obs'),open=!!S.view.obsOpen;
+  box.classList.toggle('open',open);
+  $('obsH').setAttribute('aria-expanded',open?'true':'false');
+  $('obsHint').textContent=open?'Ocultar detalle':'Ver detalle';
+}
 
 /* ══════════ DRIVE ══════════ */
 function match(name,key){
@@ -946,7 +976,7 @@ function parseOferta(rows,plan){
   const map={};
   for(let i=hi+1;i<rows.length;i++){
     const f=rows[i];if(!f||!f.length)continue;
-    const tit=String(f[ix.t]||'').trim(),nrc=String(f[ix.n]||'').trim();
+    const tit=up(f[ix.t]),nrc=String(f[ix.n]||'').trim();
     if(!tit||!nrc||!/^\d+$/.test(nrc))continue;
     if(tit.includes('CF_DESC_LEVL')||tit==='LICENCIATURA')continue;
     if(!S.termDesc&&ix.term>=0){const td=String(f[ix.term]||'').trim();if(parecePeriodo(td))S.termDesc=td}
@@ -973,7 +1003,7 @@ function parseOferta(rows,plan){
     const sab=e.horarios.filter(h=>h.dia===5);
     e.turno=sab.length?(sab.reduce((s,h)=>s+h.ini,0)/sab.length<1400?'M':'V'):null;
     e.bloque=(S.bl[plan]&&S.bl[plan][e.nrc])||null;
-    e.antecedentes=buscaAntecedentes(e.nombre,plan);   /* ← ANTECEDENTES */
+    e.antecedentes=buscaAntecedentes(e.nombre,plan);
     return e;
   });
 }
@@ -984,10 +1014,14 @@ function periodoActual(){
   if(S.termDesc)return bonito(S.termDesc);
   return 'Periodo no especificado';
 }
+function contexto(){
+  const mT=S.m==='E'?'Escolarizado':'Abierto',pT=S.pl==='04'?'Plan 2004':'Plan 2025';
+  return 'Universidad Veracruzana · FCC · '+periodoActual()+' · '+mT+' · '+pT;
+}
 function boot(){
   const k=S.pl+'-'+S.m,d=S.data[k];
   if(!d||!d.length){$('load').style.display='none';$('err').textContent='⚠️ No hay datos para esta combinación.';$('err').style.display='block';return}
-  S.ees=d;S.sel=[];S.hist=[];
+  S.ees=d;S.sel=[];S.hist=[];S.obsPrev=0;
   $('load').style.display='none';$('err').style.display='none';$('main').style.display='block';
   const mT=S.m==='E'?'Escolarizado':'Abierto',pT=S.pl==='04'?'Plan 2004':'Plan 2025',per=periodoActual();
   $('sub').textContent='Periodo: '+per+' · '+mT+' · '+pT;
@@ -996,7 +1030,8 @@ function boot(){
   $('chipPer').title=S.perSrc?('Origen: Bloques-Abierto.xlsx · '+S.perSrc):(S.termDesc?'Origen: columna STVTERM_DESC del archivo de oferta':'Sin dato de periodo en los archivos');
   $('chipPlan').textContent=mT+' · '+pT;
   $('ofT').textContent='📂 Oferta Académica · '+mT+' · '+pT;
-  $('pSub').textContent='Universidad Veracruzana · FCC · '+per+' · '+mT+' · '+pT;
+  $('pSub').textContent=contexto();
+  $('obsPrintHead').textContent='Hoja 2 · Observaciones de antecedentes — '+contexto();
   $('kHRL').textContent=S.m==='A'?'Horas/Sábado':'Horas/Semana';
   $('fTu').style.display=S.m==='A'?'block':'none';
   $('fBl').style.display=S.m==='A'?'block':'none';
@@ -1005,8 +1040,8 @@ function boot(){
   for(let i=1;i<=5;i++)$('f'+i).textContent=S.fechas[i]||'Fechas por definir';
   const ar=[...new Set(d.map(e=>e.area).filter(Boolean))].sort();
   $('fAr').innerHTML='<option value="">📁 Todas las áreas</option>'+ar.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
-  syncView();
-  const cb=d.filter(e=>e.bloque).length, ca=d.filter(e=>e.antecedentes.length).length;
+  syncView();applyObs();
+  const cb=d.filter(e=>e.bloque).length,ca=d.filter(e=>e.antecedentes.length).length;
   $('ok').textContent='✅ '+d.length+' experiencias cargadas'+(S.m==='A'?' · '+cb+' con bloque':'')+' · '+ca+' con antecedente · '+per;
   $('ok').style.display='block';setTimeout(()=>$('ok').style.display='none',6500);
   stats();paint();
@@ -1024,26 +1059,28 @@ function clash(a,b){
 function hitSet(){const s=new Set();for(let i=0;i<S.sel.length;i++)for(let j=i+1;j<S.sel.length;j++)if(clash(S.sel[i],S.sel[j])){s.add(S.sel[i].nrc);s.add(S.sel[j].nrc)}return s}
 function hitCount(){let n=0;for(let i=0;i<S.sel.length;i++)for(let j=i+1;j<S.sel.length;j++)if(clash(S.sel[i],S.sel[j]))n++;return n}
 
-/* ══════════ PANEL DE OBSERVACIONES ══════════ */
+/* ══════════ OBSERVACIONES (plegable, tras el grid) ══════════ */
 function renderObs(){
-  const con=S.sel.filter(e=>e.antecedentes&&e.antecedentes.length);
+  const con=S.view.ant?S.sel.filter(e=>e.antecedentes&&e.antecedentes.length):[];
   const box=$('obs');
-  if(!con.length){box.classList.remove('on');return}
+  if(!con.length){box.classList.remove('on');S.obsPrev=0;return}
   box.classList.add('on');
   $('obsCnt').textContent=con.length+(con.length===1?' experiencia':' experiencias');
+  if(con.length>S.obsPrev){
+    const c=$('obsCnt');c.classList.remove('pulse');void c.offsetWidth;c.classList.add('pulse');
+  }
+  S.obsPrev=con.length;
   $('obsList').innerHTML=con.map(e=>{
-    const reqs=e.antecedentes.map(a=>{
-      const dentro=antecedenteEnHorario(a);
-      return {a,dentro};
-    });
+    const reqs=e.antecedentes.map(a=>({a,dentro:antecedenteEnHorario(a)}));
     const todosDentro=reqs.every(r=>r.dentro);
     return '<div class="obs-item'+(todosDentro?' ok':'')+'">'+
       '<span class="oi">'+(todosDentro?'✅':'⚠️')+'</span>'+
-      '<span class="ot"><b>'+esc(bonito(e.nombre))+'</b> <span style="opacity:.7">(NRC '+e.nrc+')</span><br>'+
+      '<span class="ot"><b>'+esc(up(e.nombre))+'</b> <span style="opacity:.7">(NRC '+e.nrc+')</span><br>'+
       'Requiere tener acreditada:'+
-      reqs.map(r=>'<span class="req">'+esc(r.a)+(r.dentro?' · también en tu horario':'')+'</span>').join(' ')+
+      reqs.map(r=>'<span class="req">'+esc(up(r.a))+(r.dentro?' · también en tu horario':'')+'</span>').join('')+
       '</span></div>';
   }).join('');
+  applyObs();
 }
 
 /* ══════════ ESTADÍSTICAS ══════════ */
@@ -1076,7 +1113,7 @@ function stats(){
   const w=$('wSin');
   if(sin.length){
     w.innerHTML='⚠️ <strong>Experiencias sin bloque asignado</strong><br>Están en tu horario pero aún no tienen bloque en SYRSEIL ni en NRC-SIN-BLOQUE. Pide a Dirección que las registre:<ul>'+
-      sin.map(e=>'<li>'+esc(e.nombre)+' · NRC '+e.nrc+'</li>').join('')+'</ul>';
+      sin.map(e=>'<li>'+esc(up(e.nombre))+' · NRC '+e.nrc+'</li>').join('')+'</ul>';
     w.classList.add('on');
   }else w.classList.remove('on');
   renderObs();
@@ -1085,7 +1122,13 @@ function stats(){
 /* ══════════ PINTADO ══════════ */
 function color(nrc){const i=S.sel.findIndex(e=>e.nrc===nrc);return PAL[(i<0?0:i)%PAL.length]}
 function paint(){S.m==='A'?paintB():paintM()}
-function antTexto(e){return e.antecedentes&&e.antecedentes.length?('📌 '+e.antecedentes.join(' + ')):''}
+function pinHTML(e){
+  if(!S.view.ant||!e.antecedentes||!e.antecedentes.length)return '';
+  return '<span class="pin" aria-hidden="true">📌</span>';
+}
+function antTitle(e){
+  return (e.antecedentes&&e.antecedentes.length)?('Requiere antecedente: '+e.antecedentes.map(up).join(' + ')):'';
+}
 function paintB(){
   const hits=S.view.hit?hitSet():new Set(),compact=S.view.dens==='compacta';
   $('tblB').classList.toggle('compact',compact);
@@ -1098,13 +1141,13 @@ function paintB(){
     const sab=e.horarios.filter(h=>h.dia===5),use=sab.length?sab:e.horarios;
     const hs=use.map(h=>hm(h.ini)+'-'+hm(h.fin)).join(' · ');
     const au=use.map(h=>h.aulas.join(' / ')).filter(Boolean).join(' · ')||'Por asignar';
-    const at=S.view.ant?antTexto(e):'';
+    const pin=pinHTML(e);
     const d=document.createElement('div');
-    d.className='bee'+(hits.has(e.nrc)?' hit':'');d.style.background=bg;d.style.color=fg;
-    d.innerHTML='<div class="n">'+esc(e.nombre)+'</div><div class="d">NRC '+e.nrc+
-      (S.view.doc?'<br>'+esc(e.docente):'')+(S.view.sal?'<br>📍 '+esc(au):'')+'<br>🕐 '+hs+'</div>'+
-      (at?'<div class="ant">'+esc(at)+'</div>':'');
-    d.title=at?('Antecedente: '+e.antecedentes.join(' + ')):'';
+    d.className='bee'+(hits.has(e.nrc)?' hit':'')+(pin?' hasant':'');
+    d.style.background=bg;d.style.color=fg;
+    d.title=antTitle(e);
+    d.innerHTML=pin+'<div class="n">'+esc(up(e.nombre))+'</div><div class="d">NRC '+e.nrc+
+      (S.view.doc?'<br>'+esc(e.docente):'')+(S.view.sal?'<br>📍 '+esc(au):'')+'<br>🕐 '+hs+'</div>';
     d.addEventListener('click',()=>drop(e.nrc));
     cel.appendChild(d);
   });
@@ -1131,14 +1174,13 @@ function paintM(){
       if(o&&o.start){
         const [bg,fg]=color(o.e.nrc),dur=Math.ceil((mn(o.h.fin)-mn(o.h.ini))/60);
         const au=o.h.aulas.join(' / ')||'Por asignar';
-        const at=S.view.ant?antTexto(o.e):'';
-        html+='<td'+(o.span>1?' rowspan="'+o.span+'"':'')+'><div class="ee'+(hits.has(o.e.nrc)?' hit':'')+
-          '" data-n="'+o.e.nrc+'" style="background:'+bg+';color:'+fg+'" title="'+esc(at?('Antecedente: '+o.e.antecedentes.join(' + ')):'')+'">'+
-          '<div class="n">'+esc(o.e.nombre)+'</div><div class="d">NRC '+o.e.nrc+'</div>'+
+        const pin=pinHTML(o.e);
+        html+='<td'+(o.span>1?' rowspan="'+o.span+'"':'')+'><div class="ee'+(hits.has(o.e.nrc)?' hit':'')+(pin?' hasant':'')+
+          '" data-n="'+o.e.nrc+'" style="background:'+bg+';color:'+fg+'" title="'+esc(antTitle(o.e))+'">'+
+          pin+'<div class="n">'+esc(up(o.e.nombre))+'</div><div class="d">NRC '+o.e.nrc+'</div>'+
           (S.view.doc?'<div class="d">'+esc(o.e.docente)+'</div>':'')+
           '<div class="d">🕐 '+hm(o.h.ini)+'-'+hm(o.h.fin)+' ('+dur+'h)</div>'+
-          (S.view.sal?'<div class="d">📍 '+esc(au)+'</div>':'')+
-          (at?'<div class="ant">'+esc(at)+'</div>':'')+'</div></td>';
+          (S.view.sal?'<div class="d">📍 '+esc(au)+'</div>':'')+'</div></td>';
       }else html+='<td></td>';
     }
     html+='</tr>';
@@ -1153,14 +1195,14 @@ function add(e){
   if(S.sel.some(x=>clash(x,e))&&!confirm('⚠️ Esta experiencia choca con otra ya seleccionada.\n\n¿Agregarla de todos modos?'))return;
   S.hist.push(S.sel.map(x=>x.nrc));S.sel.push(e);
   stats();paint();closeM('mEE');
-  if(e.antecedentes&&e.antecedentes.length)toast('📌 '+e.nombre+' requiere: '+e.antecedentes.join(' + '),'warn');
-  else toast('Agregada: '+e.nombre);
+  if(e.antecedentes&&e.antecedentes.length)toast('📌 '+up(e.nombre)+' requiere antecedente. Revisa Observaciones al final del horario.','warn');
+  else toast('Agregada: '+up(e.nombre));
 }
 function drop(nrc){
   const e=S.sel.find(x=>x.nrc===nrc);if(!e)return;
-  if(!confirm('¿Quitar "'+e.nombre+'" de tu horario?'))return;
+  if(!confirm('¿Quitar "'+up(e.nombre)+'" de tu horario?'))return;
   S.hist.push(S.sel.map(x=>x.nrc));S.sel=S.sel.filter(x=>x.nrc!==nrc);
-  stats();paint();toast('Quitada: '+e.nombre,'warn');
+  stats();paint();toast('Quitada: '+up(e.nombre),'warn');
 }
 function wipe(){
   if(!S.sel.length){toast('Tu horario ya está vacío','warn');return}
@@ -1182,13 +1224,13 @@ function toCSV(){
   if(!S.sel.length){toast('No hay experiencias en tu horario','warn');return}
   const per=periodoActual(),mT=S.m==='E'?'Escolarizado':'Abierto',pT=S.pl==='04'?'2004':'2025';
   const rows=[['Periodo','Modalidad','Plan','Experiencia Educativa','NRC','Creditos','Docente','Dia','Inicio','Fin','Aula','Bloque','Antecedentes requeridos']];
-  S.sel.forEach(e=>e.horarios.forEach(h=>rows.push([per,mT,pT,e.nombre,e.nrc,e.creditos,e.docente,DIAS[h.dia],
+  S.sel.forEach(e=>e.horarios.forEach(h=>rows.push([per,mT,pT,up(e.nombre),e.nrc,e.creditos,e.docente,DIAS[h.dia],
     hm(h.ini),hm(h.fin),h.aulas.join(' / ')||'Por asignar',S.m==='A'?(e.bloque||'Sin bloque'):'—',
-    (e.antecedentes&&e.antecedentes.length)?e.antecedentes.join(' + '):'—'])));
+    (e.antecedentes&&e.antecedentes.length)?e.antecedentes.map(up).join(' + '):'—'])));
   const conAnt=S.sel.filter(e=>e.antecedentes&&e.antecedentes.length);
   if(conAnt.length){
     rows.push([]);rows.push(['OBSERVACIONES · ANTECEDENTES']);
-    conAnt.forEach(e=>rows.push([e.nombre,'NRC '+e.nrc,'Requiere acreditada: '+e.antecedentes.join(' + ')]));
+    conAnt.forEach(e=>rows.push([up(e.nombre),'NRC '+e.nrc,'Requiere acreditada: '+e.antecedentes.map(up).join(' + ')]));
   }
   dl(rows,'horario-'+mT.toLowerCase()+'-'+pT+'.csv');toast('CSV descargado 📥');
 }
@@ -1210,14 +1252,14 @@ function openEE(){
     it.dataset.q=norm(e.nombre+' '+e.docente+' '+e.nrc+' '+e.area+' '+e.antecedentes.join(' '));
     it.dataset.a=e.area||'';it.dataset.t=e.turno||'';it.dataset.b=e.bloque?String(e.bloque):'sin';
     it.dataset.an=tieneAnt?'si':'no';
-    it.innerHTML='<h4>'+esc(e.nombre)+(done?' ✓ (ya agregada)':'')+'</h4>'+
+    it.innerHTML='<h4>'+esc(up(e.nombre))+(done?' ✓ (ya agregada)':'')+'</h4>'+
       '<p><span class="tag">'+esc(e.areaCode||'N/A')+'</span>'+
       (S.m==='A'?(e.bloque?'<span class="tag b">Bloque '+e.bloque+'</span>':'<span class="tag s">Sin bloque</span>'):'')+
       (tieneAnt?'<span class="tag a">📌 Con antecedente</span>':'')+
       '<strong>NRC:</strong> '+e.nrc+' · <strong>Créditos:</strong> '+e.creditos+(e.cupo?' · <strong>Cupo:</strong> '+e.cupo:'')+'</p>'+
       '<p><strong>Docente:</strong> '+esc(e.docente)+'</p><p><strong>Horario:</strong> '+esc(hs)+'</p>'+
       (S.m==='A'?'<p><strong>Turno:</strong> '+(e.turno==='M'?'Matutino':e.turno==='V'?'Vespertino':'—')+'</p>':'')+
-      (tieneAnt?'<div class="antbox">📌 <strong>Antecedente requerido:</strong> '+esc(e.antecedentes.join(' + '))+'<br>Debes tenerla acreditada antes de cursar esta experiencia.</div>':'');
+      (tieneAnt?'<div class="antbox">📌 <strong>Antecedente requerido:</strong> '+esc(e.antecedentes.map(up).join(' + '))+'<br>Debes tenerla acreditada antes de cursar esta experiencia.</div>':'');
     if(!done)it.addEventListener('click',()=>add(e));
     L.appendChild(it);
   });
@@ -1283,7 +1325,7 @@ async function sendEval(ev){
 })();
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on')}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.on').forEach(m=>m.classList.remove('on'))});
-loadView();renderQueue();
+loadView();renderQueue();applyObs();
 window.addEventListener('online',()=>flushQueue(false));
 setTimeout(()=>{if(getQ().length)flushQueue(false)},1500);
 </script>
